@@ -1,0 +1,15 @@
+{
+    "name": "TestHelper.Monkey.Annotations",
+    "rootNamespace": "TestHelper.Monkey.Annotations",
+    "references": [
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

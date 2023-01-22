@@ -1,0 +1,17 @@
+{
+    "name": "TestHelper.Monkey",
+    "rootNamespace": "TestHelper.Monkey",
+    "references": [
+        "TestHelper.Monkey.Annotations",
+        "UniTask"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
