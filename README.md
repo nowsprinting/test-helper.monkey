@@ -1,5 +1,7 @@
 # Monkey testing helper library for Unity Test Framework
 
+[![Meta file check](https://github.com/nowsprinting/test-helper.monkey/actions/workflows/metacheck.yml/badge.svg)](https://github.com/nowsprinting/test-helper.monkey/actions/workflows/metacheck.yml)
+
 
 ## Features
 
@@ -11,10 +13,7 @@ Run monkey testing for uGUI elements.
 [Test]
 public async Task MonkeyTesting()
 {
-    var config = new MonkeyConfig
-    {
-        Lifetime = new TimeSpan(0, 0, 3, 0), // 3minutes
-    };
+    var config = new MonkeyConfig();
     var cancellationTokenSource = new CancellationTokenSource();
 
     await Monkey.Run(config, cancellationTokenSource.Token);
@@ -49,6 +48,12 @@ Or open Package Manager window (Window | Package Manager) and add package from g
 ```
 https://github.com/nowsprinting/test-helper.monkey.git
 ```
+
+
+## Limitations
+
+In batchmode, `InteractiveComponent.IsReallyInteractiveFromUser` for UI elements is always false.
+Because `UnityEngine.UI.GraphicRaycaster` does not work in batchmode.
 
 
 ## License
