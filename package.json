@@ -1,7 +1,7 @@
 {
   "name": "com.nowsprinting.test-helper.monkey",
   "description": "Monkey testing helper library for Unity Test Framework",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "Koji Hasegawa <hasegawa@hubsys.co.jp> (https://github.com/nowsprinting)",
   "category": "Unity Test Framework",
   "changelogUrl": "https://github.com/nowsprinting/test-helper.monkey/releases",
