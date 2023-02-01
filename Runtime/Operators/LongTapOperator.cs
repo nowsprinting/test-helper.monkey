@@ -31,7 +31,7 @@ namespace TestHelper.Monkey.Operators
 
         internal static async Task LongTap(MonoBehaviour component, int delayMillis = 1000)
         {
-            if (component is not (IPointerDownHandler downHandler and IPointerUpHandler upHandler))
+            if (!(component is IPointerDownHandler downHandler) || !(component is IPointerUpHandler upHandler))
             {
                 return;
             }

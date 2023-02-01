@@ -28,7 +28,7 @@ namespace TestHelper.Monkey.Operators
 
         internal static void Click(MonoBehaviour component)
         {
-            if (component is not IPointerClickHandler handler)
+            if (!(component is IPointerClickHandler handler))
             {
                 return;
             }
