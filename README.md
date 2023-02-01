@@ -1,4 +1,4 @@
-# Monkey testing helper library for Unity Test Framework
+# Monkey testing library for Unity Test Framework
 
 [![Meta file check](https://github.com/nowsprinting/test-helper.monkey/actions/workflows/metacheck.yml/badge.svg)](https://github.com/nowsprinting/test-helper.monkey/actions/workflows/metacheck.yml)
 
@@ -35,6 +35,12 @@ public void FindAndOperationInteractiveComponent()
 ```
 
 
+## Limitations
+
+In batchmode, `InteractiveComponent.IsReallyInteractiveFromUser` for UI elements is always false.
+Because `UnityEngine.UI.GraphicRaycaster` does not work in batchmode.
+
+
 ## Installation
 
 If you installed [openupm-cli](https://github.com/openupm/openupm-cli), run the command below
@@ -48,12 +54,6 @@ Or open Package Manager window (Window | Package Manager) and add package from g
 ```
 https://github.com/nowsprinting/test-helper.monkey.git
 ```
-
-
-## Limitations
-
-In batchmode, `InteractiveComponent.IsReallyInteractiveFromUser` for UI elements is always false.
-Because `UnityEngine.UI.GraphicRaycaster` does not work in batchmode.
 
 
 ## License

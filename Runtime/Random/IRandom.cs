@@ -5,6 +5,6 @@ namespace TestHelper.Monkey.Random
 {
     public interface IRandom
     {
-        public int Next(int maxValue);
+        int Next(int maxValue);
     }
 }

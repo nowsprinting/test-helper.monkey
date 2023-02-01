@@ -138,10 +138,14 @@ namespace TestHelper.Monkey
         {
             var components = new List<InteractiveComponent>()
             {
-                new(GameObject.Find("UsingOnPointerClickHandler").GetComponent<SpyOnPointerClickHandler>()),
-                new(GameObject.Find("UsingPointerClickEventTrigger").GetComponent<EventTrigger>()),
-                new(GameObject.Find("UsingOnPointerDownUpHandler").GetComponent<SpyOnPointerDownUpHandler>()),
-                new(GameObject.Find("UsingPointerDownUpEventTrigger").GetComponent<EventTrigger>()),
+                new InteractiveComponent(
+                    GameObject.Find("UsingOnPointerClickHandler").GetComponent<SpyOnPointerClickHandler>()),
+                new InteractiveComponent(
+                    GameObject.Find("UsingPointerClickEventTrigger").GetComponent<EventTrigger>()),
+                new InteractiveComponent(
+                    GameObject.Find("UsingOnPointerDownUpHandler").GetComponent<SpyOnPointerDownUpHandler>()),
+                new InteractiveComponent(
+                    GameObject.Find("UsingPointerDownUpEventTrigger").GetComponent<EventTrigger>()),
             };
             components[0].gameObject.SetActive(false);
 
@@ -158,7 +162,8 @@ namespace TestHelper.Monkey
         {
             var components = new List<InteractiveComponent>()
             {
-                new(GameObject.Find("UsingOnPointerClickHandler").GetComponent<SpyOnPointerClickHandler>()),
+                new InteractiveComponent(
+                    GameObject.Find("UsingOnPointerClickHandler").GetComponent<SpyOnPointerClickHandler>()),
             };
             components[0].gameObject.SetActive(false);
 
@@ -174,7 +179,7 @@ namespace TestHelper.Monkey
         {
             var components = new List<InteractiveComponent>()
             {
-                new(GameObject.Find("UsingMultipleEventTriggers").GetComponent<EventTrigger>()),
+                new InteractiveComponent(GameObject.Find("UsingMultipleEventTriggers").GetComponent<EventTrigger>()),
             };
             components[0].gameObject.AddComponent<IgnoreAnnotation>();
 

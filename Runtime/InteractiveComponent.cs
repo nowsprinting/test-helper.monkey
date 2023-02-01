@@ -58,10 +58,10 @@ namespace TestHelper.Monkey
                 return false;
             }
 
-            eventData ??= new PointerEventData(EventSystem.current);
+            eventData = eventData ?? new PointerEventData(EventSystem.current);
             eventData.position = gameObject.GetScreenPoint();
 
-            results ??= new List<RaycastResult>();
+            results = results ?? new List<RaycastResult>();
             results.Clear();
 
             EventSystem.current.RaycastAll(eventData, results);
