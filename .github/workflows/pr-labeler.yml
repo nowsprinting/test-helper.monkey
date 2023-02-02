@@ -6,8 +6,6 @@ on:
 jobs:
   pr-labeler:
     runs-on: ubuntu-latest
-    permissions:
-      issues: write
 
     steps:
       - uses: TimonVS/pr-labeler-action@v4
