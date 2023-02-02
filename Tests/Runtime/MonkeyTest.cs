@@ -19,8 +19,8 @@ using UnityEngine.TestTools;
 
 namespace TestHelper.Monkey
 {
-    [TestFixture]
     [UnityPlatform(RuntimePlatform.OSXEditor, RuntimePlatform.WindowsEditor, RuntimePlatform.LinuxEditor)]
+    [TestFixture]
     public class MonkeyTest
     {
         [SetUp]
@@ -36,11 +36,12 @@ namespace TestHelper.Monkey
         {
             var config = new MonkeyConfig
             {
-                Lifetime = new TimeSpan(0, 0, 0, 1), // 1sec
+                Lifetime = TimeSpan.FromSeconds(1), // 1sec
             };
-            var cancellationTokenSource = new CancellationTokenSource();
-
-            await Monkey.Run(config, cancellationTokenSource.Token);
+            using (var cancellationTokenSource = new CancellationTokenSource())
+            {
+                await Monkey.Run(config, cancellationTokenSource.Token);
+            }
         }
 
         [Test]
@@ -48,14 +49,15 @@ namespace TestHelper.Monkey
         {
             var config = new MonkeyConfig
             {
-                Lifetime = new TimeSpan(0, 0, 0, 5), // 5sec
+                Lifetime = TimeSpan.FromSeconds(5), // 5sec
             };
-            var cancellationTokenSource = new CancellationTokenSource();
+            using (var cancellationTokenSource = new CancellationTokenSource())
+            {
+                Monkey.Run(config, cancellationTokenSource.Token).Forget();
 
-            Monkey.Run(config, cancellationTokenSource.Token).Forget();
-
-            await UniTask.Delay(1000, DelayType.DeltaTime, cancellationToken: cancellationTokenSource.Token);
-            cancellationTokenSource.Cancel();
+                await UniTask.Delay(1000, DelayType.DeltaTime, cancellationToken: cancellationTokenSource.Token);
+                cancellationTokenSource.Cancel();
+            }
         }
 
         [Test]
@@ -68,19 +70,20 @@ namespace TestHelper.Monkey
 
             var config = new MonkeyConfig
             {
-                Lifetime = new TimeSpan(0, 0, 0, 5), // 5sec
+                Lifetime = TimeSpan.FromSeconds(5), // 5sec
                 SecondsToErrorForNoInteractiveComponent = 1, // 1sec
             };
-            var cancellationTokenSource = new CancellationTokenSource();
-
-            try
+            using (var cancellationTokenSource = new CancellationTokenSource())
             {
-                await Monkey.Run(config, cancellationTokenSource.Token);
-                Assert.Fail();
-            }
-            catch (UnityEngine.Assertions.AssertionException e)
-            {
-                Assert.That(e.Message, Does.StartWith("Interactive component not found in 1 seconds"));
+                try
+                {
+                    await Monkey.Run(config, cancellationTokenSource.Token);
+                    Assert.Fail();
+                }
+                catch (UnityEngine.Assertions.AssertionException e)
+                {
+                    Assert.That(e.Message, Does.StartWith("Interactive component not found in 1 seconds"));
+                }
             }
         }
 
@@ -94,12 +97,13 @@ namespace TestHelper.Monkey
 
             var config = new MonkeyConfig
             {
-                Lifetime = new TimeSpan(0, 0, 0, 2), // 2sec
+                Lifetime = TimeSpan.FromSeconds(2), // 2sec
                 SecondsToErrorForNoInteractiveComponent = 0, // not detect error
             };
-            var cancellationTokenSource = new CancellationTokenSource();
-
-            await Monkey.Run(config, cancellationTokenSource.Token);
+            using (var cancellationTokenSource = new CancellationTokenSource())
+            {
+                await Monkey.Run(config, cancellationTokenSource.Token);
+            }
         }
 
         [Test]
@@ -108,15 +112,16 @@ namespace TestHelper.Monkey
             var spyLogger = new SpyLogger();
             var config = new MonkeyConfig
             {
-                Lifetime = new TimeSpan(0, 0, 0, 1), // 1sec
+                Lifetime = TimeSpan.FromSeconds(1), // 1sec
                 Random = new RandomImpl(0), // fix seed
                 Logger = spyLogger,
             };
-            var cancellationTokenSource = new CancellationTokenSource();
+            using (var cancellationTokenSource = new CancellationTokenSource())
+            {
+                await Monkey.Run(config, cancellationTokenSource.Token);
 
-            await Monkey.Run(config, cancellationTokenSource.Token);
-
-            Assert.That(spyLogger.Messages, Does.Contain("Using System.Random, seed=0"));
+                Assert.That(spyLogger.Messages, Does.Contain("Using System.Random, seed=0"));
+            }
         }
 
         [Test]
@@ -154,7 +159,7 @@ namespace TestHelper.Monkey
             var actual = Monkey.Lottery(ref components, random);
 
             Assert.That(actual.gameObject.name, Is.EqualTo(expected.gameObject.name));
-            Assert.That(components.Count, Is.EqualTo(3)); // Removed not interactive objects.
+            Assert.That(components, Has.Count.EqualTo(3)); // Removed not interactive objects.
         }
 
         [Test]
@@ -171,7 +176,7 @@ namespace TestHelper.Monkey
             var actual = Monkey.Lottery(ref components, random);
 
             Assert.That(actual, Is.Null);
-            Assert.That(components.Count, Is.EqualTo(0)); // Removed not interactive objects.
+            Assert.That(components, Has.Count.EqualTo(0)); // Removed not interactive objects.
         }
 
         [Test]
@@ -179,7 +184,8 @@ namespace TestHelper.Monkey
         {
             var components = new List<InteractiveComponent>()
             {
-                new InteractiveComponent(GameObject.Find("UsingMultipleEventTriggers").GetComponent<EventTrigger>()),
+                new InteractiveComponent(
+                    GameObject.Find("UsingMultipleEventTriggers").GetComponent<EventTrigger>()),
             };
             components[0].gameObject.AddComponent<IgnoreAnnotation>();
 
@@ -187,7 +193,7 @@ namespace TestHelper.Monkey
             var actual = Monkey.Lottery(ref components, random);
 
             Assert.That(actual, Is.Null);
-            Assert.That(components.Count, Is.EqualTo(0)); // Removed not interactive objects.
+            Assert.That(components, Has.Count.EqualTo(0)); // Removed not interactive objects.
         }
 
         private static object[][] s_componentAndOperations = new[]
@@ -224,17 +230,18 @@ namespace TestHelper.Monkey
             var spyLogger = new SpyLogger();
             var config = new MonkeyConfig
             {
-                Lifetime = new TimeSpan(0, 0, 0, 1), // 1sec
+                Lifetime = TimeSpan.FromSeconds(1), // 1sec
                 DelayMillis = 1, // 1ms
                 LongTapDelayMillis = 1, // 1ms
                 Random = new RandomImpl(0), // fix seed
                 Logger = spyLogger,
             };
-            var cancellationTokenSource = new CancellationTokenSource();
+            using (var cancellationTokenSource = new CancellationTokenSource())
+            {
+                await Monkey.Run(config, cancellationTokenSource.Token);
 
-            await Monkey.Run(config, cancellationTokenSource.Token);
-
-            Assert.That(spyLogger.Messages, Does.Contain($"Do operation {target} {operation}"));
+                Assert.That(spyLogger.Messages, Does.Contain($"Do operation {target} {operation}"));
+            }
         }
     }
 }
