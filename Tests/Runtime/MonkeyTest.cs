@@ -53,10 +53,13 @@ namespace TestHelper.Monkey
             };
             using (var cancellationTokenSource = new CancellationTokenSource())
             {
-                Monkey.Run(config, cancellationTokenSource.Token).Forget();
+                var task = Monkey.Run(config, cancellationTokenSource.Token);
+                await UniTask.Delay(1000, DelayType.DeltaTime);
 
-                await UniTask.Delay(1000, DelayType.DeltaTime, cancellationToken: cancellationTokenSource.Token);
                 cancellationTokenSource.Cancel();
+                await UniTask.NextFrame();
+
+                Assert.That(task.Status, Is.EqualTo(UniTaskStatus.Canceled));
             }
         }
 
