@@ -166,7 +166,7 @@ namespace TestHelper.Monkey
         }
 
         [Test]
-        public void Lottery_NoInteractiveComponent_returnNull()
+        public void Lottery_noInteractiveComponent_returnNull()
         {
             var components = new List<InteractiveComponent>()
             {
@@ -183,7 +183,7 @@ namespace TestHelper.Monkey
         }
 
         [Test]
-        public void Lottery_WithIgnoreAnnotation_returnNull()
+        public void Lottery_withIgnoreAnnotation_returnNull()
         {
             var components = new List<InteractiveComponent>()
             {
@@ -225,6 +225,35 @@ namespace TestHelper.Monkey
             await Monkey.DoOperation(component, config);
 
             Assert.That(spyLogger.Messages, Does.Contain($"Do operation {target} {operation}"));
+        }
+
+        [Test]
+        public async Task DoOperation_cancelDuringLongTap_cancel()
+        {
+            const string Target = "UsingOnPointerDownUpHandler";
+            const int Index = 0;
+            const string Operation = "LongTap";
+
+            var component = InteractiveComponentCollector.FindInteractiveComponents(false)
+                .First(x => x.gameObject.name == Target);
+            var spyLogger = new SpyLogger();
+            var config = new MonkeyConfig
+            {
+                LongTapDelayMillis = 1000, // 1sec
+                Random = new StubRandom(Index), // for lottery operation
+                Logger = spyLogger,
+            };
+            using (var cancellationTokenSource = new CancellationTokenSource())
+            {
+                var task = Monkey.DoOperation(component, config, cancellationTokenSource.Token);
+                await UniTask.Delay(100, DelayType.DeltaTime);
+
+                cancellationTokenSource.Cancel();
+                await UniTask.NextFrame();
+
+                Assert.That(task.Status, Is.EqualTo(UniTaskStatus.Canceled));
+                Assert.That(spyLogger.Messages, Does.Contain($"Do operation {Target} {Operation}"));
+            }
         }
 
         [TestCaseSource(nameof(s_componentAndOperations))]
