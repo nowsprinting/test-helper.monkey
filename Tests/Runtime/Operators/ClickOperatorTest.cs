@@ -12,6 +12,7 @@ using UnityEngine.TestTools;
 
 namespace TestHelper.Monkey.Operators
 {
+    [UnityPlatform(RuntimePlatform.OSXEditor, RuntimePlatform.WindowsEditor, RuntimePlatform.LinuxEditor)]
     [TestFixture]
     public class ClickOperatorTest
     {

@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Threading;
 using System.Threading.Tasks;
 using TestHelper.Monkey.Extensions;
 using TestHelper.Monkey.Operators;
@@ -121,7 +122,9 @@ namespace TestHelper.Monkey
         /// Long-tap inner component
         /// </summary>
         /// <param name="delayMillis">Delay time between down to up</param>
-        public async Task LongTap(int delayMillis = 1000) => await LongTapOperator.LongTap(component, delayMillis);
+        /// <param name="cancellationToken">Task cancellation token</param>
+        public async Task LongTap(int delayMillis = 1000, CancellationToken cancellationToken = default)
+            => await LongTapOperator.LongTap(component, delayMillis, cancellationToken);
 
         // TODO: drag, swipe, flick, etc...
     }

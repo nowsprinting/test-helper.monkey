@@ -2,6 +2,7 @@
 // This software is released under the MIT License.
 
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using TestHelper.Monkey.Annotations;
 using TestHelper.Monkey.Extensions;
@@ -29,7 +30,8 @@ namespace TestHelper.Monkey.Operators
             return interfaces.Contains(typeof(IPointerDownHandler)) && interfaces.Contains(typeof(IPointerUpHandler));
         }
 
-        internal static async Task LongTap(MonoBehaviour component, int delayMillis = 1000)
+        internal static async Task LongTap(MonoBehaviour component, int delayMillis = 1000,
+            CancellationToken cancellationToken = default)
         {
             if (!(component is IPointerDownHandler downHandler) || !(component is IPointerUpHandler upHandler))
             {
@@ -42,7 +44,7 @@ namespace TestHelper.Monkey.Operators
             };
 
             downHandler.OnPointerDown(eventData);
-            await Task.Delay(delayMillis);
+            await Task.Delay(delayMillis, cancellationToken);
             upHandler.OnPointerUp(eventData);
         }
     }

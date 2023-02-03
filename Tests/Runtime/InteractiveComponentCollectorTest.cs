@@ -13,8 +13,8 @@ using UnityEngine.TestTools;
 
 namespace TestHelper.Monkey
 {
-    [TestFixture]
     [UnityPlatform(RuntimePlatform.OSXEditor, RuntimePlatform.WindowsEditor, RuntimePlatform.LinuxEditor)]
+    [TestFixture]
     public class InteractiveComponentCollectorTest
     {
         /// <summary>

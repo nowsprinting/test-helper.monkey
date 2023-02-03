@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using TestHelper.Monkey.Random;
 using UnityEngine;
@@ -26,10 +25,10 @@ namespace TestHelper.Monkey
         /// <param name="cancellationToken">Cancellation token</param>
         public static async UniTask Run(MonkeyConfig config, CancellationToken cancellationToken = default)
         {
-            var endTime = config.Lifetime.Add(new TimeSpan(0, 0, 0, (int)Time.time)).TotalSeconds;
+            var endTime = config.Lifetime.Add(TimeSpan.FromSeconds(Time.time)).TotalSeconds;
             var lastOperationTime = Time.time;
 
-            config.Logger.Log($"Using {config.Random.ToString()}");
+            config.Logger.Log($"Using {config.Random}");
 
             while (Time.time < endTime)
             {
@@ -38,7 +37,7 @@ namespace TestHelper.Monkey
                 if (component != null)
                 {
                     lastOperationTime = Time.time;
-                    await DoOperation(component, config);
+                    await DoOperation(component, config, cancellationToken);
                 }
                 else if (config.SecondsToErrorForNoInteractiveComponent > 0)
                 {
@@ -86,7 +85,8 @@ namespace TestHelper.Monkey
             if (component.CanLongTap()) yield return SupportOperation.LongTap;
         }
 
-        internal static async Task DoOperation(InteractiveComponent component, MonkeyConfig config)
+        internal static async UniTask DoOperation(InteractiveComponent component, MonkeyConfig config,
+            CancellationToken cancellationToken = default)
         {
             var operations = GetCanOperations(component).ToArray();
             var operation = operations[config.Random.Next(operations.Length)];
@@ -97,7 +97,7 @@ namespace TestHelper.Monkey
                     component.Click();
                     break;
                 case SupportOperation.LongTap:
-                    await component.LongTap(config.LongTapDelayMillis);
+                    await component.LongTap(config.LongTapDelayMillis, cancellationToken);
                     break;
                 default:
                     throw new IndexOutOfRangeException();
