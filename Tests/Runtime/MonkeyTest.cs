@@ -54,7 +54,7 @@ namespace TestHelper.Monkey
         {
             var config = new MonkeyConfig
             {
-                Lifetime = TimeSpan.FromSeconds(5), // 5sec
+                Lifetime = TimeSpan.MaxValue, // Test that it does not overflow
             };
             using (var cancellationTokenSource = new CancellationTokenSource())
             {
