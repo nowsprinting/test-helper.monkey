@@ -25,7 +25,9 @@ namespace TestHelper.Monkey
         /// <param name="cancellationToken">Cancellation token</param>
         public static async UniTask Run(MonkeyConfig config, CancellationToken cancellationToken = default)
         {
-            var endTime = config.Lifetime.Add(TimeSpan.FromSeconds(Time.time)).TotalSeconds;
+            var endTime = config.Lifetime == TimeSpan.MaxValue
+                ? TimeSpan.MaxValue.TotalSeconds
+                : config.Lifetime.Add(TimeSpan.FromSeconds(Time.time)).TotalSeconds;
             var lastOperationTime = Time.time;
 
             config.Logger.Log($"Using {config.Random}");

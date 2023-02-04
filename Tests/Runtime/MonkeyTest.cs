@@ -36,11 +36,16 @@ namespace TestHelper.Monkey
         {
             var config = new MonkeyConfig
             {
-                Lifetime = TimeSpan.FromSeconds(1), // 1sec
+                Lifetime = TimeSpan.FromMilliseconds(200), // 200ms
+                DelayMillis = 1, // 1ms
+                LongTapDelayMillis = 1, // 1ms
             };
             using (var cancellationTokenSource = new CancellationTokenSource())
             {
-                await Monkey.Run(config, cancellationTokenSource.Token);
+                var task = Monkey.Run(config, cancellationTokenSource.Token);
+                await UniTask.Delay(500, DelayType.DeltaTime, cancellationToken: cancellationTokenSource.Token);
+
+                Assert.That(task.Status, Is.EqualTo(UniTaskStatus.Succeeded));
             }
         }
 
@@ -49,7 +54,7 @@ namespace TestHelper.Monkey
         {
             var config = new MonkeyConfig
             {
-                Lifetime = TimeSpan.FromSeconds(5), // 5sec
+                Lifetime = TimeSpan.MaxValue, // Test that it does not overflow
             };
             using (var cancellationTokenSource = new CancellationTokenSource())
             {
@@ -81,7 +86,8 @@ namespace TestHelper.Monkey
                 try
                 {
                     await Monkey.Run(config, cancellationTokenSource.Token);
-                    Assert.Fail();
+
+                    Assert.Fail("AssertionException was not thrown");
                 }
                 catch (UnityEngine.Assertions.AssertionException e)
                 {
@@ -93,7 +99,7 @@ namespace TestHelper.Monkey
         [Test]
         public async Task Run_noInteractiveComponentAndSecondsToErrorForNoInteractiveComponentIsZero_finish()
         {
-            foreach (var component in InteractiveComponentCollector.FindInteractiveComponents(true))
+            foreach (var component in InteractiveComponentCollector.FindInteractiveComponents())
             {
                 component.gameObject.SetActive(false);
             }
@@ -101,11 +107,16 @@ namespace TestHelper.Monkey
             var config = new MonkeyConfig
             {
                 Lifetime = TimeSpan.FromSeconds(2), // 2sec
+                DelayMillis = 1, // 1ms
+                LongTapDelayMillis = 1, // 1ms
                 SecondsToErrorForNoInteractiveComponent = 0, // not detect error
             };
             using (var cancellationTokenSource = new CancellationTokenSource())
             {
-                await Monkey.Run(config, cancellationTokenSource.Token);
+                var task = Monkey.Run(config, cancellationTokenSource.Token);
+                await UniTask.Delay(2200, DelayType.DeltaTime, cancellationToken: cancellationTokenSource.Token);
+
+                Assert.That(task.Status, Is.EqualTo(UniTaskStatus.Succeeded));
             }
         }
 
