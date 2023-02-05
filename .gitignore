@@ -74,6 +74,9 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
+# Auto-generated scenes by play mode tests
+/[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
+
 
 ### https://raw.github.com/github/gitignore/4488915eec0b3a45b5c63ead28f286819c0917de/Global/JetBrains.gitignore
 
