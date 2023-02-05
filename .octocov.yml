@@ -5,12 +5,10 @@ coverage:
     - ./Logs/Report/lcov.info
 codeToTestRatio:
   code:
-    - 'Assets/**/*.cs'
-    - 'Packages/**/*.cs'
+    - '**/*.cs'
     - '!**/Tests/**/*.cs'
   test:
-    - 'Assets/**/Tests/**/*.cs'
-    - 'Packages/**/Tests/**/*.cs'
+    - '**/Tests/**/*.cs'
 testExecutionTime:
   if: true
 diff:
