@@ -11,6 +11,7 @@ on:
     paths:
       - .github/workflows/**
 
+permissions: write-all
 jobs:
   actionlint:
     runs-on: ubuntu-latest

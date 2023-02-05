@@ -5,6 +5,7 @@ on:
     branches:
       - master
 
+permissions: write-all
 jobs:
   release-drafter:
     runs-on: ubuntu-latest

@@ -7,6 +7,7 @@ on:
     paths:
       - package.json
 
+permissions: write-all
 jobs:
   check-bump-version:
     runs-on: ubuntu-latest

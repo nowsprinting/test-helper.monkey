@@ -4,6 +4,7 @@ on:
   pull_request:
     types: [ opened ]
 
+permissions: write-all
 jobs:
   pr-labeler:
     runs-on: ubuntu-latest

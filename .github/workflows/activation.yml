@@ -7,6 +7,7 @@ on:
         description: 'Unity version'
         required: true
 
+permissions: write-all
 jobs:
   activation:
     name: Request manual activation file 🔑
