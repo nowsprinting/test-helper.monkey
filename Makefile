@@ -1,8 +1,8 @@
 # Copyright (c) 2023 Koji Hasegawa.
 # This software is released under the MIT License.
 
-PACKAGE_HOME?=$(PWD)
-PROJECT_HOME?=$(PWD)/UnityProject~
+PACKAGE_HOME?=$(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+PROJECT_HOME?=$(PACKAGE_HOME)/UnityProject~
 BUILD_DIR?=$(PROJECT_HOME)/Build
 LOG_DIR?=$(PROJECT_HOME)/Logs
 UNITY_VERSION?=$(shell grep '"unity":' $(PACKAGE_HOME)/package.json | grep -o -E '\d{4}\.[1-4]').$(shell grep '"unityRelease":' $(PACKAGE_HOME)/package.json | grep -o -E '\d+[abfp]\d+')
