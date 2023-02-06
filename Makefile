@@ -1,12 +1,13 @@
 # Copyright (c) 2023 Koji Hasegawa.
 # This software is released under the MIT License.
 
+PACKAGE_HOME?=$(PWD)
 PROJECT_HOME?=$(PWD)/UnityProject~
 BUILD_DIR?=$(PROJECT_HOME)/Build
 LOG_DIR?=$(PROJECT_HOME)/Logs
-UNITY_VERSION?=$(shell grep '"unity":' $(PWD)/package.json | grep -o -E '\d{4}\.[1-4]').$(shell grep '"unityRelease":' $(PWD)/package.json | grep -o -E '\d+[abfp]\d+')
-PACKAGE_NAME?=$(shell grep -o -E '"name": "(.+)"' $(PWD)/package.json | cut -d ' ' -f2)
-ASSEMBLY_NAME?=$(shell ls Runtime/*.asmdef| sed -e s/Runtime\\/// | sed -e s/.asmdef//)
+UNITY_VERSION?=$(shell grep '"unity":' $(PACKAGE_HOME)/package.json | grep -o -E '\d{4}\.[1-4]').$(shell grep '"unityRelease":' $(PACKAGE_HOME)/package.json | grep -o -E '\d+[abfp]\d+')
+PACKAGE_NAME?=$(shell grep -o -E '"name": "(.+)"' $(PACKAGE_HOME)/package.json | cut -d ' ' -f2)
+ASSEMBLY_NAME?=$(shell ls $(PACKAGE_HOME)/Runtime/*.asmdef| sed -e s/.*\\/// | sed -e s/.asmdef//)
 
 # Code Coverage report filter (comma separated)
 # see: https://docs.unity3d.com/Packages/com.unity.testtools.codecoverage@1.2/manual/CoverageBatchmode.html
@@ -96,8 +97,8 @@ create_project_for_run_tests:
 	openupm -c $(PROJECT_HOME) add com.unity.test-framework
 	openupm -c $(PROJECT_HOME) add com.unity.testtools.codecoverage
 	openupm -c $(PROJECT_HOME) add com.cysharp.unitask
-	openupm -c $(PROJECT_HOME) add --test $(PACKAGE_NAME)@file:../../
-	cp $(PWD)/.gitignore $(PROJECT_HOME)
+	openupm -c $(PROJECT_HOME) add --test $(PACKAGE_NAME)@file:$(PACKAGE_HOME)
+	cp $(PACKAGE_HOME)/.gitignore $(PROJECT_HOME)
 
 .PHONY: remove_project
 remove_project:
