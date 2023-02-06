@@ -1,0 +1,96 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - '**.md'
+      - '.github/'
+      - '!.github/workflows/test.yml'
+  pull_request:
+    types: [ opened, synchronize, reopened ]  # Same as default
+    paths-ignore:
+      - '**.md'
+      - '.github/'
+      - '!.github/workflows/test.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions: write-all
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        targetPlatform:
+          - StandaloneLinux64
+        unityVersion: # Available versions see: https://game.ci/docs/docker/versions
+          - 2019.4.40f1
+          - 2022.2.5f1
+
+    steps:
+      # Checkout
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          submodules: false
+          lfs: false
+
+      # Cache
+      - uses: actions/cache@v3
+        with:
+          path: UnityProject~/Library
+          key: Library-${{ matrix.targetPlatform }}-${{ matrix.unityVersion }}
+          restore-keys: |
+            Library-${{ matrix.targetPlatform }}-
+            Library-
+
+      # Test
+      - name: Create license secret key
+        id: license
+        run: echo "secret_key=UNITY_LICENSE_$(echo ${{ matrix.unityVersion }} | cut -c 1-4)" >> "$GITHUB_OUTPUT"
+
+      - name: Run tests
+        uses: game-ci/unity-test-runner@v2
+        with:
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          unityVersion: ${{ matrix.unityVersion }}  # 通常は未指定（`auto`）でok
+          checkName: test result (${{ matrix.unityVersion }})
+          projectPath: UnityProject~  # Unity project for run tests
+          customParameters: -testCategory "!IgnoreCI"
+          coverageOptions: generateAdditionalMetrics;generateTestReferences;generateHtmlReport;generateAdditionalReports;dontClear;assemblyFilters:+TestHelper.Monkey*,-*Tests
+          # see: https://docs.unity3d.com/Packages/com.unity.testtools.codecoverage@1.2/manual/CoverageBatchmode.html
+        env:
+          UNITY_LICENSE: ${{ secrets[steps.license.outputs.secret_key] }}
+        id: test
+
+      - name: Set coverage path for octocov
+        run: sed -i -r 's/\.\/Logs/${{ steps.test.outputs.coveragePath }}/' .octocov.yml
+
+      - name: Run octocov
+        uses: k1LoW/octocov-action@v0
+        if: ${{ startsWith(matrix.unityVersion, '2022') }}
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: TestResults-Unity${{ matrix.unityVersion }}
+          path: |
+            ${{ steps.test.outputs.artifactsPath }}
+            ${{ steps.test.outputs.coveragePath }}
+        if: always()
+
+  notify:
+    needs: test
+    if: always()
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: Gamesight/slack-workflow-status@v1.2.0
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}

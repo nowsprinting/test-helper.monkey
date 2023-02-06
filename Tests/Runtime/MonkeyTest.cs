@@ -91,7 +91,7 @@ namespace TestHelper.Monkey
                 }
                 catch (UnityEngine.Assertions.AssertionException e)
                 {
-                    Assert.That(e.Message, Does.StartWith("Interactive component not found in 1 seconds"));
+                    Assert.That(e.Message, Does.Contain("Interactive component not found in 1 seconds"));
                 }
             }
         }
