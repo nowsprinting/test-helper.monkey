@@ -78,9 +78,11 @@ endef
 .PHONY: usage
 usage:
 	@echo "Tasks:"
-	@echo "  create_project_for_run_tests: Create Unity project for run UPM package tests."
+	@echo "  create_project: Create Unity project for run UPM package tests."
 	@echo "  remove_project: Remove created project."
 	@echo "  clean: Clean Build and Logs directories in created project."
+	@echo "  setup_unityyamlmerge: Setup UnityYAMLMerge as mergetool in .git/config."
+	@echo "  open_editor: Open this project in Unity editor."
 	@echo "  test_editmode: Run Edit Mode tests."
 	@echo "  test_playmode: Run Play Mode tests."
 	@echo "  cover_report: Create code coverage HTML report."
@@ -88,18 +90,17 @@ usage:
 
 # Create Unity project for run UPM package tests. And upgrade and add dependencies for tests.
 # Required install [openupm-cli](https://github.com/openupm/openupm-cli).
-.PHONY: create_project_for_run_tests
-create_project_for_run_tests:
+.PHONY: create_project
+create_project:
 	$(UNITY) \
 	  -createProject $(PROJECT_HOME) \
 	  -batchmode \
 	  -quit
-	cp $(PACKAGE_HOME)/.gitignore $(PROJECT_HOME)
 	touch UnityProject~/Assets/.gitkeep
-	openupm -c $(PROJECT_HOME) add com.unity.test-framework
-	openupm -c $(PROJECT_HOME) add com.unity.testtools.codecoverage
-	openupm -c $(PROJECT_HOME) add com.cysharp.unitask
-	openupm -c $(PROJECT_HOME) add --test $(PACKAGE_NAME)@file:../../
+	openupm -c $(PROJECT_HOME) add -f com.unity.test-framework
+	openupm -c $(PROJECT_HOME) add -f com.unity.testtools.codecoverage
+	openupm -c $(PROJECT_HOME) add -f com.cysharp.unitask
+	openupm -c $(PROJECT_HOME) add -ft $(PACKAGE_NAME)@file:../../
 
 .PHONY: remove_project
 remove_project:
@@ -109,6 +110,16 @@ remove_project:
 clean:
 	rm -rf $(BUILD_DIR)
 	rm -rf $(LOG_DIR)
+
+.PHONY: setup_unityyamlmerge
+setup_unityyamlmerge:
+	git config --local merge.tool "unityyamlmerge"
+	git config --local mergetool.unityyamlmerge.trustExitCode false
+	git config --local mergetool.unityyamlmerge.cmd '$(UNITY_YAML_MERGE) merge -p "$$BASE" "$$REMOTE" "$$LOCAL" "$$MERGED"'
+
+.PHONY: open_editor
+open_editor:
+	$(UNITY) -projectPath $(PROJECT_HOME) -logFile $(LOG_DIR)/editor.log &
 
 .PHONY: test_editmode
 test_editmode:

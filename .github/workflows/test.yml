@@ -33,26 +33,50 @@ jobs:
           - 2022.2.5f1
 
     steps:
-      # Checkout
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
           submodules: false
           lfs: false
 
-      # Cache
+      - name: Crete project for tests
+        uses: nowsprinting/create-unity-project-action@v1
+        with:
+          project_path: UnityProject~
+
       - uses: actions/cache@v3
         with:
-          path: UnityProject~/Library
+          path: ${{ env.created_project_path }}/Library
           key: Library-${{ matrix.targetPlatform }}-${{ matrix.unityVersion }}
           restore-keys: |
             Library-${{ matrix.targetPlatform }}-
             Library-
 
-      # Test
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Set npm bin path
+        run: echo "path=$(npm bin -g)" >> "$GITHUB_OUTPUT"
+        id: npm_bin
+
+      - uses: actions/cache@v3
+        with:
+          path: ${{ steps.npm_bin.outputs.path }}
+          key: npm-${{ hashFiles('.github/workflows/test.yml') }}
+
+      - name: Install dependencies
+        run: |
+          npm install -g openupm-cli
+          openupm add -f com.unity.test-framework@1.3.2
+          openupm add -f com.unity.testtools.codecoverage@1.2.2
+          openupm add -f com.cysharp.unitask@2.3.3
+          openupm add -ft com.nowsprinting.test-helper.monkey@file:../../
+        working-directory: ${{ env.created_project_path }}
+
       - name: Create license secret key
-        id: license
         run: echo "secret_key=UNITY_LICENSE_$(echo ${{ matrix.unityVersion }} | cut -c 1-4)" >> "$GITHUB_OUTPUT"
+        id: license
 
       - name: Run tests
         uses: game-ci/unity-test-runner@v2
@@ -60,7 +84,7 @@ jobs:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           unityVersion: ${{ matrix.unityVersion }}  # 通常は未指定（`auto`）でok
           checkName: test result (${{ matrix.unityVersion }})
-          projectPath: UnityProject~  # Unity project for run tests
+          projectPath: ${{ env.created_project_path }}
           customParameters: -testCategory "!IgnoreCI"
           coverageOptions: generateAdditionalMetrics;generateTestReferences;generateHtmlReport;generateAdditionalReports;dontClear;assemblyFilters:+TestHelper.Monkey*,-*Tests
           # see: https://docs.unity3d.com/Packages/com.unity.testtools.codecoverage@1.2/manual/CoverageBatchmode.html
@@ -86,8 +110,8 @@ jobs:
 
   notify:
     needs: test
-    if: always()
     runs-on: ubuntu-latest
+    if: always()
 
     steps:
       - uses: Gamesight/slack-workflow-status@v1.2.0
