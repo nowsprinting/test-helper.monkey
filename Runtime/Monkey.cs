@@ -12,14 +12,18 @@ using UnityEngine.Assertions;
 
 namespace TestHelper.Monkey
 {
+    /// <summary>
+    /// Reference implementation of the monkey testing.
+    ///
+    /// - Can specific lifetime and delay time
+    /// - Can specific random number generator
+    /// - Can lottery and operation only clickable objects
+    /// - Can throw assert exception if Interactive component not found in 5 sec
+    /// </summary>
     public static class Monkey
     {
         /// <summary>
-        /// Reference implementation of the monkey testing
-        /// - Can specific lifetime and delay time
-        /// - Can specific random number generator
-        /// - Can lottery and operation only clickable objects
-        /// - Can throw assert exception if Interactive component not found in 5 sec
+        /// Run monkey testing.
         /// </summary>
         /// <param name="config">Run configuration for monkey testing</param>
         /// <param name="cancellationToken">Cancellation token</param>

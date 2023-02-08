@@ -61,7 +61,7 @@ namespace TestHelper.Monkey
             [Test]
             public void FindInteractiveObjects_reallyInteractiveOnly_findReachableObjects()
             {
-                var actual = InteractiveComponentCollector.FindInteractiveComponents(true)
+                var actual = InteractiveComponentCollector.FindInteractiveComponents()
                     .Select(x => x.gameObject.name)
                     .ToArray();
                 Assert.That(actual, Is.EquivalentTo(s_reachableObjects));
@@ -112,7 +112,7 @@ namespace TestHelper.Monkey
             [Test]
             public void FindInteractiveObjects_reallyInteractiveOnly_findReachableObjects()
             {
-                var actual = InteractiveComponentCollector.FindInteractiveComponents(true)
+                var actual = InteractiveComponentCollector.FindInteractiveComponents()
                     .Select(x => x.gameObject.name)
                     .ToArray();
                 Assert.That(actual, Is.EquivalentTo(s_reachableObjects));
@@ -183,7 +183,7 @@ namespace TestHelper.Monkey
                 [Category("IgnoreCI")] // GraphicRaycaster not work on batchmode
                 public void FindInteractiveObjects_reallyInteractiveOnly_findReachableObjects()
                 {
-                    var actual = InteractiveComponentCollector.FindInteractiveComponents(true)
+                    var actual = InteractiveComponentCollector.FindInteractiveComponents()
                         .Select(x => x.gameObject.name)
                         .ToArray();
                     Assert.That(actual, Is.EquivalentTo(s_reachableUiObjects));
@@ -218,7 +218,7 @@ namespace TestHelper.Monkey
                 [Category("IgnoreCI")] // GraphicRaycaster not work on batchmode
                 public void FindInteractiveObjects_reallyInteractiveOnly_findReachableObjects()
                 {
-                    var actual = InteractiveComponentCollector.FindInteractiveComponents(true)
+                    var actual = InteractiveComponentCollector.FindInteractiveComponents()
                         .Select(x => x.gameObject.name)
                         .ToArray();
                     Assert.That(actual, Is.EquivalentTo(s_reachableUiObjects));
@@ -252,7 +252,7 @@ namespace TestHelper.Monkey
                 [Category("IgnoreCI")] // GraphicRaycaster not work on batchmode
                 public void FindInteractiveObjects_reallyInteractiveOnly_findReachableObjects()
                 {
-                    var actual = InteractiveComponentCollector.FindInteractiveComponents(true)
+                    var actual = InteractiveComponentCollector.FindInteractiveComponents()
                         .Select(x => x.gameObject.name)
                         .ToArray();
                     Assert.That(actual, Is.EquivalentTo(s_reachableUiObjects));

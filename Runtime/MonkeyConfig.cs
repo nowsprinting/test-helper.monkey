@@ -2,6 +2,7 @@
 // This software is released under the MIT License.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using TestHelper.Monkey.Random;
 using UnityEngine;
 
@@ -10,6 +11,7 @@ namespace TestHelper.Monkey
     /// <summary>
     /// Run configuration for monkey testing
     /// </summary>
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     public class MonkeyConfig
     {
         /// <summary>

@@ -13,6 +13,9 @@ using UnityEngine.UI;
 
 namespace TestHelper.Monkey
 {
+    /// <summary>
+    /// Wrapped component that provide interaction for user.
+    /// </summary>
     public class InteractiveComponent
     {
         /// <summary>
