@@ -57,12 +57,13 @@ jobs:
           node-version: 16
 
       - name: Set npm bin path
-        run: echo "npm_bin=$(bash npm bin -g)" >> $GITHUB_ENV
+        run: echo "path=$(npm bin -g)" >> "$GITHUB_OUTPUT"
+        id: npm_bin
 
       - uses: actions/cache@v3
         with:
-          path: ${{ env.npm_bin }}
-          key: ${{ hashFiles('.github/workflows/test.yml') }}
+          path: ${{ steps.npm_bin.outputs.path }}
+          key: npm-${{ hashFiles('.github/workflows/test.yml') }}
 
       - name: Install dependencies
         run: |
@@ -74,8 +75,8 @@ jobs:
         working-directory: ${{ env.created_project_path }}
 
       - name: Create license secret key
-        id: license
         run: echo "secret_key=UNITY_LICENSE_$(echo ${{ matrix.unityVersion }} | cut -c 1-4)" >> "$GITHUB_OUTPUT"
+        id: license
 
       - name: Run tests
         uses: game-ci/unity-test-runner@v2
@@ -109,8 +110,8 @@ jobs:
 
   notify:
     needs: test
-    if: always()
     runs-on: ubuntu-latest
+    if: always()
 
     steps:
       - uses: Gamesight/slack-workflow-status@v1.2.0
