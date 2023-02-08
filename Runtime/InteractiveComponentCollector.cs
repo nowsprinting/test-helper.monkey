@@ -8,6 +8,9 @@ using UnityEngine.EventSystems;
 
 namespace TestHelper.Monkey
 {
+    /// <summary>
+    /// Collect <c>InteractiveComponent</c>s in the scene.
+    /// </summary>
     public static class InteractiveComponentCollector
     {
         /// <summary>
