@@ -96,10 +96,10 @@ create_project_for_run_tests:
 	  -quit
 	cp $(PACKAGE_HOME)/.gitignore $(PROJECT_HOME)
 	touch UnityProject~/Assets/.gitkeep
-	openupm -c $(PROJECT_HOME) add com.unity.test-framework
-	openupm -c $(PROJECT_HOME) add com.unity.testtools.codecoverage
-	openupm -c $(PROJECT_HOME) add com.cysharp.unitask
-	openupm -c $(PROJECT_HOME) add --test $(PACKAGE_NAME)@file:../../
+	openupm -c $(PROJECT_HOME) add -f com.unity.test-framework
+	openupm -c $(PROJECT_HOME) add -f com.unity.testtools.codecoverage
+	openupm -c $(PROJECT_HOME) add -f com.cysharp.unitask
+	openupm -c $(PROJECT_HOME) add -ft $(PACKAGE_NAME)@file:../../
 
 .PHONY: remove_project
 remove_project:

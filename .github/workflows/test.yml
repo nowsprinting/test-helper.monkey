@@ -68,10 +68,10 @@ jobs:
       - name: Install dependencies
         run: |
           npm install -g openupm-cli
-          openupm add com.unity.test-framework@1.3.2
-          openupm add com.unity.testtools.codecoverage@1.2.2
-          openupm add com.cysharp.unitask@2.3.3
-          openupm add --test com.nowsprinting.test-helper.monkey@file:../../
+          openupm add -f com.unity.test-framework@1.3.2
+          openupm add -f com.unity.testtools.codecoverage@1.2.2
+          openupm add -f com.cysharp.unitask@2.3.3
+          openupm add -ft com.nowsprinting.test-helper.monkey@file:../../
         working-directory: ${{ env.created_project_path }}
 
       - name: Create license secret key
