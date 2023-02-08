@@ -231,6 +231,13 @@ csharp_preserve_single_line_statements = true
 # IDE0060: Remove unused parameter
 dotnet_diagnostic.IDE0060.severity = warning
 
+# Suppress C#8.0+ syntax sugar (for under Unity 2020.2 compatibility)
+# See: https://www.jetbrains.com/help/resharper/Reference__Code_Inspections_CSHARP.html
+resharper_convert_to_using_declaration_highlighting = none
+resharper_convert_to_null_coalescing_compound_assignment_highlighting = none
+resharper_merge_into_logical_pattern_highlighting = none
+resharper_use_negated_pattern_in_is_expression_highlighting = none
+
 [src/{Compilers,ExpressionEvaluator,Scripting}/**Test**/*.{cs,vb}]
 
 # IDE0060: Remove unused parameter
