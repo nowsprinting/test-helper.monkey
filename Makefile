@@ -11,22 +11,28 @@ ASSEMBLY_NAME?=$(shell ls $(PACKAGE_HOME)/Runtime/*.asmdef| sed -e s/.*\\/// | s
 
 # Code Coverage report filter (comma separated)
 # see: https://docs.unity3d.com/Packages/com.unity.testtools.codecoverage@1.2/manual/CoverageBatchmode.html
-COVERAGE_ASSEMBLY_FILTERS?=+$(ASSEMBLY_NAME)*,-*Tests
+COVERAGE_ASSEMBLY_FILTERS?=+$(ASSEMBLY_NAME)*,-*.Tests
 
 UNAME := $(shell uname)
 ifeq ($(UNAME), Darwin)
 # macOS
 UNITY_HOME=/Applications/Unity/HUB/Editor/$(UNITY_VERSION)/Unity.app/Contents
 UNITY?=$(UNITY_HOME)/MacOS/Unity
+UNITY_YAML_MERGE?=$(UNITY_HOME)/Tools/UnityYAMLMerge
+STANDALONE_PLAYER=StandaloneOSX
 else
 ifeq ($(UNAME), Linux)
 # Linux: not test yet
 UNITY_HOME=$HOME/Unity/Hub/Editor/<version>
 UNITY?=$(UNITY_HOME)/Unity
+UNITY_YAML_MERGE?=$(UNITY_HOME)/ # unknown
+STANDALONE_PLAYER=StandaloneLinux64
 else
 # Windows: not test yet
 UNITY_HOME=C:\Program Files\Unity\Hub\Editor\$(UNITY_VERSION)\Editor
 UNITY?=$(UNITY_HOME)\Unity.exe
+UNITY_YAML_MERGE?=$(UNITY_HOME)\Data\Tools\UnityYAMLMerge.exe
+STANDALONE_PLAYER=StandaloneWindows64
 endif
 endif
 
