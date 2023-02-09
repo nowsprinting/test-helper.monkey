@@ -31,6 +31,9 @@ jobs:
         unityVersion: # Available versions see: https://game.ci/docs/docker/versions
           - 2019.4.40f1
           - 2022.2.5f1
+        include:
+          - unityVersion: 2022.2.5f1
+            octocov: true
 
     steps:
       - name: Checkout repository
@@ -39,14 +42,20 @@ jobs:
           submodules: false
           lfs: false
 
+      - name: Set package and assembly name
+        run: |
+          echo "package=$(grep -o -E '"name": "(.+)"' ./package.json | cut -d ' ' -f2)" >> "$GITHUB_OUTPUT"
+          echo "assembly=$(find ./Runtime -name "*.asmdef" | sed -e s/.*\\/// | sed -e s/\\.asmdef//)" >> "$GITHUB_OUTPUT"
+        id: names
+
       - name: Crete project for tests
-        uses: nowsprinting/create-unity-project-action@v1
+        uses: nowsprinting/create-unity-project-action@v2
         with:
-          project_path: UnityProject~
+          project-path: UnityProject~
 
       - uses: actions/cache@v3
         with:
-          path: ${{ env.created_project_path }}/Library
+          path: ${{ env.CREATED_PROJECT_PATH }}/Library
           key: Library-${{ matrix.targetPlatform }}-${{ matrix.unityVersion }}
           restore-keys: |
             Library-${{ matrix.targetPlatform }}-
@@ -56,7 +65,7 @@ jobs:
         with:
           node-version: 16
 
-      - name: Set npm bin path
+      - name: Set npm bin path for cache
         run: echo "path=$(npm bin -g)" >> "$GITHUB_OUTPUT"
         id: npm_bin
 
@@ -71,10 +80,10 @@ jobs:
           openupm add -f com.unity.test-framework@1.3.2
           openupm add -f com.unity.testtools.codecoverage@1.2.2
           openupm add -f com.cysharp.unitask@2.3.3
-          openupm add -ft com.nowsprinting.test-helper.monkey@file:../../
-        working-directory: ${{ env.created_project_path }}
+          openupm add -ft "${{ steps.names.outputs.package }}"@file:../../
+        working-directory: ${{ env.CREATED_PROJECT_PATH }}
 
-      - name: Create license secret key
+      - name: Set license secret key
         run: echo "secret_key=UNITY_LICENSE_$(echo ${{ matrix.unityVersion }} | cut -c 1-4)" >> "$GITHUB_OUTPUT"
         id: license
 
@@ -82,11 +91,11 @@ jobs:
         uses: game-ci/unity-test-runner@v2
         with:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
-          unityVersion: ${{ matrix.unityVersion }}  # 通常は未指定（`auto`）でok
+          unityVersion: ${{ matrix.unityVersion }}  # Default is `auto`
           checkName: test result (${{ matrix.unityVersion }})
-          projectPath: ${{ env.created_project_path }}
+          projectPath: ${{ env.CREATED_PROJECT_PATH }}
           customParameters: -testCategory "!IgnoreCI"
-          coverageOptions: generateAdditionalMetrics;generateTestReferences;generateHtmlReport;generateAdditionalReports;dontClear;assemblyFilters:+TestHelper.Monkey*,-*Tests
+          coverageOptions: generateAdditionalMetrics;generateTestReferences;generateHtmlReport;generateAdditionalReports;dontClear;assemblyFilters:+${{ steps.names.outputs.assembly }}*,-*.Tests
           # see: https://docs.unity3d.com/Packages/com.unity.testtools.codecoverage@1.2/manual/CoverageBatchmode.html
         env:
           UNITY_LICENSE: ${{ secrets[steps.license.outputs.secret_key] }}
@@ -94,10 +103,11 @@ jobs:
 
       - name: Set coverage path for octocov
         run: sed -i -r 's/\.\/Logs/${{ steps.test.outputs.coveragePath }}/' .octocov.yml
+        if: ${{ matrix.octocov }}
 
       - name: Run octocov
         uses: k1LoW/octocov-action@v0
-        if: ${{ startsWith(matrix.unityVersion, '2022') }}
+        if: ${{ matrix.octocov }}
 
       - name: Upload test results
         uses: actions/upload-artifact@v3

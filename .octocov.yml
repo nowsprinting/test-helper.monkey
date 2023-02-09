@@ -2,7 +2,7 @@
 coverage:
   if: true
   paths:
-    - ./Logs/Report/lcov.info
+    - ./Logs/Report/lcov.info # Warning: This path is replace by regex in test.yml
 codeToTestRatio:
   code:
     - 'Editor/**/*.cs'
