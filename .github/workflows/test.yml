@@ -49,13 +49,13 @@ jobs:
         id: names
 
       - name: Crete project for tests
-        uses: nowsprinting/create-unity-project-action@v1
+        uses: nowsprinting/create-unity-project-action@v2
         with:
-          project_path: UnityProject~
+          project-path: UnityProject~
 
       - uses: actions/cache@v3
         with:
-          path: ${{ env.created_project_path }}/Library
+          path: ${{ env.CREATED_PROJECT_PATH }}/Library
           key: Library-${{ matrix.targetPlatform }}-${{ matrix.unityVersion }}
           restore-keys: |
             Library-${{ matrix.targetPlatform }}-
@@ -81,7 +81,7 @@ jobs:
           openupm add -f com.unity.testtools.codecoverage@1.2.2
           openupm add -f com.cysharp.unitask@2.3.3
           openupm add -ft "${{ steps.names.outputs.package }}"@file:../../
-        working-directory: ${{ env.created_project_path }}
+        working-directory: ${{ env.CREATED_PROJECT_PATH }}
 
       - name: Set license secret key
         run: echo "secret_key=UNITY_LICENSE_$(echo ${{ matrix.unityVersion }} | cut -c 1-4)" >> "$GITHUB_OUTPUT"
@@ -93,9 +93,9 @@ jobs:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           unityVersion: ${{ matrix.unityVersion }}  # Default is `auto`
           checkName: test result (${{ matrix.unityVersion }})
-          projectPath: ${{ env.created_project_path }}
+          projectPath: ${{ env.CREATED_PROJECT_PATH }}
           customParameters: -testCategory "!IgnoreCI"
-          coverageOptions: generateAdditionalMetrics;generateTestReferences;generateHtmlReport;generateAdditionalReports;dontClear;assemblyFilters:+"${{ steps.names.outputs.assembly }}"*,-*.Tests
+          coverageOptions: generateAdditionalMetrics;generateTestReferences;generateHtmlReport;generateAdditionalReports;dontClear;assemblyFilters:+${{ steps.names.outputs.assembly }}*,-*.Tests
           # see: https://docs.unity3d.com/Packages/com.unity.testtools.codecoverage@1.2/manual/CoverageBatchmode.html
         env:
           UNITY_LICENSE: ${{ secrets[steps.license.outputs.secret_key] }}
