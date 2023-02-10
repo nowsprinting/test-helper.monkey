@@ -1,3 +1,6 @@
+# Copyright (c) 2023 Koji Hasegawa.
+# This software is released under the MIT License.
+
 name: Test
 
 on:
@@ -26,8 +29,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        targetPlatform:
-          - StandaloneLinux64
         unityVersion: # Available versions see: https://game.ci/docs/docker/versions
           - 2019.4.40f1
           - 2022.2.5f1
@@ -45,7 +46,11 @@ jobs:
       - name: Set package and assembly name
         run: |
           echo "package=$(grep -o -E '"name": "(.+)"' ./package.json | cut -d ' ' -f2)" >> "$GITHUB_OUTPUT"
-          echo "assembly=$(find ./Runtime -name "*.asmdef" | sed -e s/.*\\/// | sed -e s/\\.asmdef//)" >> "$GITHUB_OUTPUT"
+          if [ -d ./Runtime ]; then
+            echo "assembly=$(find ./Runtime -name "*.asmdef" | sed -e s/.*\\/// | sed -e s/\\.asmdef//)" >> "$GITHUB_OUTPUT"
+          else
+            echo "assembly=$(find ./Editor -name "*.asmdef" | sed -e s/.*\\/// | sed -e s/\\.Editor\\.asmdef//)" >> "$GITHUB_OUTPUT"
+          fi
         id: names
 
       - name: Crete project for tests
@@ -56,9 +61,8 @@ jobs:
       - uses: actions/cache@v3
         with:
           path: ${{ env.CREATED_PROJECT_PATH }}/Library
-          key: Library-${{ matrix.targetPlatform }}-${{ matrix.unityVersion }}
+          key: Library-${{ matrix.unityVersion }}
           restore-keys: |
-            Library-${{ matrix.targetPlatform }}-
             Library-
 
       - uses: actions/setup-node@v3
