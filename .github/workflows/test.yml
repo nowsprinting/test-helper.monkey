@@ -43,16 +43,6 @@ jobs:
           submodules: false
           lfs: false
 
-      - name: Set package and assembly name
-        run: |
-          echo "package=$(grep -o -E '"name": "(.+)"' ./package.json | cut -d ' ' -f2)" >> "$GITHUB_OUTPUT"
-          if [ -d ./Runtime ]; then
-            echo "assembly=$(find ./Runtime -name "*.asmdef" | sed -e s/.*\\/// | sed -e s/\\.asmdef//)" >> "$GITHUB_OUTPUT"
-          else
-            echo "assembly=$(find ./Editor -name "*.asmdef" | sed -e s/.*\\/// | sed -e s/\\.Editor\\.asmdef//)" >> "$GITHUB_OUTPUT"
-          fi
-        id: names
-
       - name: Crete project for tests
         uses: nowsprinting/create-unity-project-action@v2
         with:
@@ -78,18 +68,27 @@ jobs:
           path: ${{ steps.npm_bin.outputs.path }}
           key: npm-${{ hashFiles('.github/workflows/test.yml') }}
 
+      - name: Set package name
+        run: |
+          echo "package_name=$(grep -o -E '"name": "(.+)"' ./package.json | cut -d ' ' -f2)" >> "$GITHUB_ENV"
+
       - name: Install dependencies
         run: |
           npm install -g openupm-cli
           openupm add -f com.unity.test-framework@1.3.2
           openupm add -f com.unity.testtools.codecoverage@1.2.2
           openupm add -f com.cysharp.unitask@2.3.3
-          openupm add -ft "${{ steps.names.outputs.package }}"@file:../../
+          openupm add -ft "${{ env.package_name }}"@file:../../
         working-directory: ${{ env.CREATED_PROJECT_PATH }}
 
+      - name: Set coverage assembly filters
+        run: |
+          assemblies=$(find . -name "*.asmdef" -maxdepth 3 | sed -e s/.*\\//\+/ | sed -e s/\\.asmdef// | sed -e s/^.*\\.Tests//)
+          # shellcheck disable=SC2001,SC2048,SC2086
+          echo "assembly_filters=$(echo ${assemblies[*]} | sed -e s/\ /,/g),+<assets>,-*.Tests" >> "$GITHUB_ENV"
+
       - name: Set license secret key
-        run: echo "secret_key=UNITY_LICENSE_$(echo ${{ matrix.unityVersion }} | cut -c 1-4)" >> "$GITHUB_OUTPUT"
-        id: license
+        run: echo "secret_key=UNITY_LICENSE_$(echo ${{ matrix.unityVersion }} | cut -c 1-4)" >> "$GITHUB_ENV"
 
       - name: Run tests
         uses: game-ci/unity-test-runner@v2
@@ -99,10 +98,10 @@ jobs:
           checkName: test result (${{ matrix.unityVersion }})
           projectPath: ${{ env.CREATED_PROJECT_PATH }}
           customParameters: -testCategory "!IgnoreCI"
-          coverageOptions: generateAdditionalMetrics;generateTestReferences;generateHtmlReport;generateAdditionalReports;dontClear;assemblyFilters:+${{ steps.names.outputs.assembly }}*,-*.Tests
+          coverageOptions: generateAdditionalMetrics;generateTestReferences;generateHtmlReport;generateAdditionalReports;dontClear;assemblyFilters:${{ env.assembly_filters }}
           # see: https://docs.unity3d.com/Packages/com.unity.testtools.codecoverage@1.2/manual/CoverageBatchmode.html
         env:
-          UNITY_LICENSE: ${{ secrets[steps.license.outputs.secret_key] }}
+          UNITY_LICENSE: ${{ secrets[env.secret_key] }}
         id: test
 
       - name: Set coverage path for octocov
