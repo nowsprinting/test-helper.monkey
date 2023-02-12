@@ -1,4 +1,4 @@
-# Monkey testing library for Unity Test Framework
+# Monkey testing library for Unity UI (uGUI)
 
 [![Meta file check](https://github.com/nowsprinting/test-helper.monkey/actions/workflows/metacheck.yml/badge.svg)](https://github.com/nowsprinting/test-helper.monkey/actions/workflows/metacheck.yml)
 [![Test](https://github.com/nowsprinting/test-helper.monkey/actions/workflows/test.yml/badge.svg)](https://github.com/nowsprinting/test-helper.monkey/actions/workflows/test.yml)
@@ -9,7 +9,7 @@
 
 ### Monkey testing reference implementation
 
-Run monkey testing for uGUI elements.
+Run monkey testing for uGUI (2D, 3D and UI) elements.
 
 ```csharp
 [Test]
@@ -53,7 +53,7 @@ openupm add com.nowsprinting.test-helper.monkey
 
 Or open Package Manager window (Window | Package Manager) and add package from git URL
 
-```
+```bash
 https://github.com/nowsprinting/test-helper.monkey.git
 ```
 
