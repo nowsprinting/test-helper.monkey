@@ -1,6 +1,6 @@
 {
     "name": "TestHelper.Monkey.Annotations",
-    "rootNamespace": "TestHelper.Monkey.Annotations",
+    "rootNamespace": "TestHelper.Monkey",
     "references": [
     ],
     "includePlatforms": [],
