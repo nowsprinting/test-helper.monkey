@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using NUnit.Framework;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
@@ -26,9 +25,11 @@ namespace TestHelper.Monkey
             [SetUp]
             public async Task SetUp()
             {
-                await EditorSceneManager.LoadSceneAsyncInPlayMode(
+#if UNITY_EDITOR
+                await UnityEditor.SceneManagement.EditorSceneManager.LoadSceneAsyncInPlayMode(
                     "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/MonkeyThreeD.unity",
                     new LoadSceneParameters(LoadSceneMode.Single));
+#endif
             }
 
             [Test]
@@ -74,10 +75,12 @@ namespace TestHelper.Monkey
             [SetUp]
             public async Task SetUp()
             {
-                await EditorSceneManager.LoadSceneAsyncInPlayMode(
+#if UNITY_EDITOR
+                await UnityEditor.SceneManagement.EditorSceneManager.LoadSceneAsyncInPlayMode(
                     "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/MonkeyUiWorldSpace.unity",
                     new LoadSceneParameters(LoadSceneMode.Single));
                 await UniTask.NextFrame(); // Wait 1 frame because warmup for GraphicRaycaster
+#endif
             }
 
             [TestCase("Button")] // Attached Button

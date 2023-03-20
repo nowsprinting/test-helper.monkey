@@ -11,7 +11,6 @@ using NUnit.Framework;
 using TestHelper.Monkey.Annotations;
 using TestHelper.Monkey.Random;
 using TestHelper.Monkey.TestDoubles;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
@@ -26,9 +25,11 @@ namespace TestHelper.Monkey
         [SetUp]
         public async Task SetUp()
         {
-            await EditorSceneManager.LoadSceneAsyncInPlayMode(
+#if UNITY_EDITOR
+            await UnityEditor.SceneManagement.EditorSceneManager.LoadSceneAsyncInPlayMode(
                 "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/Operators.unity",
                 new LoadSceneParameters(LoadSceneMode.Single));
+#endif
         }
 
         [Test]
