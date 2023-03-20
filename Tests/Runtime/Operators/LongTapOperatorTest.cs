@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using NUnit.Framework;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
@@ -19,9 +18,11 @@ namespace TestHelper.Monkey.Operators
         [SetUp]
         public async Task SetUp()
         {
-            await EditorSceneManager.LoadSceneAsyncInPlayMode(
+#if UNITY_EDITOR
+            await UnityEditor.SceneManagement.EditorSceneManager.LoadSceneAsyncInPlayMode(
                 "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/Operators.unity",
                 new LoadSceneParameters(LoadSceneMode.Single));
+#endif
         }
 
         [TestCase("UsingOnPointerDownUpHandler", "OnPointerDown", "OnPointerUp")]
