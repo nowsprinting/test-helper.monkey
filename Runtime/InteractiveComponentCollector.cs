@@ -35,7 +35,7 @@ namespace TestHelper.Monkey
                 results = new List<RaycastResult>();
             }
 
-            foreach (var component in Object.FindObjectsOfType<MonoBehaviour>())
+            foreach (var component in FindMonoBehaviours())
             {
                 if (component.GetType() == typeof(EventTrigger) ||
                     component.GetType().GetInterfaces().Contains(typeof(IEventSystemHandler)))
@@ -47,6 +47,16 @@ namespace TestHelper.Monkey
                     }
                 }
             }
+        }
+
+        private static IEnumerable<MonoBehaviour> FindMonoBehaviours()
+        {
+#if UNITY_2022_3_OR_NEWER
+            return Object.FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
+            // Note: Supported in Unity 2020.3.4, 2021.3.18, 2022.2.5 or later.
+#else
+            return Object.FindObjectsOfType<MonoBehaviour>();
+#endif
         }
     }
 }
