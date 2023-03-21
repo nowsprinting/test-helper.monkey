@@ -35,7 +35,7 @@ namespace TestHelper.Monkey
                 results = new List<RaycastResult>();
             }
 
-            foreach (var component in Object.FindObjectsOfType<MonoBehaviour>())
+            foreach (var component in FindMonoBehaviours())
             {
                 if (component.GetType() == typeof(EventTrigger) ||
                     component.GetType().GetInterfaces().Contains(typeof(IEventSystemHandler)))
@@ -47,6 +47,15 @@ namespace TestHelper.Monkey
                     }
                 }
             }
+        }
+
+        private static IEnumerable<MonoBehaviour> FindMonoBehaviours()
+        {
+#if UNITY_2022_2_5_OR_NEWER
+            return Object.FindObjectsByType<MonoBehaviour>();
+#else
+            return Object.FindObjectsOfType<MonoBehaviour>();
+#endif
         }
     }
 }
