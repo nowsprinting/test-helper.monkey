@@ -90,16 +90,24 @@ public void FindAndOperationInteractiveComponent()
 
 ## Installation
 
-If you installed [openupm-cli](https://github.com/openupm/openupm-cli), run the command below
+You can be installed in two major ways.
+
+### Install via Package Manager window
+
+1. Open the **Package Manager** tab in Player Settings window (**Editor > Player Settings**)
+2. Click **+** button under the Scoped Registries and add following settings:
+   1. **Name:** `package.openupm.com`
+   2. **URL:** `https://package.openupm.com`
+   3. **Scope(s):** `com.nowsprintingtest-helper.monkey` and `com.cysharp.unitask`
+3. Open the Package Manager window (**Window > Package Manager**) and select **Packages: My Registries**
+4. Click **Install** button on the `com.nowsprinting.test-helper.monkey` package
+
+### Install via OpenUPM-CLI
+
+If you installed [openupm-cli](https://github.com/openupm/openupm-cli), run the command below:
 
 ```bash
 openupm add com.nowsprinting.test-helper.monkey
-```
-
-Or open Package Manager window (Window | Package Manager) and add package from git URL
-
-```bash
-https://github.com/nowsprinting/test-helper.monkey.git
 ```
 
 
