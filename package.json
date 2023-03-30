@@ -13,6 +13,7 @@
   "documentationUrl": "https://github.com/nowsprinting/test-helper.monkey/blob/master/README.md",
   "files": [
     "Annotations*",
+    "Documentation~",
     "Runtime*",
     "Tests*",
     "LICENSE.md*",

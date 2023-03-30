@@ -4,8 +4,9 @@
 [![Test](https://github.com/nowsprinting/test-helper.monkey/actions/workflows/test.yml/badge.svg)](https://github.com/nowsprinting/test-helper.monkey/actions/workflows/test.yml)
 [![openupm](https://img.shields.io/npm/v/com.nowsprinting.test-helper.monkey?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.nowsprinting.test-helper.monkey/)
 
+Reference implementation that performs object-based Unity UI (uGUI) monkey tests and an API for custom implementation.
 
-Reference implementation that performs object-based Unity UI (uGUI) monkey tests and an API for implementation.
+Required Unity 2019 LTS or later.
 
 
 ## Features
@@ -90,17 +91,28 @@ public void FindAndOperationInteractiveComponent()
 
 ## Installation
 
-You can be installed in two major ways.
+You can choose from two typical installation methods.
 
 ### Install via Package Manager window
 
 1. Open the **Package Manager** tab in Player Settings window (**Editor > Player Settings**)
-2. Click **+** button under the Scoped Registries and add following settings:
+2. Click **+** button under the **Scoped Registries** and enter the following settings (figure 1.):
    1. **Name:** `package.openupm.com`
    2. **URL:** `https://package.openupm.com`
-   3. **Scope(s):** `com.nowsprintingtest-helper.monkey` and `com.cysharp.unitask`
-3. Open the Package Manager window (**Window > Package Manager**) and select **Packages: My Registries**
+   3. **Scope(s):** `com.nowsprinting` and `com.cysharp`
+3. Open the Package Manager window (**Window > Package Manager**) and select **My Registries** in registries drop-down list (figure 2.)
 4. Click **Install** button on the `com.nowsprinting.test-helper.monkey` package
+
+**Fugure 1.** Package Manager tab in Player Settings window.
+
+![](Documentation~/ProjectSettings_Dark.png#gh-dark-mode-only)
+![](Documentation~/ProjectSettings_Light.png#gh-light-mode-only)
+
+**Fugure 2.** Select registries drop-down list in Package Manager window.
+
+![](Documentation~/PackageManager_Dark.png/#gh-dark-mode-only)
+![](Documentation~/PackageManager_Light.png/#gh-light-mode-only)
+
 
 ### Install via OpenUPM-CLI
 
@@ -124,14 +136,14 @@ Be grateful if you could label the PR as `enhancement`, `bug`, `chore`, and `doc
 See [PR Labeler settings](.github/pr-labeler.yml) for automatically labeling from the branch name.
 
 
-### How to development
+## How to development
 
 Add this repository as a submodule to the Packages/ directory in your project.
 
 Examples:
 
 ```bash
-$ git submodule add https://github.com/nowsprinting/test-helper.monkey.git Packages/com.nowsprinting.test-helper.monkey
+git submodule add https://github.com/nowsprinting/test-helper.monkey.git Packages/com.nowsprinting.test-helper.monkey
 ```
 
 And required install [Unity Test Framework](https://docs.unity3d.com/Packages/com.unity.test-framework@latest) package v1.3 or later for running tests.
@@ -139,7 +151,7 @@ And required install [Unity Test Framework](https://docs.unity3d.com/Packages/co
 
 ## Release workflow
 
-Run `Actions | Create release pull request | Run workflow` and merge created PR.
+Run **Actions > Create release pull request > Run workflow** and merge created PR.
 (Or bump version in package.json on default branch)
 
 Then, Will do the release process automatically by [Release](.github/workflows/release.yml) workflow.
