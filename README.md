@@ -151,7 +151,7 @@ And required install [Unity Test Framework](https://docs.unity3d.com/Packages/co
 
 ## Release workflow
 
-Run **Actions > Create release pull request > Run workflow** and merge created PR.
+Run **Actions > Create release pull request > Run workflow** and merge created pull request.
 (Or bump version in package.json on default branch)
 
 Then, Will do the release process automatically by [Release](.github/workflows/release.yml) workflow.
