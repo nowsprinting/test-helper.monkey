@@ -1,6 +1,6 @@
 {
   "name": "com.nowsprinting.test-helper.monkey",
-  "description": "Monkey testing helper library for Unity Test Framework",
+  "description": "Reference implementation that performs object-based Unity UI (uGUI) monkey tests and an API for implementation.",
   "version": "0.1.2",
   "author": "Koji Hasegawa <hasegawa@hubsys.co.jp> (https://github.com/nowsprinting)",
   "category": "Unity Test Framework",
@@ -9,10 +9,11 @@
     "com.cysharp.unitask": "2.3.3",
     "com.unity.ugui": "1.0.0"
   },
-  "displayName": "Monkey Testing Helper",
+  "displayName": "Monkey test helper library for Unity UI (uGUI)",
   "documentationUrl": "https://github.com/nowsprinting/test-helper.monkey/blob/master/README.md",
   "files": [
     "Annotations*",
+    "Documentation~",
     "Runtime*",
     "Tests*",
     "LICENSE.md*",
