@@ -43,7 +43,7 @@ public async Task MonkeyTesting()
 #### InteractiveComponentCollector.FindInteractiveComponents
 
 Returns interactive uGUI components.
-If the argument is true, return only user really reachable components (using the `IsReallyInteractiveFromUser` method).
+If the argument is true, return only user-really reachable components (using the `IsReallyInteractiveFromUser` method).
 
 Usage:
 
@@ -109,12 +109,12 @@ You can choose from two typical installation methods.
 > **Note**  
 > Required install [Unity Test Framework](https://docs.unity3d.com/Packages/com.unity.test-framework@latest) package v1.3 or later for running tests (when adding to the `testables` in package.json).
 
-**Fugure 1.** Package Manager tab in Player Settings window.
+**Figure 1.** Package Manager tab in Player Settings window.
 
 ![](Documentation~/ProjectSettings_Dark.png#gh-dark-mode-only)
 ![](Documentation~/ProjectSettings_Light.png#gh-light-mode-only)
 
-**Fugure 2.** Select registries drop-down list in Package Manager window.
+**Figure 2.** Select registries drop-down list in Package Manager window.
 
 ![](Documentation~/PackageManager_Dark.png/#gh-dark-mode-only)
 ![](Documentation~/PackageManager_Light.png/#gh-light-mode-only)
@@ -162,9 +162,9 @@ Run **Actions > Create release pull request > Run workflow** and merge created p
 (Or bump version in package.json on default branch)
 
 Then, Will do the release process automatically by [Release](.github/workflows/release.yml) workflow.
-And after tagged, OpenUPM retrieves the tag and updates it.
+And after tagging, OpenUPM retrieves the tag and updates it.
 
 Do **NOT** manually operation the following operations:
 
-- Create release tag
+- Create a release tag
 - Publish draft releases
