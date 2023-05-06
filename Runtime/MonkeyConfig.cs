@@ -17,7 +17,7 @@ namespace TestHelper.Monkey
         /// <summary>
         /// Running time
         /// </summary>
-        public TimeSpan Lifetime = new TimeSpan(0, 0, 3, 0); // 3min
+        public TimeSpan Lifetime = new TimeSpan(0, 0, 1, 0); // 1min
 
         /// <summary>
         /// Delay time between operations

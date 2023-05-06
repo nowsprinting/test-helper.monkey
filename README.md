@@ -24,11 +24,12 @@ public async Task MonkeyTesting()
 {
     var config = new MonkeyConfig
     {
-        Lifetime = TimeSpan.FromMinutes(3),
-        DelayMillis = 200
+        Lifetime = TimeSpan.FromMinutes(2),
+        DelayMillis = 200,
+        SecondsToErrorForNoInteractiveComponent = 5,
     };
-    var cancellationTokenSource = new CancellationTokenSource();
 
+    using var cancellationTokenSource = new CancellationTokenSource();
     await Monkey.Run(config, cancellationTokenSource.Token);
 }
 ```
@@ -127,6 +128,13 @@ If you installed [openupm-cli](https://github.com/openupm/openupm-cli), run the 
 ```bash
 openupm add com.nowsprinting.test-helper.monkey
 ```
+
+
+### Add assembly reference
+
+1. Open your test assembly definition file (.asmdef) in **Inspector** window
+2. Add **TestHelper.Monkey** into **Assembly Definition References**
+
 
 
 ## License
