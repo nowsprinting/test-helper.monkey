@@ -24,11 +24,12 @@ public async Task MonkeyTesting()
 {
     var config = new MonkeyConfig
     {
-        Lifetime = TimeSpan.FromMinutes(3),
-        DelayMillis = 200
+        Lifetime = TimeSpan.FromMinutes(2),
+        DelayMillis = 200,
+        SecondsToErrorForNoInteractiveComponent = 5,
     };
-    var cancellationTokenSource = new CancellationTokenSource();
 
+    using var cancellationTokenSource = new CancellationTokenSource();
     await Monkey.Run(config, cancellationTokenSource.Token);
 }
 ```
