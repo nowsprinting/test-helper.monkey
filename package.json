@@ -9,7 +9,7 @@
     "com.cysharp.unitask": "2.3.3",
     "com.unity.ugui": "1.0.0"
   },
-  "displayName": "Monkey test helper library for Unity UI (uGUI)",
+  "displayName": "Monkey Test Helper",
   "documentationUrl": "https://github.com/nowsprinting/test-helper.monkey/blob/master/README.md",
   "files": [
     "Annotations*",
