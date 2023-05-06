@@ -29,8 +29,7 @@ public async Task MonkeyTesting()
         SecondsToErrorForNoInteractiveComponent = 5,
     };
 
-    using var cancellationTokenSource = new CancellationTokenSource();
-    await Monkey.Run(config, cancellationTokenSource.Token);
+    await Monkey.Run(config);
 }
 ```
 
