@@ -30,9 +30,9 @@ namespace TestHelper.Monkey
         public int SecondsToErrorForNoInteractiveComponent = 5;
 
         /// <summary>
-        /// Delay time for long tap
+        /// Delay time for touch-and-hold
         /// </summary>
-        public int LongTapDelayMillis = 1000;
+        public int TouchAndHoldDelayMillis = 1000;
 
         /// <summary>
         /// Random generator

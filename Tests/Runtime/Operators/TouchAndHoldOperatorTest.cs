@@ -13,7 +13,7 @@ namespace TestHelper.Monkey.Operators
 {
     [UnityPlatform(RuntimePlatform.OSXEditor, RuntimePlatform.WindowsEditor, RuntimePlatform.LinuxEditor)]
     [TestFixture]
-    public class LongTapOperatorTest
+    public class TouchAndHoldOperatorTest
     {
         [SetUp]
         public async Task SetUp()
@@ -27,25 +27,25 @@ namespace TestHelper.Monkey.Operators
 
         [TestCase("UsingOnPointerDownUpHandler", "OnPointerDown", "OnPointerUp")]
         [TestCase("UsingPointerDownUpEventTrigger", "ReceivePointerDown", "ReceivePointerUp")]
-        public async Task LongTap(string targetName, string expectedMessage1, string expectedMessage2)
+        public async Task TouchAndHold(string targetName, string expectedMessage1, string expectedMessage2)
         {
             var target = InteractiveComponentCollector.FindInteractiveComponents(false)
                 .First(x => x.gameObject.name == targetName);
 
-            Assert.That(target.CanLongTap(), Is.True);
-            await target.LongTap();
+            Assert.That(target.CanTouchAndHold(), Is.True);
+            await target.TouchAndHold();
             LogAssert.Expect(LogType.Log, $"{targetName}.{expectedMessage1}");
             LogAssert.Expect(LogType.Log, $"{targetName}.{expectedMessage2}");
         }
 
         [TestCase("UsingOnPointerClickHandler")]
         [TestCase("UsingPointerClickEventTrigger")]
-        public void CanNotLongTap(string targetName)
+        public void CanNotTouchAndHold(string targetName)
         {
             var target = InteractiveComponentCollector.FindInteractiveComponents(false)
                 .First(x => x.gameObject.name == targetName);
 
-            Assert.That(target.CanLongTap(), Is.False);
+            Assert.That(target.CanTouchAndHold(), Is.False);
         }
     }
 }
