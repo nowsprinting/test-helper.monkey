@@ -39,7 +39,7 @@ namespace TestHelper.Monkey
             {
                 Lifetime = TimeSpan.FromMilliseconds(200), // 200ms
                 DelayMillis = 1, // 1ms
-                LongTapDelayMillis = 1, // 1ms
+                TouchAndHoldDelayMillis = 1, // 1ms
             };
             using (var cancellationTokenSource = new CancellationTokenSource())
             {
@@ -109,7 +109,7 @@ namespace TestHelper.Monkey
             {
                 Lifetime = TimeSpan.FromSeconds(2), // 2sec
                 DelayMillis = 1, // 1ms
-                LongTapDelayMillis = 1, // 1ms
+                TouchAndHoldDelayMillis = 1, // 1ms
                 SecondsToErrorForNoInteractiveComponent = 0, // not detect error
             };
             using (var cancellationTokenSource = new CancellationTokenSource())
@@ -215,10 +215,10 @@ namespace TestHelper.Monkey
         {
             new object[] { "UsingOnPointerClickHandler", 0, "Click" },
             new object[] { "UsingPointerClickEventTrigger", 0, "Click" },
-            new object[] { "UsingOnPointerDownUpHandler", 0, "LongTap" },
-            new object[] { "UsingPointerDownUpEventTrigger", 0, "LongTap" },
+            new object[] { "UsingOnPointerDownUpHandler", 0, "TouchAndHold" },
+            new object[] { "UsingPointerDownUpEventTrigger", 0, "TouchAndHold" },
             new object[] { "UsingMultipleEventTriggers", 0, "Click" },
-            new object[] { "UsingMultipleEventTriggers", 1, "LongTap" },
+            new object[] { "UsingMultipleEventTriggers", 1, "TouchAndHold" },
         };
 
         [TestCaseSource(nameof(s_componentAndOperations))]
@@ -229,7 +229,7 @@ namespace TestHelper.Monkey
             var spyLogger = new SpyLogger();
             var config = new MonkeyConfig
             {
-                LongTapDelayMillis = 1, // 1ms
+                TouchAndHoldDelayMillis = 1, // 1ms
                 Random = new StubRandom(index), // for lottery operation
                 Logger = spyLogger,
             };
@@ -240,18 +240,18 @@ namespace TestHelper.Monkey
         }
 
         [Test]
-        public async Task DoOperation_cancelDuringLongTap_cancel()
+        public async Task DoOperation_cancelDuringTouchAndHold_cancel()
         {
             const string Target = "UsingOnPointerDownUpHandler";
             const int Index = 0;
-            const string Operation = "LongTap";
+            const string Operation = "TouchAndHold";
 
             var component = InteractiveComponentCollector.FindInteractiveComponents(false)
                 .First(x => x.gameObject.name == Target);
             var spyLogger = new SpyLogger();
             var config = new MonkeyConfig
             {
-                LongTapDelayMillis = 1000, // 1sec
+                TouchAndHoldDelayMillis = 1000, // 1sec
                 Random = new StubRandom(Index), // for lottery operation
                 Logger = spyLogger,
             };
@@ -276,7 +276,7 @@ namespace TestHelper.Monkey
             {
                 Lifetime = TimeSpan.FromSeconds(1), // 1sec
                 DelayMillis = 1, // 1ms
-                LongTapDelayMillis = 1, // 1ms
+                TouchAndHoldDelayMillis = 1, // 1ms
                 Random = new RandomImpl(0), // fix seed
                 Logger = spyLogger,
             };

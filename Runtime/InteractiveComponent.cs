@@ -116,18 +116,18 @@ namespace TestHelper.Monkey
         public void Tap() => ClickOperator.Click(component);
 
         /// <summary>
-        /// Check inner component can receive long-tap event
+        /// Check inner component can receive touch-and-hold event
         /// </summary>
-        /// <returns>true: Can long-tap</returns>
-        public bool CanLongTap() => LongTapOperator.CanLongTap(component);
+        /// <returns>true: Can touch-and-hold</returns>
+        public bool CanTouchAndHold() => TouchAndHoldOperator.CanTouchAndHold(component);
 
         /// <summary>
-        /// Long-tap inner component
+        /// Touch-and-hold inner component
         /// </summary>
         /// <param name="delayMillis">Delay time between down to up</param>
         /// <param name="cancellationToken">Task cancellation token</param>
-        public async Task LongTap(int delayMillis = 1000, CancellationToken cancellationToken = default)
-            => await LongTapOperator.LongTap(component, delayMillis, cancellationToken);
+        public async Task TouchAndHold(int delayMillis = 1000, CancellationToken cancellationToken = default)
+            => await TouchAndHoldOperator.TouchAndHold(component, delayMillis, cancellationToken);
 
         // TODO: drag, swipe, flick, etc...
     }

@@ -82,13 +82,13 @@ namespace TestHelper.Monkey
         private enum SupportOperation
         {
             Click,
-            LongTap,
+            TouchAndHold,
         }
 
         private static IEnumerable<SupportOperation> GetCanOperations(InteractiveComponent component)
         {
             if (component.CanClick()) yield return SupportOperation.Click;
-            if (component.CanLongTap()) yield return SupportOperation.LongTap;
+            if (component.CanTouchAndHold()) yield return SupportOperation.TouchAndHold;
         }
 
         internal static async UniTask DoOperation(InteractiveComponent component, MonkeyConfig config,
@@ -102,8 +102,8 @@ namespace TestHelper.Monkey
                 case SupportOperation.Click:
                     component.Click();
                     break;
-                case SupportOperation.LongTap:
-                    await component.LongTap(config.LongTapDelayMillis, cancellationToken);
+                case SupportOperation.TouchAndHold:
+                    await component.TouchAndHold(config.TouchAndHoldDelayMillis, cancellationToken);
                     break;
                 default:
                     throw new IndexOutOfRangeException();

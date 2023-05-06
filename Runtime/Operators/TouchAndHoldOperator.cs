@@ -11,9 +11,9 @@ using UnityEngine.EventSystems;
 
 namespace TestHelper.Monkey.Operators
 {
-    internal static class LongTapOperator
+    internal static class TouchAndHoldOperator
     {
-        internal static bool CanLongTap(MonoBehaviour component)
+        internal static bool CanTouchAndHold(MonoBehaviour component)
         {
             if (component.gameObject.TryGetComponent(typeof(IgnoreAnnotation), out _))
             {
@@ -30,7 +30,7 @@ namespace TestHelper.Monkey.Operators
             return interfaces.Contains(typeof(IPointerDownHandler)) && interfaces.Contains(typeof(IPointerUpHandler));
         }
 
-        internal static async Task LongTap(MonoBehaviour component, int delayMillis = 1000,
+        internal static async Task TouchAndHold(MonoBehaviour component, int delayMillis = 1000,
             CancellationToken cancellationToken = default)
         {
             if (!(component is IPointerDownHandler downHandler) || !(component is IPointerUpHandler upHandler))
