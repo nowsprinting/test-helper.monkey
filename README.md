@@ -37,6 +37,9 @@ public async Task MonkeyTesting()
 > In batchmode, does not operate UI elements on Canvas.
 > Because `UnityEngine.UI.GraphicRaycaster` does not work in batchmode.
 
+> **Note**  
+> This library can use in runtime code because it does not depend on the Unity Test Framework.
+
 
 ### Find and operate interactive uGUI elements API
 
