@@ -130,6 +130,13 @@ openupm add com.nowsprinting.test-helper.monkey
 ```
 
 
+### Add assembly reference
+
+1. Open your test assembly definition file (.asmdef) in **Inspector** window
+2. Add **TestHelper.Monkey** into **Assembly Definition References**
+
+
+
 ## License
 
 MIT License
