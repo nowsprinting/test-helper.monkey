@@ -29,14 +29,16 @@ public async Task MonkeyTesting()
         SecondsToErrorForNoInteractiveComponent = 5,
     };
 
-    using var cancellationTokenSource = new CancellationTokenSource();
-    await Monkey.Run(config, cancellationTokenSource.Token);
+    await Monkey.Run(config);
 }
 ```
 
 > **Warning**  
 > In batchmode, does not operate UI elements on Canvas.
 > Because `UnityEngine.UI.GraphicRaycaster` does not work in batchmode.
+
+> **Note**  
+> This library can use in runtime code because it does not depend on the Unity Test Framework.
 
 
 ### Find and operate interactive uGUI elements API
