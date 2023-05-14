@@ -6,7 +6,8 @@
         "UnityEditor.TestRunner",
         "TestHelper.Monkey",
         "TestHelper.Monkey.Annotations",
-        "UniTask"
+        "UniTask",
+        "TestHelper"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

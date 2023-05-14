@@ -185,7 +185,6 @@ namespace TestHelper.Monkey
                 }
 
                 [Test]
-                [Category("IgnoreCI")] // GraphicRaycaster not work on batchmode
                 public void FindInteractiveObjects_reallyInteractiveOnly_findReachableObjects()
                 {
                     var actual = InteractiveComponentCollector.FindInteractiveComponents()
@@ -222,7 +221,6 @@ namespace TestHelper.Monkey
                 }
 
                 [Test]
-                [Category("IgnoreCI")] // GraphicRaycaster not work on batchmode
                 public void FindInteractiveObjects_reallyInteractiveOnly_findReachableObjects()
                 {
                     var actual = InteractiveComponentCollector.FindInteractiveComponents()
@@ -258,7 +256,6 @@ namespace TestHelper.Monkey
                 }
 
                 [Test]
-                [Category("IgnoreCI")] // GraphicRaycaster not work on batchmode
                 public void FindInteractiveObjects_reallyInteractiveOnly_findReachableObjects()
                 {
                     var actual = InteractiveComponentCollector.FindInteractiveComponents()
