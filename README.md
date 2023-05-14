@@ -33,10 +33,6 @@ public async Task MonkeyTesting()
 }
 ```
 
-> **Warning**  
-> In batchmode, does not operate UI elements on Canvas.
-> Because `UnityEngine.UI.GraphicRaycaster` does not work in batchmode.
-
 > **Note**  
 > This library can use in runtime code because it does not depend on the Unity Test Framework.
 
@@ -163,7 +159,9 @@ git submodule add https://github.com/nowsprinting/test-helper.monkey.git Package
 ```
 
 > **Warning**  
-> Required install [Unity Test Framework](https://docs.unity3d.com/Packages/com.unity.test-framework@latest) package v1.3 or later for running tests.
+> Required install following packages for running tests:
+> - [Unity Test Framework](https://docs.unity3d.com/Packages/com.unity.test-framework@latest) package v1.3 or later
+> - [Test Helper](https://github.com/nowsprinting/test-helper) package
 
 
 ## Release workflow
