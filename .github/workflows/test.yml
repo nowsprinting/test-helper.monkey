@@ -32,6 +32,7 @@ jobs:
         unityVersion: # Available versions see: https://game.ci/docs/docker/versions
           - 2019.4.40f1
           - 2022.2.5f1
+          - 2022.2.12f1
         include:
           - unityVersion: 2022.2.5f1
             octocov: true
