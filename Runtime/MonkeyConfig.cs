@@ -37,7 +37,7 @@ namespace TestHelper.Monkey
         /// <summary>
         /// Random generator
         /// </summary>
-        public IRandom Random = new RandomImpl(Environment.TickCount);
+        public IRandom Random = new RandomImpl();
 
         /// <summary>
         /// Logger

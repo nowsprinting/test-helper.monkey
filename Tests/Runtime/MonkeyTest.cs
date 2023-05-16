@@ -135,7 +135,7 @@ namespace TestHelper.Monkey
             {
                 await Monkey.Run(config, cancellationTokenSource.Token);
 
-                Assert.That(spyLogger.Messages, Does.Contain("Using System.Random, seed=0"));
+                Assert.That(spyLogger.Messages, Does.Contain("Using wrapping System.Random, seed=0"));
             }
         }
 
