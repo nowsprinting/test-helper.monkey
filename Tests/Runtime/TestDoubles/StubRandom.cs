@@ -19,6 +19,16 @@ namespace TestHelper.Monkey.TestDoubles
             _returnValueIndex = 0;
         }
 
+        public int Next()
+        {
+            if (_returnValues.Length <= _returnValueIndex)
+            {
+                throw new ArgumentException("The number of calls exceeds the length of arguments.");
+            }
+
+            return _returnValues[_returnValueIndex++];
+        }
+
         public int Next(int maxValue)
         {
             if (_returnValues.Length <= _returnValueIndex)
