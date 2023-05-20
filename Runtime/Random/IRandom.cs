@@ -4,15 +4,22 @@
 namespace TestHelper.Monkey.Random
 {
     /// <summary>
-    /// Random number generator interface
+    /// Random number generator interface like a <c>System.Random</c> class.
     /// </summary>
+    /// <seealso cref="System.Random"/>
     public interface IRandom
     {
         /// <summary>
-        /// Returns random number that is less than specified max-value.
+        /// Returns a non-negative random integer.
         /// </summary>
-        /// <param name="maxValue">Upper bound of the random number to be generated</param>
-        /// <returns>Generated random number</returns>
+        /// <returns>A 32-bit signed integer greater than or equal to zero and less than <c>int.MaxValue</c>.</returns>
+        int Next();
+
+        /// <summary>
+        /// Returns a non-negative random integer that is less than the specified maximum.
+        /// </summary>
+        /// <param name="maxValue">The exclusive upper bound of the random number to be generated. maxValue must be greater than or equal to zero.</param>
+        /// <returns>A 32-bit signed integer greater than or equal to zero, and less than maxValue; that is, the range of return values ordinarily includes zero but not maxValue. However, if maxValue equals zero, maxValue is returned.</returns>
         int Next(int maxValue);
     }
 }
