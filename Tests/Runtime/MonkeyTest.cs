@@ -264,7 +264,7 @@ namespace TestHelper.Monkey
             var spyLogger = new SpyLogger();
             var config = new MonkeyConfig
             {
-                Lifetime = TimeSpan.FromSeconds(1), // 1sec
+                Lifetime = TimeSpan.FromSeconds(10), // 10sec
                 DelayMillis = 1, // 1ms
                 TouchAndHoldDelayMillis = 1, // 1ms
                 Random = new RandomImpl(0), // fix seed
