@@ -86,7 +86,6 @@ namespace TestHelper.Monkey
             [TestCase("Button")] // Attached Button
             [TestCase("ChildInTheSight")] // Parent object is out of sight, but this object is in the sight
             [TestCase("ButtonOnInnerCanvas")] // On the inner Canvas
-            [Category("IgnoreCI")] // GraphicRaycaster not work on batchmode
             public void IsReallyInteractiveFromUser_reachableObjects_returnTrue(string targetName)
             {
                 var target = InteractiveComponentCollector.FindInteractiveComponents(false)

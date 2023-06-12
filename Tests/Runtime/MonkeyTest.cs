@@ -41,13 +41,10 @@ namespace TestHelper.Monkey
                 DelayMillis = 1, // 1ms
                 TouchAndHoldDelayMillis = 1, // 1ms
             };
-            using (var cancellationTokenSource = new CancellationTokenSource())
-            {
-                var task = Monkey.Run(config, cancellationTokenSource.Token);
-                await UniTask.Delay(500, DelayType.DeltaTime, cancellationToken: cancellationTokenSource.Token);
+            var task = Monkey.Run(config);
+            await UniTask.Delay(1000, DelayType.DeltaTime);
 
-                Assert.That(task.Status, Is.EqualTo(UniTaskStatus.Succeeded));
-            }
+            Assert.That(task.Status, Is.EqualTo(UniTaskStatus.Succeeded));
         }
 
         [Test]
@@ -82,18 +79,15 @@ namespace TestHelper.Monkey
                 Lifetime = TimeSpan.FromSeconds(5), // 5sec
                 SecondsToErrorForNoInteractiveComponent = 1, // 1sec
             };
-            using (var cancellationTokenSource = new CancellationTokenSource())
-            {
-                try
-                {
-                    await Monkey.Run(config, cancellationTokenSource.Token);
 
-                    Assert.Fail("AssertionException was not thrown");
-                }
-                catch (UnityEngine.Assertions.AssertionException e)
-                {
-                    Assert.That(e.Message, Does.Contain("Interactive component not found in 1 seconds"));
-                }
+            try
+            {
+                await Monkey.Run(config);
+                Assert.Fail("AssertionException was not thrown");
+            }
+            catch (UnityEngine.Assertions.AssertionException e)
+            {
+                Assert.That(e.Message, Does.Contain("Interactive component not found in 1 seconds"));
             }
         }
 
@@ -112,13 +106,11 @@ namespace TestHelper.Monkey
                 TouchAndHoldDelayMillis = 1, // 1ms
                 SecondsToErrorForNoInteractiveComponent = 0, // not detect error
             };
-            using (var cancellationTokenSource = new CancellationTokenSource())
-            {
-                var task = Monkey.Run(config, cancellationTokenSource.Token);
-                await UniTask.Delay(2200, DelayType.DeltaTime, cancellationToken: cancellationTokenSource.Token);
 
-                Assert.That(task.Status, Is.EqualTo(UniTaskStatus.Succeeded));
-            }
+            var task = Monkey.Run(config);
+            await UniTask.Delay(2200, DelayType.DeltaTime);
+
+            Assert.That(task.Status, Is.EqualTo(UniTaskStatus.Succeeded));
         }
 
         [Test]
@@ -131,12 +123,10 @@ namespace TestHelper.Monkey
                 Random = new RandomImpl(0), // fix seed
                 Logger = spyLogger,
             };
-            using (var cancellationTokenSource = new CancellationTokenSource())
-            {
-                await Monkey.Run(config, cancellationTokenSource.Token);
 
-                Assert.That(spyLogger.Messages, Does.Contain("Using wrapping System.Random, seed=0"));
-            }
+            await Monkey.Run(config);
+
+            Assert.That(spyLogger.Messages, Does.Contain("Using wrapping System.Random, seed=0"));
         }
 
         [Test]
@@ -274,18 +264,16 @@ namespace TestHelper.Monkey
             var spyLogger = new SpyLogger();
             var config = new MonkeyConfig
             {
-                Lifetime = TimeSpan.FromSeconds(1), // 1sec
+                Lifetime = TimeSpan.FromSeconds(10), // 10sec
                 DelayMillis = 1, // 1ms
                 TouchAndHoldDelayMillis = 1, // 1ms
                 Random = new RandomImpl(0), // fix seed
                 Logger = spyLogger,
             };
-            using (var cancellationTokenSource = new CancellationTokenSource())
-            {
-                await Monkey.Run(config, cancellationTokenSource.Token);
 
-                Assert.That(spyLogger.Messages, Does.Contain($"Do operation {target} {operation}"));
-            }
+            await Monkey.Run(config);
+
+            Assert.That(spyLogger.Messages, Does.Contain($"Do operation {target} {operation}"));
         }
     }
 }

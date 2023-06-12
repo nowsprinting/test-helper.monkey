@@ -6,6 +6,8 @@
 
 Reference implementation that performs object-based Unity UI (uGUI) monkey tests and an API for custom implementation.
 
+This library can use in runtime code because it does not depend on the Unity Test Framework.
+
 Required Unity 2019 LTS or later.
 
 
@@ -33,12 +35,14 @@ public async Task MonkeyTesting()
 }
 ```
 
-> **Warning**  
-> In batchmode, does not operate UI elements on Canvas.
-> Because `UnityEngine.UI.GraphicRaycaster` does not work in batchmode.
+Configurations in `MonkeyConfig`:
 
-> **Note**  
-> This library can use in runtime code because it does not depend on the Unity Test Framework.
+- **Lifetime**: Running time
+- **DelayMillis**: Delay time between operations
+- **SecondsToErrorForNoInteractiveComponent**: Seconds to determine that an error has occurred when an object that can be interacted with does not exist
+- **TouchAndHoldDelayMillis**: Delay time for touch-and-hold
+- **Random**: Random generator
+- **Logger**: Logger
 
 
 ### Find and operate interactive uGUI elements API
@@ -63,11 +67,6 @@ public void FindAndOperationInteractiveComponent()
 }
 ```
 
-> **Warning**  
-> In batchmode, it does not return interactable UI elements on Canvas.
-> Because `UnityEngine.UI.GraphicRaycaster` does not work in batchmode.
-
-
 #### InteractiveComponent.IsReallyInteractiveFromUser
 
 Returns true if the component is really reachable from the user.
@@ -87,10 +86,6 @@ public void FindAndOperationInteractiveComponent()
 }
 ```
 
-> **Warning**  
-> In batchmode, `InteractiveComponent.IsReallyInteractiveFromUser` for UI elements is always false.
-> Because `UnityEngine.UI.GraphicRaycaster` does not work in batchmode.
-
 
 ## Installation
 
@@ -108,9 +103,6 @@ You can choose from two typical installation methods.
 
 > **Note**  
 > Do not forget to add `com.cysharp` into scopes. These are used within this package.
-
-> **Note**  
-> Required install [Unity Test Framework](https://docs.unity3d.com/Packages/com.unity.test-framework@latest) package v1.3 or later for running tests (when adding to the `testables` in package.json).
 
 **Figure 1.** Package Manager tab in Project Settings window.
 
@@ -163,7 +155,9 @@ git submodule add https://github.com/nowsprinting/test-helper.monkey.git Package
 ```
 
 > **Warning**  
-> Required install [Unity Test Framework](https://docs.unity3d.com/Packages/com.unity.test-framework@latest) package v1.3 or later for running tests.
+> Required install packages for running tests (when adding to the `testables` in package.json), as follows:  
+> * [Unity Test Framework](https://docs.unity3d.com/Packages/com.unity.test-framework@latest) package v1.3 or later  
+> * [Test Helper](https://github.com/nowsprinting/test-helper) package v0.1.1 or later  
 
 
 ## Release workflow
