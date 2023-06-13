@@ -13,6 +13,28 @@ PACKAGE_NAME?=$(shell grep -o -E '"name": "(.+)"' $(PACKAGE_HOME)/package.json |
 PACKAGE_ASSEMBLIES?=$(shell echo $(shell find $(PACKAGE_HOME) -name "*.asmdef" -maxdepth 3 | sed -e s/.*\\//\+/ | sed -e s/\\.asmdef// | sed -e s/^.*\\.Tests//) | sed -e s/\ /,/g)
 COVERAGE_ASSEMBLY_FILTERS?=$(PACKAGE_ASSEMBLIES),+<assets>,-*.Tests
 
+# -nographics` option
+ifdef NOGRAPHICS
+NOGRAPHICS=-nographics
+endif
+
+# -testCategory option. see https://docs.unity3d.com/Packages/com.unity.test-framework@1.3/manual/reference-command-line.html#testcategory
+ifdef CATEGORY
+TEST_CATEGORY=-testCategory "$(CATEGORY)"
+else
+TEST_CATEGORY=-testCategory "!IgnoreCI"
+endif
+
+# -testFilter option. see https://docs.unity3d.com/Packages/com.unity.test-framework@1.3/manual/reference-command-line.html#testfilter
+ifdef FILTER
+TEST_FILTER=-testFilter "$(FILTER)"
+endif
+
+# -assemblyNames option. see https://docs.unity3d.com/Packages/com.unity.test-framework@1.3/manual/reference-command-line.html#assemblynames
+ifdef ASSEMBLY
+ASSEMBLY_NAMES=-assemblyNames "$(ASSEMBLY)"
+endif
+
 UNAME := $(shell uname)
 ifeq ($(UNAME), Darwin)
 UNITY_HOME=/Applications/Unity/HUB/Editor/$(UNITY_VERSION)/Unity.app/Contents
@@ -20,20 +42,29 @@ UNITY?=$(UNITY_HOME)/MacOS/Unity
 UNITY_YAML_MERGE?=$(UNITY_HOME)/Tools/UnityYAMLMerge
 STANDALONE_PLAYER=StandaloneOSX
 endif
+ifeq ($(UNAME), Linux)  # not test yet
+UNITY_HOME=$HOME/Unity/Hub/Editor/<version>
+UNITY?=$(UNITY_HOME)/Unity
+UNITY_YAML_MERGE?=$(UNITY_HOME)/ # unknown
+STANDALONE_PLAYER=StandaloneLinux64
+endif
 
 define base_arguments
-  -projectPath $(PROJECT_HOME) \
-  -logFile $(LOG_DIR)/test_$(TEST_PLATFORM).log
+-projectPath $(PROJECT_HOME) \
+-logFile $(LOG_DIR)/test_$(TEST_PLATFORM).log
 endef
 
 define test_arguments
-  -batchmode \
-  -silent-crashes \
-  -stackTraceLogType Full \
-  -runTests \
-  -testCategory "!IgnoreCI" \
-  -testPlatform $(TEST_PLATFORM) \
-  -testResults $(LOG_DIR)/test_$(TEST_PLATFORM)_results.xml
+-batchmode \
+$(NOGRAPHICS) \
+-silent-crashes \
+-stackTraceLogType Full \
+-runTests \
+$(TEST_CATEGORY) \
+$(TEST_FILTER) \
+$(ASSEMBLY_NAMES) \
+-testPlatform $(TEST_PLATFORM) \
+-testResults $(LOG_DIR)/test_$(TEST_PLATFORM)_results.xml
 endef
 
 define test
@@ -80,6 +111,7 @@ usage:
 	@echo "  test_playmode: Run Play Mode tests."
 	@echo "  cover_report: Create code coverage HTML report."
 	@echo "  test: Run test_editmode, test_playmode, and cover_report. Recommended to use with '-k' option."
+	@echo "  test_standalone_player: Run Play Mode tests on standalone player."
 
 # Create Unity project for run UPM package tests. And upgrade and add dependencies for tests.
 # Required install [openupm-cli](https://github.com/openupm/openupm-cli).
@@ -133,3 +165,9 @@ cover_report:
 # it will run through to Html report generation and return an exit code indicating an error.
 .PHONY: test
 test: test_editmode test_playmode cover_report
+
+# Run Play Mode tests on standalone player
+# Run test because code coverage package is not support run on standalone player.
+.PHONY: test_standalone_player
+test_standalone_player:
+	$(call test,$(STANDALONE_PLAYER))
