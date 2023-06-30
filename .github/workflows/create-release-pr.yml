@@ -7,10 +7,12 @@ name: Create release pull request
 on:
   workflow_dispatch:
 
-permissions: write-all
 jobs:
   create-release-pr:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
 
     steps:
       - name: Get draft release version

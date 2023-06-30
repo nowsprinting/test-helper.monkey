@@ -10,10 +10,11 @@ on:
     paths:
       - package.json
 
-permissions: write-all
 jobs:
   check-bump-version:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     outputs:
       new-version: ${{ steps.diff.outputs.version }}
 
@@ -32,6 +33,10 @@ jobs:
     needs: check-bump-version
     if: ${{ needs.check-bump-version.outputs.new-version }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: read
+      actions: read
 
     steps:
       - uses: release-drafter/release-drafter@v5
