@@ -22,10 +22,12 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-permissions: write-all
 jobs:
   test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write
     strategy:
       fail-fast: false
       matrix:
@@ -126,6 +128,8 @@ jobs:
   notify:
     needs: test
     runs-on: ubuntu-latest
+    permissions:
+      actions: read
     if: always()
 
     steps:

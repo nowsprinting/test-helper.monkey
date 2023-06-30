@@ -7,10 +7,12 @@ on:
   pull_request:
     types: [ opened ]
 
-permissions: write-all
 jobs:
   pr-labeler:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
 
     steps:
       - uses: TimonVS/pr-labeler-action@v4
