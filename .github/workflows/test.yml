@@ -28,6 +28,7 @@ jobs:
     permissions:
       contents: read
       checks: write
+      pull-requests: write
     strategy:
       fail-fast: false
       matrix:
