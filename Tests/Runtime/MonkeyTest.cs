@@ -120,7 +120,7 @@ namespace TestHelper.Monkey
             var config = new MonkeyConfig
             {
                 Lifetime = TimeSpan.FromSeconds(1), // 1sec
-                Random = new RandomImpl(0), // fix seed
+                Random = new RandomImpl(0), // pin seed
                 Logger = spyLogger,
             };
 
@@ -267,7 +267,7 @@ namespace TestHelper.Monkey
                 Lifetime = TimeSpan.FromSeconds(10), // 10sec
                 DelayMillis = 1, // 1ms
                 TouchAndHoldDelayMillis = 1, // 1ms
-                Random = new RandomImpl(0), // fix seed
+                Random = new RandomImpl(0), // pin seed
                 Logger = spyLogger,
             };
 
