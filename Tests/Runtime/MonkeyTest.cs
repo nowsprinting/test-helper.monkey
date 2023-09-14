@@ -259,6 +259,7 @@ namespace TestHelper.Monkey
         }
 
         [TestCaseSource(nameof(s_componentAndOperations))]
+        [Category("IgnoreCI")] // Ignore on CI due to low fps
         public async Task Run_lotteryComponentsAndOperations(string target, int _, string operation)
         {
             var spyLogger = new SpyLogger();
