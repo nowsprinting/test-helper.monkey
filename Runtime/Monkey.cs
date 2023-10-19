@@ -23,7 +23,7 @@ namespace TestHelper.Monkey
     public static class Monkey
     {
         /// <summary>
-        /// Run monkey testing.
+        /// Run monkey testing by repeating to call <c cref="RunStep" /> and wait.
         /// </summary>
         /// <param name="config">Run configuration for monkey testing</param>
         /// <param name="cancellationToken">Cancellation token</param>
@@ -38,12 +38,10 @@ namespace TestHelper.Monkey
 
             while (Time.time < endTime)
             {
-                var components = InteractiveComponentCollector.FindInteractiveComponents(false).ToList();
-                var component = Lottery(ref components, config.Random);
-                if (component != null)
+                var didAct = await RunStep(config, cancellationToken);
+                if (didAct)
                 {
                     lastOperationTime = Time.time;
-                    await DoOperation(component, config, cancellationToken);
                 }
                 else if (config.SecondsToErrorForNoInteractiveComponent > 0)
                 {
@@ -53,6 +51,25 @@ namespace TestHelper.Monkey
 
                 await UniTask.Delay(config.DelayMillis, DelayType.DeltaTime, cancellationToken: cancellationToken);
             }
+        }
+
+        /// <summary>
+        /// Run a step of monkey testing.
+        /// </summary>
+        /// <param name="config"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public static async UniTask<bool> RunStep(MonkeyConfig config, CancellationToken cancellationToken = default)
+        {
+            var components = InteractiveComponentCollector.FindInteractiveComponents(false).ToList();
+            var component = Lottery(ref components, config.Random);
+            if (component == null)
+            {
+                return false;
+            }
+
+            await DoOperation(component, config, cancellationToken);
+            return true;
         }
 
         internal static InteractiveComponent Lottery(ref List<InteractiveComponent> components, IRandom random)

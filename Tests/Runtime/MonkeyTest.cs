@@ -33,6 +33,37 @@ namespace TestHelper.Monkey
         }
 
         [Test]
+        public async Task RunStep_finish()
+        {
+            var config = new MonkeyConfig
+            {
+                DelayMillis = 1, // 1ms
+                TouchAndHoldDelayMillis = 1, // 1ms
+            };
+
+            var didAct = await Monkey.RunStep(config);
+            Assert.That(didAct, Is.EqualTo(true));
+        }
+
+        [Test]
+        public async Task RunStep_noInteractiveComponent_abort()
+        {
+            foreach (var component in InteractiveComponentCollector.FindInteractiveComponents(false))
+            {
+                component.gameObject.SetActive(false);
+            }
+
+            var config = new MonkeyConfig
+            {
+                DelayMillis = 1, // 1ms
+                TouchAndHoldDelayMillis = 1, // 1ms
+            };
+
+            var didAct = await Monkey.RunStep(config);
+            Assert.That(didAct, Is.EqualTo(false));
+        }
+
+        [Test]
         public async Task Run_finish()
         {
             var config = new MonkeyConfig
