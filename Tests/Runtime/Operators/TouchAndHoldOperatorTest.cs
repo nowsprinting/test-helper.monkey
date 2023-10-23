@@ -27,6 +27,7 @@ namespace TestHelper.Monkey.Operators
 
         [TestCase("UsingOnPointerDownUpHandler", "OnPointerDown", "OnPointerUp")]
         [TestCase("UsingPointerDownUpEventTrigger", "ReceivePointerDown", "ReceivePointerUp")]
+        [TestCase("DestroyItselfIfPointerDown", "OnPointerDown", "DestroyImmediate")]
         public async Task TouchAndHold(string targetName, string expectedMessage1, string expectedMessage2)
         {
             var target = InteractiveComponentCollector.FindInteractiveComponents(false)
