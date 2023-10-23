@@ -30,8 +30,11 @@ namespace TestHelper.Monkey.Operators
             return interfaces.Contains(typeof(IPointerDownHandler)) && interfaces.Contains(typeof(IPointerUpHandler));
         }
 
-        internal static async Task TouchAndHold(MonoBehaviour component, int delayMillis = 1000,
-            CancellationToken cancellationToken = default)
+        internal static async Task TouchAndHold(
+            MonoBehaviour component,
+            int delayMillis = 1000,
+            CancellationToken cancellationToken = default
+        )
         {
             if (!(component is IPointerDownHandler downHandler) || !(component is IPointerUpHandler upHandler))
             {
@@ -45,6 +48,12 @@ namespace TestHelper.Monkey.Operators
 
             downHandler.OnPointerDown(eventData);
             await Task.Delay(delayMillis, cancellationToken);
+
+            if (component == null)
+            {
+                return;
+            }
+
             upHandler.OnPointerUp(eventData);
         }
     }
