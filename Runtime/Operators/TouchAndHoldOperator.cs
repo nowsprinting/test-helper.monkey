@@ -1,9 +1,10 @@
 ﻿// Copyright (c) 2023 Koji Hasegawa.
 // This software is released under the MIT License.
 
+using System;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using TestHelper.Monkey.Annotations;
 using TestHelper.Monkey.Extensions;
 using UnityEngine;
@@ -30,7 +31,7 @@ namespace TestHelper.Monkey.Operators
             return interfaces.Contains(typeof(IPointerDownHandler)) && interfaces.Contains(typeof(IPointerUpHandler));
         }
 
-        internal static async Task TouchAndHold(
+        internal static async UniTask TouchAndHold(
             MonoBehaviour component,
             int delayMillis = 1000,
             CancellationToken cancellationToken = default
@@ -47,7 +48,7 @@ namespace TestHelper.Monkey.Operators
             };
 
             downHandler.OnPointerDown(eventData);
-            await Task.Delay(delayMillis, cancellationToken);
+            await UniTask.Delay(TimeSpan.FromMilliseconds(delayMillis), cancellationToken: cancellationToken);
 
             if (component == null)
             {

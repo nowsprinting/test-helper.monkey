@@ -4,7 +4,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using TestHelper.Monkey.Extensions;
 using TestHelper.Monkey.Operators;
 using UnityEngine;
@@ -126,7 +126,7 @@ namespace TestHelper.Monkey
         /// </summary>
         /// <param name="delayMillis">Delay time between down to up</param>
         /// <param name="cancellationToken">Task cancellation token</param>
-        public async Task TouchAndHold(int delayMillis = 1000, CancellationToken cancellationToken = default)
+        public async UniTask TouchAndHold(int delayMillis = 1000, CancellationToken cancellationToken = default)
             => await TouchAndHoldOperator.TouchAndHold(component, delayMillis, cancellationToken);
 
         // TODO: drag, swipe, flick, etc...
