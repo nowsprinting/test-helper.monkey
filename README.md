@@ -11,6 +11,7 @@ This library can use in runtime code because it does not depend on the Unity Tes
 Required Unity 2019 LTS or later.
 
 
+
 ## Features
 
 ### Monkey test reference implementation
@@ -87,6 +88,7 @@ public void FindAndOperationInteractiveComponent()
 ```
 
 
+
 ## Installation
 
 You can choose from two typical installation methods.
@@ -136,6 +138,7 @@ openupm add com.nowsprinting.test-helper.monkey
 MIT License
 
 
+
 ## How to contribute
 
 Open an issue or create a pull request.
@@ -144,20 +147,27 @@ Be grateful if you could label the PR as `enhancement`, `bug`, `chore`, and `doc
 See [PR Labeler settings](.github/pr-labeler.yml) for automatically labeling from the branch name.
 
 
+
 ## How to development
 
 Add this repository as a submodule to the Packages/ directory in your project.
-
-Run the command below:
 
 ```bash
 git submodule add https://github.com/nowsprinting/test-helper.monkey.git Packages/com.nowsprinting.test-helper.monkey
 ```
 
+Generate a temporary project and run tests on each Unity version from the command line.
+
+```bash
+make create_project
+UNITY_VERSION=2019.4.40f1 make -k test
+```
+
 > **Warning**  
 > Required install packages for running tests (when adding to the `testables` in package.json), as follows:  
-> * [Unity Test Framework](https://docs.unity3d.com/Packages/com.unity.test-framework@latest) package v1.3 or later  
-> * [Test Helper](https://github.com/nowsprinting/test-helper) package v0.1.1 or later  
+> * [Unity Test Framework](https://docs.unity3d.com/Packages/com.unity.test-framework@latest) package v1.3.4 or later  
+> * [Test Helper](https://github.com/nowsprinting/test-helper) package v0.3.0 or later  
+
 
 
 ## Release workflow
