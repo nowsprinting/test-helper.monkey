@@ -22,17 +22,26 @@ Run a monkey test for uGUI (2D, 3D, and UI) elements.
 Usage:
 
 ```csharp
-[Test]
-public async Task MonkeyTesting()
-{
-    var config = new MonkeyConfig
-    {
-        Lifetime = TimeSpan.FromMinutes(2),
-        DelayMillis = 200,
-        SecondsToErrorForNoInteractiveComponent = 5,
-    };
+using System;
+using System.Threading.Tasks;
+using NUnit.Framework;
+using TestHelper.Monkey;
 
-    await Monkey.Run(config);
+[TestFixture]
+public class MyIntegrationTest
+{
+    [Test]
+    public async Task MonkeyTesting()
+    {
+        var config = new MonkeyConfig
+        {
+            Lifetime = TimeSpan.FromMinutes(2),
+            DelayMillis = 200,
+            SecondsToErrorForNoInteractiveComponent = 5,
+        };
+
+        await Monkey.Run(config);
+    }
 }
 ```
 
@@ -56,16 +65,24 @@ If the argument is true, return only user-really reachable components (using the
 Usage:
 
 ```csharp
-[Test]
-public void FindAndOperationInteractiveComponent()
+using System.Linq;
+using NUnit.Framework;
+using TestHelper.Monkey;
+
+[TestFixture]
+public class MyIntegrationTest
 {
-    var component = InteractiveComponentCollector.FindInteractiveComponents(true)
-        .First();
-    if (component.CanClick())
+    [Test]
+    public void MyTestMethod()
     {
+        var component = InteractiveComponentCollector.FindInteractiveComponents(true)
+            .First();
+
+        Assume.That(component.CanClick(), Is.True);
         component.Click();
     }
 }
+
 ```
 
 #### InteractiveComponent.IsReallyInteractiveFromUser
@@ -75,13 +92,21 @@ Returns true if the component is really reachable from the user.
 Usage:
 
 ```csharp
-[Test]
-public void FindAndOperationInteractiveComponent()
+using System.Linq;
+using NUnit.Framework;
+using TestHelper.Monkey;
+
+[TestFixture]
+public class MyIntegrationTest
 {
-    var component = InteractiveComponentCollector.FindInteractiveComponents(false)
-        .First();
-    if (component.IsReallyInteractiveFromUser() && component.CanClick())
+    [Test]
+    public void MyTestMethod()
     {
+        var component = InteractiveComponentCollector.FindInteractiveComponents(false)
+            .First();
+
+        Assume.That(component.IsReallyInteractiveFromUser(), Is.True);
+        Assume.That(component.CanClick(), Is.True);
         component.Click();
     }
 }
@@ -164,9 +189,10 @@ UNITY_VERSION=2019.4.40f1 make -k test
 ```
 
 > **Warning**  
-> Required install packages for running tests (when adding to the `testables` in package.json), as follows:  
-> * [Unity Test Framework](https://docs.unity3d.com/Packages/com.unity.test-framework@latest) package v1.3.4 or later  
-> * [Test Helper](https://github.com/nowsprinting/test-helper) package v0.3.0 or later  
+> - Required install packages for running tests (when adding to the `testables` in package.json), as follows:
+>   - [Unity Test Framework](https://docs.unity3d.com/Packages/com.unity.test-framework@latest) package v1.3.4 or later
+>   - [Test Helper](https://github.com/nowsprinting/test-helper) package v0.3.0 or later
+> - Set the player screen resolution to 1920x1080 when running Play Mode tests on Player.
 
 
 
