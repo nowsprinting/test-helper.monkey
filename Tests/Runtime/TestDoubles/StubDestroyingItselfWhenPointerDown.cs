@@ -1,7 +1,10 @@
+// Copyright (c) 2023 Koji Hasegawa.
+// This software is released under the MIT License.
+
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-namespace TestHelper.Monkey
+namespace TestHelper.Monkey.TestDoubles
 {
     /// <summary>
     /// Pointer down event handler

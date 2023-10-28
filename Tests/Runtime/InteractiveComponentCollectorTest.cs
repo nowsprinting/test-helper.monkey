@@ -4,15 +4,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Cysharp.Threading.Tasks;
 using NUnit.Framework;
-using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.TestTools;
+using TestHelper.Attributes;
 
 namespace TestHelper.Monkey
 {
-    [UnityPlatform(RuntimePlatform.OSXEditor, RuntimePlatform.WindowsEditor, RuntimePlatform.LinuxEditor)]
     [TestFixture]
     public class InteractiveComponentCollectorTest
     {
@@ -22,6 +18,9 @@ namespace TestHelper.Monkey
         [TestFixture]
         public class ThreeD
         {
+            private const string TestScene =
+                "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/MonkeyThreeD.unity";
+
             private static readonly string[] s_reachableObjects =
             {
                 "UsingEventHandler", // Implements IPointerClickHandler
@@ -40,17 +39,8 @@ namespace TestHelper.Monkey
                 return s_reachableObjects.Concat(s_unreachableObjects);
             }
 
-            [SetUp]
-            public async Task SetUp()
-            {
-#if UNITY_EDITOR
-                await UnityEditor.SceneManagement.EditorSceneManager.LoadSceneAsyncInPlayMode(
-                    "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/MonkeyThreeD.unity",
-                    new LoadSceneParameters(LoadSceneMode.Single));
-#endif
-            }
-
             [Test]
+            [LoadScene(TestScene)]
             public void FindInteractiveObjects_findAllInteractiveObjects()
             {
                 var actual = InteractiveComponentCollector.FindInteractiveComponents(false)
@@ -60,6 +50,7 @@ namespace TestHelper.Monkey
             }
 
             [Test]
+            [LoadScene(TestScene)]
             public void FindInteractiveObjects_reallyInteractiveOnly_findReachableObjects()
             {
                 var actual = InteractiveComponentCollector.FindInteractiveComponents()
@@ -75,6 +66,9 @@ namespace TestHelper.Monkey
         [TestFixture]
         public class TwoD
         {
+            private const string TestScene =
+                "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/MonkeyTwoD.unity";
+
             private static readonly string[] s_reachableObjects =
             {
                 "UsingEventHandler", // Implements IPointerClickHandler
@@ -93,17 +87,8 @@ namespace TestHelper.Monkey
                 return s_reachableObjects.Concat(s_unreachableObjects);
             }
 
-            [SetUp]
-            public async Task SetUp()
-            {
-#if UNITY_EDITOR
-                await UnityEditor.SceneManagement.EditorSceneManager.LoadSceneAsyncInPlayMode(
-                    "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/MonkeyTwoD.unity",
-                    new LoadSceneParameters(LoadSceneMode.Single));
-#endif
-            }
-
             [Test]
+            [LoadScene(TestScene)]
             public void FindInteractiveObjects_findAllInteractiveObjects()
             {
                 var actual = InteractiveComponentCollector.FindInteractiveComponents(false)
@@ -113,8 +98,11 @@ namespace TestHelper.Monkey
             }
 
             [Test]
-            public void FindInteractiveObjects_reallyInteractiveOnly_findReachableObjects()
+            [LoadScene(TestScene)]
+            public async Task FindInteractiveObjects_reallyInteractiveOnly_findReachableObjects()
             {
+                await Task.Yield(); // wait for GraphicRaycaster initialization
+
                 var actual = InteractiveComponentCollector.FindInteractiveComponents()
                     .Select(x => x.gameObject.name)
                     .ToArray();
@@ -152,6 +140,9 @@ namespace TestHelper.Monkey
             [TestFixture]
             public class ScreenSpaceOverlay
             {
+                private const string TestScene =
+                    "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/MonkeyUiScreenSpaceOverlay.unity";
+
                 private static readonly string[] s_unreachableUiObjectsInOverlayCanvas =
                 {
                     "BeyondTheWall", // Beyond the another object
@@ -164,18 +155,8 @@ namespace TestHelper.Monkey
                     return s_reachableUiObjects.Concat(s_unreachableUiObjectsInOverlayCanvas);
                 }
 
-                [SetUp]
-                public async Task SetUp()
-                {
-#if UNITY_EDITOR
-                    await UnityEditor.SceneManagement.EditorSceneManager.LoadSceneAsyncInPlayMode(
-                        "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/MonkeyUiScreenSpaceOverlay.unity",
-                        new LoadSceneParameters(LoadSceneMode.Single));
-                    await UniTask.NextFrame(); // Wait 1 frame because warmup for GraphicRaycaster
-#endif
-                }
-
                 [Test]
+                [LoadScene(TestScene)]
                 public void FindInteractiveObjects_findAllInteractiveObjects()
                 {
                     var actual = InteractiveComponentCollector.FindInteractiveComponents(false)
@@ -185,8 +166,11 @@ namespace TestHelper.Monkey
                 }
 
                 [Test]
-                public void FindInteractiveObjects_reallyInteractiveOnly_findReachableObjects()
+                [LoadScene(TestScene)]
+                public async Task FindInteractiveObjects_reallyInteractiveOnly_findReachableObjects()
                 {
+                    await Task.Yield(); // wait for GraphicRaycaster initialization
+
                     var actual = InteractiveComponentCollector.FindInteractiveComponents()
                         .Select(x => x.gameObject.name)
                         .ToArray();
@@ -200,18 +184,11 @@ namespace TestHelper.Monkey
             [TestFixture]
             public class ScreenSpaceCamera
             {
-                [SetUp]
-                public async Task SetUp()
-                {
-#if UNITY_EDITOR
-                    await UnityEditor.SceneManagement.EditorSceneManager.LoadSceneAsyncInPlayMode(
-                        "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/MonkeyUiScreenSpaceCamera.unity",
-                        new LoadSceneParameters(LoadSceneMode.Single));
-                    await UniTask.NextFrame(); // Wait 1 frame because warmup for GraphicRaycaster
-#endif
-                }
+                private const string TestScene =
+                    "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/MonkeyUiScreenSpaceCamera.unity";
 
                 [Test]
+                [LoadScene(TestScene)]
                 public void FindInteractiveObjects_findAllInteractiveObjects()
                 {
                     var actual = InteractiveComponentCollector.FindInteractiveComponents(false)
@@ -221,8 +198,11 @@ namespace TestHelper.Monkey
                 }
 
                 [Test]
-                public void FindInteractiveObjects_reallyInteractiveOnly_findReachableObjects()
+                [LoadScene(TestScene)]
+                public async Task FindInteractiveObjects_reallyInteractiveOnly_findReachableObjects()
                 {
+                    await Task.Yield(); // wait for GraphicRaycaster initialization
+
                     var actual = InteractiveComponentCollector.FindInteractiveComponents()
                         .Select(x => x.gameObject.name)
                         .ToArray();
@@ -235,18 +215,11 @@ namespace TestHelper.Monkey
             /// </summary>
             public class WorldSpace
             {
-                [SetUp]
-                public async Task SetUp()
-                {
-#if UNITY_EDITOR
-                    await UnityEditor.SceneManagement.EditorSceneManager.LoadSceneAsyncInPlayMode(
-                        "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/MonkeyUiWorldSpace.unity",
-                        new LoadSceneParameters(LoadSceneMode.Single));
-                    await UniTask.NextFrame(); // Wait 1 frame because warmup for GraphicRaycaster
-#endif
-                }
+                private const string TestScene =
+                    "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/MonkeyUiWorldSpace.unity";
 
                 [Test]
+                [LoadScene(TestScene)]
                 public void FindInteractiveObjects_findAllInteractiveObjects()
                 {
                     var actual = InteractiveComponentCollector.FindInteractiveComponents(false)
@@ -256,8 +229,11 @@ namespace TestHelper.Monkey
                 }
 
                 [Test]
-                public void FindInteractiveObjects_reallyInteractiveOnly_findReachableObjects()
+                [LoadScene(TestScene)]
+                public async Task FindInteractiveObjects_reallyInteractiveOnly_findReachableObjects()
                 {
+                    await Task.Yield(); // wait for GraphicRaycaster initialization
+
                     var actual = InteractiveComponentCollector.FindInteractiveComponents()
                         .Select(x => x.gameObject.name)
                         .ToArray();

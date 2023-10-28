@@ -2,31 +2,21 @@
 // This software is released under the MIT License.
 
 using System.Linq;
-using System.Threading.Tasks;
-using Cysharp.Threading.Tasks;
 using NUnit.Framework;
+using TestHelper.Attributes;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 
 namespace TestHelper.Monkey.Operators
 {
-    [UnityPlatform(RuntimePlatform.OSXEditor, RuntimePlatform.WindowsEditor, RuntimePlatform.LinuxEditor)]
     [TestFixture]
     public class ClickOperatorTest
     {
-        [SetUp]
-        public async Task SetUp()
-        {
-#if UNITY_EDITOR
-            await UnityEditor.SceneManagement.EditorSceneManager.LoadSceneAsyncInPlayMode(
-                "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/Operators.unity",
-                new LoadSceneParameters(LoadSceneMode.Single));
-#endif
-        }
+        private const string TestScene = "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/Operators.unity";
 
         [TestCase("UsingOnPointerClickHandler", "OnPointerClick")]
         [TestCase("UsingPointerClickEventTrigger", "ReceivePointerClick")]
+        [LoadScene(TestScene)]
         public void Click(string targetName, string expectedMessage)
         {
             var target = InteractiveComponentCollector.FindInteractiveComponents(false)
@@ -39,6 +29,7 @@ namespace TestHelper.Monkey.Operators
 
         [TestCase("UsingOnPointerClickHandler", "OnPointerClick")]
         [TestCase("UsingPointerClickEventTrigger", "ReceivePointerClick")]
+        [LoadScene(TestScene)]
         public void Tap(string targetName, string expectedMessage) // Same as Click
         {
             var target = InteractiveComponentCollector.FindInteractiveComponents(false)
@@ -51,6 +42,7 @@ namespace TestHelper.Monkey.Operators
 
         [TestCase("UsingOnPointerDownUpHandler")]
         [TestCase("UsingPointerDownUpEventTrigger")]
+        [LoadScene(TestScene)]
         public void CanNotClick(string targetName)
         {
             var target = InteractiveComponentCollector.FindInteractiveComponents(false)

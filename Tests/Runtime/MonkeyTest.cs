@@ -8,31 +8,22 @@ using System.Threading;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using NUnit.Framework;
+using TestHelper.Attributes;
 using TestHelper.Monkey.Annotations;
 using TestHelper.Monkey.Random;
 using TestHelper.Monkey.TestDoubles;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.SceneManagement;
-using UnityEngine.TestTools;
 
 namespace TestHelper.Monkey
 {
-    [UnityPlatform(RuntimePlatform.OSXEditor, RuntimePlatform.WindowsEditor, RuntimePlatform.LinuxEditor)]
     [TestFixture]
     public class MonkeyTest
     {
-        [SetUp]
-        public async Task SetUp()
-        {
-#if UNITY_EDITOR
-            await UnityEditor.SceneManagement.EditorSceneManager.LoadSceneAsyncInPlayMode(
-                "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/Operators.unity",
-                new LoadSceneParameters(LoadSceneMode.Single));
-#endif
-        }
+        private const string TestScene = "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/Operators.unity";
 
         [Test]
+        [LoadScene(TestScene)]
         public async Task RunStep_finish()
         {
             var config = new MonkeyConfig
@@ -46,6 +37,7 @@ namespace TestHelper.Monkey
         }
 
         [Test]
+        [LoadScene(TestScene)]
         public async Task RunStep_noInteractiveComponent_abort()
         {
             foreach (var component in InteractiveComponentCollector.FindInteractiveComponents(false))
@@ -64,6 +56,7 @@ namespace TestHelper.Monkey
         }
 
         [Test]
+        [LoadScene(TestScene)]
         public async Task Run_finish()
         {
             var config = new MonkeyConfig
@@ -79,6 +72,7 @@ namespace TestHelper.Monkey
         }
 
         [Test]
+        [LoadScene(TestScene)]
         public async Task Run_cancel()
         {
             var config = new MonkeyConfig
@@ -98,6 +92,7 @@ namespace TestHelper.Monkey
         }
 
         [Test]
+        [LoadScene(TestScene)]
         public async Task Run_noInteractiveComponent_abort()
         {
             foreach (var component in InteractiveComponentCollector.FindInteractiveComponents(false))
@@ -123,6 +118,7 @@ namespace TestHelper.Monkey
         }
 
         [Test]
+        [LoadScene(TestScene)]
         public async Task Run_noInteractiveComponentAndSecondsToErrorForNoInteractiveComponentIsZero_finish()
         {
             foreach (var component in InteractiveComponentCollector.FindInteractiveComponents())
@@ -145,6 +141,7 @@ namespace TestHelper.Monkey
         }
 
         [Test]
+        [LoadScene(TestScene)]
         public async Task Run_usingConfigObjects()
         {
             var spyLogger = new SpyLogger();
@@ -161,6 +158,7 @@ namespace TestHelper.Monkey
         }
 
         [Test]
+        [LoadScene(TestScene)]
         public void Lottery_hitInteractiveComponent_returnComponent()
         {
             var components = InteractiveComponentCollector.FindInteractiveComponents(false).ToList();
@@ -175,6 +173,7 @@ namespace TestHelper.Monkey
         }
 
         [Test]
+        [LoadScene(TestScene)]
         public void Lottery_hitNotInteractiveComponent_returnNextLotteryComponent()
         {
             var components = new List<InteractiveComponent>()
@@ -199,6 +198,7 @@ namespace TestHelper.Monkey
         }
 
         [Test]
+        [LoadScene(TestScene)]
         public void Lottery_noInteractiveComponent_returnNull()
         {
             var components = new List<InteractiveComponent>()
@@ -216,6 +216,7 @@ namespace TestHelper.Monkey
         }
 
         [Test]
+        [LoadScene(TestScene)]
         public void Lottery_withIgnoreAnnotation_returnNull()
         {
             var components = new List<InteractiveComponent>()
@@ -243,6 +244,7 @@ namespace TestHelper.Monkey
         };
 
         [TestCaseSource(nameof(s_componentAndOperations))]
+        [LoadScene(TestScene)]
         public async Task DoOperation_invokeOperationByLottery(string target, int index, string operation)
         {
             var component = InteractiveComponentCollector.FindInteractiveComponents(false)
@@ -261,6 +263,7 @@ namespace TestHelper.Monkey
         }
 
         [Test]
+        [LoadScene(TestScene)]
         public async Task DoOperation_cancelDuringTouchAndHold_cancel()
         {
             const string Target = "UsingOnPointerDownUpHandler";
@@ -291,6 +294,7 @@ namespace TestHelper.Monkey
 
         [TestCaseSource(nameof(s_componentAndOperations))]
         [Category("IgnoreCI")] // Ignore on CI due to low fps
+        [LoadScene(TestScene)]
         public async Task Run_lotteryComponentsAndOperations(string target, int _, string operation)
         {
             var spyLogger = new SpyLogger();
