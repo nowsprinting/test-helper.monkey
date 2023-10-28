@@ -3,16 +3,14 @@
 
 using System.Linq;
 using System.Threading.Tasks;
-using Cysharp.Threading.Tasks;
 using NUnit.Framework;
+using TestHelper.Attributes;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 
 namespace TestHelper.Monkey
 {
-    [UnityPlatform(RuntimePlatform.OSXEditor, RuntimePlatform.WindowsEditor, RuntimePlatform.LinuxEditor)]
     [TestFixture]
     public class InteractiveComponentTest
     {
@@ -22,17 +20,11 @@ namespace TestHelper.Monkey
         [TestFixture]
         public class ThreeD
         {
-            [SetUp]
-            public async Task SetUp()
-            {
-#if UNITY_EDITOR
-                await UnityEditor.SceneManagement.EditorSceneManager.LoadSceneAsyncInPlayMode(
-                    "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/MonkeyThreeD.unity",
-                    new LoadSceneParameters(LoadSceneMode.Single));
-#endif
-            }
+            private const string TestScene =
+                "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/MonkeyThreeD.unity";
 
             [Test]
+            [LoadScene(TestScene)]
             public void Fields()
             {
                 var gameObject = GameObject.Find("UsingEventTrigger");
@@ -47,6 +39,7 @@ namespace TestHelper.Monkey
             [TestCase("UsingEventHandler")] // Implements IPointerClickHandler
             [TestCase("UsingEventTrigger")] // Attached EventTrigger
             [TestCase("ChildInTheSight")] // Parent object is out of sight, but this object is in the sight
+            [LoadScene(TestScene)]
             public void IsReallyInteractiveFromUser_reachableObjects_returnTrue(string targetName)
             {
                 var target = InteractiveComponentCollector.FindInteractiveComponents(false)
@@ -57,6 +50,7 @@ namespace TestHelper.Monkey
 
             [TestCase("BeyondTheWall")] // Beyond the another object
             [TestCase("OutOfSight")] // Out of sight
+            [LoadScene(TestScene)]
             public void IsReallyInteractiveFromUser_unreachableObjects_returnFalse(string targetName)
             {
                 var target = InteractiveComponentCollector.FindInteractiveComponents(false)
@@ -72,22 +66,17 @@ namespace TestHelper.Monkey
         [TestFixture]
         public class UI
         {
-            [SetUp]
-            public async Task SetUp()
-            {
-#if UNITY_EDITOR
-                await UnityEditor.SceneManagement.EditorSceneManager.LoadSceneAsyncInPlayMode(
-                    "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/MonkeyUiWorldSpace.unity",
-                    new LoadSceneParameters(LoadSceneMode.Single));
-                await UniTask.NextFrame(); // Wait 1 frame because warmup for GraphicRaycaster
-#endif
-            }
+            private const string TestScene =
+                "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/MonkeyUiWorldSpace.unity";
 
             [TestCase("Button")] // Attached Button
             [TestCase("ChildInTheSight")] // Parent object is out of sight, but this object is in the sight
             [TestCase("ButtonOnInnerCanvas")] // On the inner Canvas
-            public void IsReallyInteractiveFromUser_reachableObjects_returnTrue(string targetName)
+            [LoadScene(TestScene)]
+            public async Task IsReallyInteractiveFromUser_reachableObjects_returnTrue(string targetName)
             {
+                await Task.Yield(); // wait for GraphicRaycaster initialization
+
                 var target = InteractiveComponentCollector.FindInteractiveComponents(false)
                     .First(x => x.gameObject.name == targetName);
 
@@ -99,8 +88,11 @@ namespace TestHelper.Monkey
             [TestCase("NotInteractable")] // Interactable=false
             [TestCase("BeyondThe2D")] // Beyond the 2D object (GraphicRaycaster.blockingObjects is BlockingObjects.All)
             [TestCase("BeyondThe3D")] // Beyond the 3D object (GraphicRaycaster.blockingObjects is BlockingObjects.All)
-            public void IsReallyInteractiveFromUser_unreachableObjects_returnFalse(string targetName)
+            [LoadScene(TestScene)]
+            public async Task IsReallyInteractiveFromUser_unreachableObjects_returnFalse(string targetName)
             {
+                await Task.Yield(); // wait for GraphicRaycaster initialization
+
                 var target = InteractiveComponentCollector.FindInteractiveComponents(false)
                     .First(x => x.gameObject.name == targetName);
 
@@ -108,7 +100,8 @@ namespace TestHelper.Monkey
             }
 
             [TestCase("Button", "ReceiveOnClick")]
-            public void Tap(string targetName, string expectedMessage)
+            [LoadScene(TestScene)]
+            public void Tap_Tapped(string targetName, string expectedMessage)
             {
                 var target = InteractiveComponentCollector.FindInteractiveComponents(false)
                     .First(x => x.gameObject.name == targetName);
