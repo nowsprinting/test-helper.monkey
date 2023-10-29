@@ -1,11 +1,9 @@
 // Copyright (c) 2023 Koji Hasegawa.
 // This software is released under the MIT License.
 
-using System.Collections;
 using System.Linq;
 using NUnit.Framework;
 using TestHelper.Attributes;
-using UnityEngine.TestTools;
 
 namespace TestHelper.Monkey.Annotations
 {
@@ -15,9 +13,9 @@ namespace TestHelper.Monkey.Annotations
     {
         private const string TestScene = "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/Annotations.unity";
 
-        [UnityTest]
+        [Test]
         [LoadScene(TestScene)]
-        public IEnumerator IsReallyInteractive(
+        public void IsReallyInteractive(
             [Values(
                 "WorldOffsetAnnotation",
                 "ScreenOffsetAnnotation",
@@ -27,8 +25,6 @@ namespace TestHelper.Monkey.Annotations
             string name
         )
         {
-            yield return null;
-
             var target = InteractiveComponentCollector.FindInteractiveComponents(false)
                 .First(x => x.gameObject.name == name);
 
