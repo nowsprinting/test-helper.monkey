@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using NUnit.Framework;
+using TestHelper.Attributes;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
@@ -15,6 +16,8 @@ namespace TestHelper.Monkey.Annotations
     [TestFixture]
     public class PositionAnnotationTest
     {
+        private const string TestScene = "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/Annotations.unity";
+        
         [SetUp]
         public async Task SetUp()
         {
@@ -29,6 +32,7 @@ namespace TestHelper.Monkey.Annotations
         [TestCase("ScreenOffsetAnnotation")]
         [TestCase("WorldPositionAnnotation")]
         [TestCase("ScreenPositionAnnotation")]
+        [LoadScene(TestScene)]
         public void IsReallyInteractive(string name)
         {
             var target = InteractiveComponentCollector.FindInteractiveComponents(false)
