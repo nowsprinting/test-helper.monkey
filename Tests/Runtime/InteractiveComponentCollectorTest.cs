@@ -16,6 +16,7 @@ namespace TestHelper.Monkey
         /// InteractiveComponentCollector test cases using 3D objects
         /// </summary>
         [TestFixture]
+        [GameViewResolution(GameViewResolution.VGA)]
         public class ThreeD
         {
             private const string TestScene =
@@ -64,6 +65,7 @@ namespace TestHelper.Monkey
         /// InteractiveComponentCollector test cases using 2D objects
         /// </summary>
         [TestFixture]
+        [GameViewResolution(GameViewResolution.VGA)]
         public class TwoD
         {
             private const string TestScene =
@@ -138,6 +140,7 @@ namespace TestHelper.Monkey
             /// InteractiveComponentCollector test cases using UI elements on screen-space-overlay canvas
             /// </summary>
             [TestFixture]
+            [GameViewResolution(GameViewResolution.FullHD)] // TODO: want to use VGA
             public class ScreenSpaceOverlay
             {
                 private const string TestScene =
@@ -182,6 +185,7 @@ namespace TestHelper.Monkey
             /// InteractiveComponentCollector test cases using UI elements on screen-space-camera canvas
             /// </summary>
             [TestFixture]
+            [GameViewResolution(GameViewResolution.FullHD)] // TODO: want to use VGA
             public class ScreenSpaceCamera
             {
                 private const string TestScene =
@@ -213,6 +217,8 @@ namespace TestHelper.Monkey
             /// <summary>
             /// InteractiveComponentCollector test cases using UI elements on world space canvas
             /// </summary>
+            [TestFixture]
+            [GameViewResolution(GameViewResolution.FullHD)] // TODO: want to use VGA
             public class WorldSpace
             {
                 private const string TestScene =

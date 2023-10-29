@@ -18,6 +18,7 @@ namespace TestHelper.Monkey
         /// InteractiveComponent test cases using 3D objects
         /// </summary>
         [TestFixture]
+        [GameViewResolution(GameViewResolution.VGA)]
         public class ThreeD
         {
             private const string TestScene =
@@ -64,6 +65,7 @@ namespace TestHelper.Monkey
         /// InteractiveComponent test cases using UI elements
         /// </summary>
         [TestFixture]
+        [GameViewResolution(GameViewResolution.FullHD)] // TODO: want to use VGA
         public class UI
         {
             private const string TestScene =
