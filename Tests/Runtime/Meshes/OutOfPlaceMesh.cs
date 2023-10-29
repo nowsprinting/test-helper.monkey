@@ -1,5 +1,3 @@
-﻿using System;
-using JetBrains.Annotations;
 using UnityEngine;
 
 namespace TestHelper.Monkey.Meshes
@@ -21,7 +19,6 @@ namespace TestHelper.Monkey.Meshes
 
         private static readonly int[] s_triangles = { 0, 1, 2 };
 
-        [CanBeNull]
         private Mesh _mesh;
         private MeshFilter _meshFilter;
         private MeshCollider _meshCollider;
