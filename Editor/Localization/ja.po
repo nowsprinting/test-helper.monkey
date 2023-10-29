@@ -1,4 +1,4 @@
-# Copyright (c) 2023 DeNA Co., Ltd.
+# Copyright (c) 2023 Koji Hasegawa.
 # This software is released under the MIT License.
 #
 # Package UI Localization is available in 2020.2
