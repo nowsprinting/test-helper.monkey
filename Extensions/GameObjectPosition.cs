@@ -5,10 +5,11 @@ using UnityEngine;
 
 namespace TestHelper.Monkey.Extensions
 {
-    internal static class GameObjectExtensions
+    public static class GameObjectPosition
     {
-        internal static Vector2 GetScreenPoint(this GameObject gameObject)
+        public static Vector2 GetScreenPoint(GameObject gameObject, Vector3? optPos = null)
         {
+            var pos = optPos.HasValue ? optPos.Value : gameObject.transform.position;
             var canvas = gameObject.GetComponentInParent<Canvas>();
             if (canvas != null)
             {
@@ -19,17 +20,19 @@ namespace TestHelper.Monkey.Extensions
 
                 if (canvas.renderMode == RenderMode.ScreenSpaceOverlay)
                 {
-                    return RectTransformUtility.WorldToScreenPoint(null, gameObject.transform.position);
+                    return RectTransformUtility.WorldToScreenPoint(null, pos);
                 }
 
-                return RectTransformUtility.WorldToScreenPoint(canvas.worldCamera, gameObject.transform.position);
+                return RectTransformUtility.WorldToScreenPoint(canvas.worldCamera, pos);
             }
 
-            return RectTransformUtility.WorldToScreenPoint(GetMainCamera(), gameObject.transform.position);
+            return RectTransformUtility.WorldToScreenPoint(GetMainCamera(), pos);
         }
+
 
         private static Camera s_cachedMainCamera;
         private static int s_cachedFrame;
+
 
         private static Camera GetMainCamera()
         {

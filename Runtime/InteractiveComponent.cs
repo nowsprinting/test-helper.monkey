@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using TestHelper.Monkey.Extensions;
 using TestHelper.Monkey.Operators;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -63,7 +62,7 @@ namespace TestHelper.Monkey
             }
 
             eventData = eventData ?? new PointerEventData(EventSystem.current);
-            eventData.position = gameObject.GetScreenPoint();
+            eventData.position = OperationPosition.GetAsScreenPoint(gameObject);
 
             results = results ?? new List<RaycastResult>();
             results.Clear();

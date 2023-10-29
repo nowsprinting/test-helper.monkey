@@ -44,7 +44,7 @@ namespace TestHelper.Monkey.Operators
 
             var eventData = new PointerEventData(EventSystem.current)
             {
-                position = component.gameObject.GetScreenPoint()
+                position = OperationPosition.GetAsScreenPoint(component.gameObject)
             };
 
             downHandler.OnPointerDown(eventData);
