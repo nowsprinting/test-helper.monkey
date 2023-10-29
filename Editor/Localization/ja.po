@@ -39,7 +39,7 @@ msgstr "このコンポーネントが付属している GameObject のワール
 
 # offset
 msgid "Position"
-msgstr "座標"
+msgstr "位置"
 
 # description tooltip
 msgid "A screen position that where monkey operators operate on"
@@ -50,7 +50,7 @@ msgstr "このコンポーネントが付属している GameObject に対する
 
 # offset
 msgid "Position"
-msgstr "座標"
+msgstr "位置"
 
 # description tooltip
 msgid "A world position that where monkey operators operate on"
