@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using JetBrains.Annotations;
+using UnityEngine;
 
 namespace TestHelper.Monkey.Meshes
 {
@@ -9,7 +11,6 @@ namespace TestHelper.Monkey.Meshes
     /// </summary>
     [RequireComponent(typeof(MeshCollider))]
     [RequireComponent(typeof(MeshFilter))]
-    [RequireComponent(typeof(MeshRenderer))]
     public class OutOfPlaceMesh : MonoBehaviour
     {
         private static readonly Vector3[] s_vertices =
@@ -19,19 +20,45 @@ namespace TestHelper.Monkey.Meshes
 
         private static readonly int[] s_triangles = { 0, 1, 2 };
 
+        [CanBeNull]
+        private Mesh _mesh;
+        private MeshFilter _meshFilter;
+        private MeshCollider _meshCollider;
 
-        private void Start()
+        private void Awake()
         {
-            var mesh = new Mesh();
-            mesh.name = nameof(OutOfPlaceMesh);
-            mesh.SetVertices(s_vertices);
-            mesh.SetTriangles(s_triangles, 0);
+            _meshFilter = gameObject.GetComponent<MeshFilter>();
+            _meshFilter.sharedMesh = Mesh;
+            _meshCollider = gameObject.GetComponent<MeshCollider>();
+            _meshCollider.sharedMesh = Mesh;
+        }
 
-            var meshFilter = gameObject.GetComponent<MeshFilter>();
-            meshFilter.sharedMesh = mesh;
+        private Mesh Mesh
+        {
+            get
+            {
+                if (_mesh != null)
+                {
+                    return _mesh;
+                }
 
-            var meshCollider = gameObject.GetComponent<MeshCollider>();
-            meshCollider.sharedMesh = mesh;
+                var mesh = new Mesh();
+                mesh.name = nameof(OutOfPlaceMesh);
+                mesh.SetVertices(s_vertices);
+                mesh.SetTriangles(s_triangles, 0);
+                mesh.RecalculateBounds();
+                mesh.RecalculateNormals();
+                _mesh = mesh;
+
+                return _mesh;
+            }
+        }
+
+        private void OnDrawGizmos()
+        {
+            Gizmos.color = Color.red;
+            var tr = transform;
+            Gizmos.DrawWireMesh(Mesh, tr.position, tr.rotation, tr.localScale);
         }
     }
 }

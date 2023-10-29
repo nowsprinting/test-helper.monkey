@@ -5,30 +5,27 @@ using System.Collections;
 using System.Linq;
 using NUnit.Framework;
 using TestHelper.Attributes;
-using UnityEngine;
 using UnityEngine.TestTools;
 
 namespace TestHelper.Monkey.Annotations
 {
-    [UnityPlatform(RuntimePlatform.OSXEditor, RuntimePlatform.WindowsEditor, RuntimePlatform.LinuxEditor)]
     [TestFixture]
+    [GameViewResolution(640, 480, "VGA")]
     public class PositionAnnotationTest
     {
         private const string TestScene = "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/Annotations.unity";
 
-        private static object[][] s_TestCases =>
-            new[]
-            {
-                new object[] { "WorldOffsetAnnotation" },
-                new object[] { "ScreenOffsetAnnotation" },
-                new object[] { "WorldPositionAnnotation" },
-                new object[] { "ScreenPositionAnnotation" }
-            };
-
-        [TestCaseSource(nameof(s_TestCases))]
+        [UnityTest]
         [LoadScene(TestScene)]
-        [GameViewResolution(640, 480, "VGA")]
-        public IEnumerator IsReallyInteractive(string name)
+        public IEnumerator IsReallyInteractive(
+            [Values(
+                "WorldOffsetAnnotation",
+                "ScreenOffsetAnnotation",
+                "WorldPositionAnnotation",
+                "ScreenPositionAnnotation"
+            )]
+            string name
+        )
         {
             yield return null;
 
