@@ -1,0 +1,64 @@
+# Copyright (c) 2023 Koji Hasegawa.
+# This software is released under the MIT License.
+#
+# このファイルは以下のファイルを参考にして書かれた。MIT ライセンスに基づき著作権表示
+# および許諾表示へのリンクを記載する：
+# https://github.com/DeNA/Anjin/blob/40d102bde0c973129cc58cffae9f8a28bea0711a/Editor/Localization/ja.po
+# > Copyright (c) 2023 DeNA Co., Ltd.
+# > This software is released under the MIT License.
+# > https://github.com/DeNA/Anjin/blob/40d102bde0c973129cc58cffae9f8a28bea0711a/LICENSE
+#
+# Package UI Localization is available in 2020.2
+# https://forum.unity.com/threads/package-ui-localization-is-available-in-2020-2.957173/
+#
+# GNU gettext
+# https://www.gnu.org/software/gettext/
+
+# 先頭にはemptyなエントリが必要
+msgid ""
+msgstr ""
+"Language: ja\n"
+
+
+#: Editor/UI/Annotations/ScreenOffsetAnnotationEditor.cs
+
+# offset
+msgid "Offset"
+msgstr "オフセット"
+
+# description tooltip
+msgid "Offset from a screen point of the GameObject that the annotation attached to"
+msgstr "このコンポーネントが付属している GameObject のスクリーン座標からのオフセット"
+
+
+#: Editor/UI/Annotations/WorldOffsetAnnotationEditor.cs
+
+# offset
+msgid "Offset"
+msgstr "オフセット"
+
+# description tooltip
+msgid "Offset from a world point of the GameObject that the annotation attached to"
+msgstr "このコンポーネントが付属している GameObject のワールド座標からのオフセット"
+
+
+#: Editor/UI/Annotations/ScreenPositionAnnotationEditor.cs
+
+# offset
+msgid "Position"
+msgstr "位置"
+
+# description tooltip
+msgid "A screen position that where monkey operators operate on"
+msgstr "このコンポーネントが付属している GameObject に対するモンキー操作をするスクリーン座標"
+
+
+#: Editor/UI/Annotations/WorldPositionAnnotationEditor.cs
+
+# offset
+msgid "Position"
+msgstr "位置"
+
+# description tooltip
+msgid "A world position that where monkey operators operate on"
+msgstr "このコンポーネントが付属している GameObject に対するモンキー操作をするスクリーン座標"

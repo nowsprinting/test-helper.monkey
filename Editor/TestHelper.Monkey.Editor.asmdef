@@ -1,13 +1,16 @@
 {
-    "name": "TestHelper.Monkey.Annotations",
-    "rootNamespace": "TestHelper.Monkey",
-    "references": [],
-    "includePlatforms": [],
+    "name": "TestHelper.Monkey.Editor",
+    "references": [
+        "TestHelper.Monkey.Annotations"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
     "precompiledReferences": [],
-    "autoReferenced": false,
+    "autoReferenced": true,
     "defineConstraints": [],
     "versionDefines": [],
     "noEngineReferences": false
