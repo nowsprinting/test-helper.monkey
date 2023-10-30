@@ -13,12 +13,12 @@ namespace TestHelper.Monkey.TestDoubles
     [AddComponentMenu("")] // Hide from "Add Component" picker
     internal class SpyOnPointerDownUpHandler : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     {
-        private void Log(PointerEventData eventData, [CallerMemberName] string member = "")
+        private void Log([CallerMemberName] string member = "")
         {
-            Debug.Log($"{this.name}.{member} at ({eventData.position.x}, {eventData.position.y})");
+            Debug.Log($"{this.name}.{member}");
         }
 
-        public void OnPointerDown(PointerEventData eventData) => Log(eventData);
-        public void OnPointerUp(PointerEventData eventData) => Log(eventData);
+        public void OnPointerDown(PointerEventData eventData) => Log();
+        public void OnPointerUp(PointerEventData eventData) => Log();
     }
 }
