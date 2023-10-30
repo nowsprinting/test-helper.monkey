@@ -13,6 +13,7 @@ using TestHelper.Monkey.Annotations;
 using TestHelper.Monkey.Random;
 using TestHelper.Monkey.ScreenPointStrategies;
 using TestHelper.Monkey.TestDoubles;
+using TestHelper.RuntimeInternals;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -157,6 +158,26 @@ namespace TestHelper.Monkey
             await Monkey.Run(config);
 
             Assert.That(spyLogger.Messages, Does.Contain("Using wrapping System.Random, seed=0"));
+        }
+
+        [Test]
+        [LoadScene(TestScene)]
+        public async Task Run_withGizmos_showGizmosAndReverted()
+        {
+            Assume.That(GameViewControlHelper.GetGizmos(), Is.False);
+
+            var config = new MonkeyConfig
+            {
+                Lifetime = TimeSpan.FromMilliseconds(200), // 200ms
+                DelayMillis = 1, // 1ms
+                TouchAndHoldDelayMillis = 1, // 1ms
+                Gizmos = true, // show Gizmos
+            };
+            var task = Monkey.Run(config);
+            await UniTask.Delay(1000, DelayType.DeltaTime);
+
+            Assert.That(task.Status, Is.EqualTo(UniTaskStatus.Succeeded));
+            Assert.That(GameViewControlHelper.GetGizmos(), Is.False, "Reverted Gizmos");
         }
 
         [Test]

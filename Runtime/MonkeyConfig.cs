@@ -49,5 +49,10 @@ namespace TestHelper.Monkey
         /// Function returns the screen position where monkey operators operate on for the specified gameObject
         /// </summary>
         public Func<GameObject, Vector2> ScreenPointStrategy = DefaultScreenPointStrategy.GetScreenPoint;
+        
+        /// <summary>
+        /// Show Gizmos on <c>GameView</c> during running monkey test if true
+        /// </summary>
+        public bool Gizmos = false;
     }
 }
