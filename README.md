@@ -191,7 +191,6 @@ UNITY_VERSION=2019.4.40f1 make -k test
 > **Warning**  
 > - Required install packages for running tests (when adding to the `testables` in package.json), as follows:
 >   - [Unity Test Framework](https://docs.unity3d.com/Packages/com.unity.test-framework@latest) package v1.3.4 or later
->   - [Test Helper](https://github.com/nowsprinting/test-helper) package v0.3.0 or later
 > - Set the player screen resolution to 1920x1080 when running Play Mode tests on Player.
 
 
