@@ -54,6 +54,9 @@ Configurations in `MonkeyConfig`:
 - **Random**: Random generator
 - **Logger**: Logger
 - **Gizmos**: Show Gizmos on `GameView` during running monkey test if true
+- **TakeScreenshots**: Take screenshots each step if true
+- **ScreenshotsDirectory**: Directory path to save screenshots. Default save path is `Application.persistentDataPath` + "/TestHelper.Monkey/Screenshots/".
+- **ScreenshotsFilenamePrefix**: Prefix of screenshots filename. Default prefix is `CurrentTest.Name` when run in test-framework context. Using caller method name when run in runtime context.
 
 
 ### Find and operate interactive uGUI elements API

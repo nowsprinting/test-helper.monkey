@@ -3,13 +3,17 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using TestHelper.Monkey.Random;
 using TestHelper.RuntimeInternals;
 using UnityEngine;
-using UnityEngine.Assertions;
+#if UNITY_INCLUDE_TESTS
+using NUnit.Framework;
+#endif
 
 namespace TestHelper.Monkey
 {
@@ -28,12 +32,15 @@ namespace TestHelper.Monkey
         /// </summary>
         /// <param name="config">Run configuration for monkey testing</param>
         /// <param name="cancellationToken">Cancellation token</param>
-        public static async UniTask Run(MonkeyConfig config, CancellationToken cancellationToken = default)
+        public static async UniTask Run(MonkeyConfig config, CancellationToken cancellationToken = default,
+            // ReSharper disable once InvalidXmlDocComment
+            [CallerMemberName] string callerMemberName = null)
         {
             var endTime = config.Lifetime == TimeSpan.MaxValue
                 ? TimeSpan.MaxValue.TotalSeconds
                 : config.Lifetime.Add(TimeSpan.FromSeconds(Time.time)).TotalSeconds;
             var lastOperationTime = Time.time;
+            var stepCount = 0;
 
             var beforeGizmos = false;
             if (config.Gizmos)
@@ -42,20 +49,26 @@ namespace TestHelper.Monkey
                 GameViewControlHelper.SetGizmos(true);
             }
 
+            if (config.TakeScreenshots)
+            {
+                ApplyScreenshotConfig(config, callerMemberName);
+            }
+
             config.Logger.Log($"Using {config.Random}");
 
             try
             {
                 while (Time.time < endTime)
                 {
-                    var didAct = await RunStep(config, cancellationToken);
+                    var didAct = await RunStep(config, ++stepCount, cancellationToken);
                     if (didAct)
                     {
                         lastOperationTime = Time.time;
                     }
                     else if (config.SecondsToErrorForNoInteractiveComponent > 0)
                     {
-                        Assert.IsTrue((Time.time - lastOperationTime) < config.SecondsToErrorForNoInteractiveComponent,
+                        UnityEngine.Assertions.Assert.IsTrue(
+                            (Time.time - lastOperationTime) < config.SecondsToErrorForNoInteractiveComponent,
                             $"Interactive component not found in {config.SecondsToErrorForNoInteractiveComponent} seconds");
                     }
 
@@ -71,13 +84,37 @@ namespace TestHelper.Monkey
             }
         }
 
+        private static void ApplyScreenshotConfig(MonkeyConfig config, string callerMemberName)
+        {
+            if (config.ScreenshotsDirectory == null)
+            {
+                config.ScreenshotsDirectory =
+                    Path.Combine(Application.persistentDataPath, "TestHelper.Monkey", "Screenshots");
+            }
+
+            if (config.ScreenshotsFilenamePrefix == null)
+            {
+#if UNITY_INCLUDE_TESTS
+                config.ScreenshotsFilenamePrefix = TestContext.CurrentTestExecutionContext.CurrentTest.Name
+                    .Replace('(', '_')
+                    .Replace(')', '_')
+                    .Replace(',', '-');
+                // Note: Same as the file name created under ActualImages of the Graphics Tests Framework package.
+#else
+                config.ScreenshotsFilenamePrefix = callerMemberName;
+#endif
+            }
+        }
+
         /// <summary>
         /// Run a step of monkey testing.
         /// </summary>
-        /// <param name="config"></param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="config">Run configuration for monkey testing</param>
+        /// <param name="stepCount">Counter for screenshot filename</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns></returns>
-        public static async UniTask<bool> RunStep(MonkeyConfig config, CancellationToken cancellationToken = default)
+        public static async UniTask<bool> RunStep(MonkeyConfig config, int stepCount,
+            CancellationToken cancellationToken = default)
         {
             var components = InteractiveComponentCollector
                 .FindInteractiveComponents()
@@ -86,6 +123,13 @@ namespace TestHelper.Monkey
             if (component == null)
             {
                 return false;
+            }
+
+            if (config.TakeScreenshots)
+            {
+                await ScreenshotHelper.TakeScreenshot(
+                    directory: config.ScreenshotsDirectory,
+                    filename: $"{config.ScreenshotsFilenamePrefix}_{stepCount:D4}.png");
             }
 
             await DoOperation(component, config, cancellationToken);
