@@ -53,6 +53,7 @@ Configurations in `MonkeyConfig`:
 - **TouchAndHoldDelayMillis**: Delay time for touch-and-hold
 - **Random**: Random generator
 - **Logger**: Logger
+- **Gizmos**: Show Gizmos on `GameView` during running monkey test if true
 
 
 ### Find and operate interactive uGUI elements API

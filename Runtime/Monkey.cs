@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using TestHelper.Monkey.Random;
+using TestHelper.RuntimeInternals;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -34,22 +35,39 @@ namespace TestHelper.Monkey
                 : config.Lifetime.Add(TimeSpan.FromSeconds(Time.time)).TotalSeconds;
             var lastOperationTime = Time.time;
 
+            var beforeGizmos = false;
+            if (config.Gizmos)
+            {
+                beforeGizmos = GameViewControlHelper.GetGizmos();
+                GameViewControlHelper.SetGizmos(true);
+            }
+
             config.Logger.Log($"Using {config.Random}");
 
-            while (Time.time < endTime)
+            try
             {
-                var didAct = await RunStep(config, cancellationToken);
-                if (didAct)
+                while (Time.time < endTime)
                 {
-                    lastOperationTime = Time.time;
-                }
-                else if (config.SecondsToErrorForNoInteractiveComponent > 0)
-                {
-                    Assert.IsTrue((Time.time - lastOperationTime) < config.SecondsToErrorForNoInteractiveComponent,
-                        $"Interactive component not found in {config.SecondsToErrorForNoInteractiveComponent} seconds");
-                }
+                    var didAct = await RunStep(config, cancellationToken);
+                    if (didAct)
+                    {
+                        lastOperationTime = Time.time;
+                    }
+                    else if (config.SecondsToErrorForNoInteractiveComponent > 0)
+                    {
+                        Assert.IsTrue((Time.time - lastOperationTime) < config.SecondsToErrorForNoInteractiveComponent,
+                            $"Interactive component not found in {config.SecondsToErrorForNoInteractiveComponent} seconds");
+                    }
 
-                await UniTask.Delay(config.DelayMillis, DelayType.DeltaTime, cancellationToken: cancellationToken);
+                    await UniTask.Delay(config.DelayMillis, DelayType.DeltaTime, cancellationToken: cancellationToken);
+                }
+            }
+            finally
+            {
+                if (config.Gizmos)
+                {
+                    GameViewControlHelper.SetGizmos(beforeGizmos);
+                }
             }
         }
 
@@ -74,7 +92,8 @@ namespace TestHelper.Monkey
             return true;
         }
 
-        internal static InteractiveComponent Lottery(ref List<InteractiveComponent> components, IRandom random, Func<GameObject, Vector2> screenPointStrategy)
+        internal static InteractiveComponent Lottery(ref List<InteractiveComponent> components, IRandom random,
+            Func<GameObject, Vector2> screenPointStrategy)
         {
             if (components == null || components.Count == 0)
             {
@@ -122,7 +141,8 @@ namespace TestHelper.Monkey
                     component.Click(config.ScreenPointStrategy);
                     break;
                 case SupportOperation.TouchAndHold:
-                    await component.TouchAndHold(config.ScreenPointStrategy, config.TouchAndHoldDelayMillis, cancellationToken);
+                    await component.TouchAndHold(config.ScreenPointStrategy, config.TouchAndHoldDelayMillis,
+                        cancellationToken);
                     break;
                 default:
                     throw new IndexOutOfRangeException();
