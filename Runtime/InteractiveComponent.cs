@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2023 Koji Hasegawa.
 // This software is released under the MIT License.
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
@@ -51,10 +52,11 @@ namespace TestHelper.Monkey
         /// This method does not give correct results about UI elements when run on batchmode.
         /// Because GraphicRaycaster does not work in batchmode.
         /// </remarks>
+        /// <param name="screenPointStrategy">Function returns the screen position where monkey operators operate on for the specified gameObject</param>
         /// <param name="eventData">Specify if avoid GC memory allocation</param>
         /// <param name="results">Specify if avoid GC memory allocation</param>
         /// <returns>true: this object can control by user</returns>
-        public bool IsReallyInteractiveFromUser(PointerEventData eventData = null, List<RaycastResult> results = null)
+        public bool IsReallyInteractiveFromUser(Func<GameObject, Vector2> screenPointStrategy, PointerEventData eventData = null, List<RaycastResult> results = null)
         {
             if (!IsInteractable())
             {
@@ -62,7 +64,7 @@ namespace TestHelper.Monkey
             }
 
             eventData = eventData ?? new PointerEventData(EventSystem.current);
-            eventData.position = OperationPosition.GetAsScreenPoint(gameObject);
+            eventData.position = screenPointStrategy(gameObject);
 
             results = results ?? new List<RaycastResult>();
             results.Clear();
@@ -101,7 +103,8 @@ namespace TestHelper.Monkey
         /// <summary>
         /// Click inner component
         /// </summary>
-        public void Click() => ClickOperator.Click(component);
+        /// <param name="screenPointStrategy">Function returns the screen position where monkey operators operate on for the specified gameObject</param>
+        public void Click(Func<GameObject, Vector2> screenPointStrategy) => ClickOperator.Click(component, screenPointStrategy);
 
         /// <summary>
         /// Check inner component can receive tap (click) event
@@ -112,7 +115,8 @@ namespace TestHelper.Monkey
         /// <summary>
         /// Tap (click) inner component
         /// </summary>
-        public void Tap() => ClickOperator.Click(component);
+        /// <param name="screenPointStrategy">Function returns the screen position where monkey operators operate on for the specified gameObject</param>
+        public void Tap(Func<GameObject, Vector2> screenPointStrategy) => ClickOperator.Click(component, screenPointStrategy);
 
         /// <summary>
         /// Check inner component can receive touch-and-hold event
@@ -123,10 +127,11 @@ namespace TestHelper.Monkey
         /// <summary>
         /// Touch-and-hold inner component
         /// </summary>
+        /// <param name="screenPointStrategy">Function returns the screen position where monkey operators operate on for the specified gameObject</param>
         /// <param name="delayMillis">Delay time between down to up</param>
         /// <param name="cancellationToken">Task cancellation token</param>
-        public async UniTask TouchAndHold(int delayMillis = 1000, CancellationToken cancellationToken = default)
-            => await TouchAndHoldOperator.TouchAndHold(component, delayMillis, cancellationToken);
+        public async UniTask TouchAndHold(Func<GameObject, Vector2> screenPointStrategy, int delayMillis = 1000, CancellationToken cancellationToken = default)
+            => await TouchAndHoldOperator.TouchAndHold(component, screenPointStrategy, delayMillis, cancellationToken);
 
         // TODO: drag, swipe, flick, etc...
     }

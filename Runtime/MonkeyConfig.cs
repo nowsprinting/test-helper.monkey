@@ -4,6 +4,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using TestHelper.Monkey.Random;
+using TestHelper.Monkey.ScreenPointStrategies;
 using UnityEngine;
 
 namespace TestHelper.Monkey
@@ -43,5 +44,10 @@ namespace TestHelper.Monkey
         /// Logger
         /// </summary>
         public ILogger Logger = Debug.unityLogger;
+
+        /// <summary>
+        /// Function returns the screen position where monkey operators operate on for the specified gameObject
+        /// </summary>
+        public Func<GameObject, Vector2> ScreenPointStrategy = DefaultScreenPointStrategy.GetScreenPoint;
     }
 }

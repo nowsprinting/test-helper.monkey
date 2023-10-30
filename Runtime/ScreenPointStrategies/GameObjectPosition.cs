@@ -3,13 +3,31 @@
 
 using UnityEngine;
 
-namespace TestHelper.Monkey.Extensions
+namespace TestHelper.Monkey.ScreenPointStrategies
 {
-    public static class GameObjectPosition
+    /// <summary>
+    /// Screen point strategy that dont care any annotations
+    /// </summary>
+    public static class TransformPositionStrategy
     {
-        public static Vector2 GetScreenPoint(GameObject gameObject, Vector3? optPos = null)
+        /// <summary>
+        /// Screen point strategy that dont care any annotations
+        /// </summary>
+        /// <param name="gameObject">GameObject that monkey operators operate</param>
+        /// <returns>The screen point of the <paramref name="gameObject"/> transform position</returns>
+        public static Vector2 GetScreenPoint(GameObject gameObject)
         {
-            var pos = optPos.HasValue ? optPos.Value : gameObject.transform.position;
+            return GetScreenPointByWorldPosition(gameObject, gameObject.transform.position);
+        }
+
+        /// <summary>
+        /// Returns 
+        /// </summary>
+        /// <param name="gameObject">GameObject that monkey operators operate</param>
+        /// <param name="pos">The world position where monkey operators operate on</param>
+        /// <returns>The screen point of the <paramref name="pos"/></returns>
+        public static Vector2 GetScreenPointByWorldPosition(GameObject gameObject, Vector3 pos)
+        {
             var canvas = gameObject.GetComponentInParent<Canvas>();
             if (canvas != null)
             {

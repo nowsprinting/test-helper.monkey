@@ -3,7 +3,6 @@
     "rootNamespace": "TestHelper.Monkey",
     "references": [
         "TestHelper.Monkey.Annotations",
-        "TestHelper.Monkey.Extensions",
         "UniTask"
     ],
     "includePlatforms": [],

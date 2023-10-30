@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
+using TestHelper.Monkey.ScreenPointStrategies;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.TestTools;
@@ -43,10 +44,10 @@ namespace TestHelper.Monkey
             [LoadScene(TestScene)]
             public void IsReallyInteractiveFromUser_reachableObjects_returnTrue(string targetName)
             {
-                var target = InteractiveComponentCollector.FindInteractiveComponents(false)
+                var target = InteractiveComponentCollector.FindInteractiveComponents()
                     .First(x => x.gameObject.name == targetName);
 
-                Assert.That(target.IsReallyInteractiveFromUser(), Is.True);
+                Assert.That(target.IsReallyInteractiveFromUser(DefaultScreenPointStrategy.GetScreenPoint), Is.True);
             }
 
             [TestCase("BeyondTheWall")] // Beyond the another object
@@ -54,10 +55,10 @@ namespace TestHelper.Monkey
             [LoadScene(TestScene)]
             public void IsReallyInteractiveFromUser_unreachableObjects_returnFalse(string targetName)
             {
-                var target = InteractiveComponentCollector.FindInteractiveComponents(false)
+                var target = InteractiveComponentCollector.FindInteractiveComponents()
                     .First(x => x.gameObject.name == targetName);
 
-                Assert.That(target.IsReallyInteractiveFromUser(), Is.False);
+                Assert.That(target.IsReallyInteractiveFromUser(DefaultScreenPointStrategy.GetScreenPoint), Is.False);
             }
         }
 
@@ -79,10 +80,10 @@ namespace TestHelper.Monkey
             {
                 await Task.Yield(); // wait for GraphicRaycaster initialization
 
-                var target = InteractiveComponentCollector.FindInteractiveComponents(false)
+                var target = InteractiveComponentCollector.FindInteractiveComponents()
                     .First(x => x.gameObject.name == targetName);
 
-                Assert.That(target.IsReallyInteractiveFromUser(), Is.True);
+                Assert.That(target.IsReallyInteractiveFromUser(DefaultScreenPointStrategy.GetScreenPoint), Is.True);
             }
 
             [TestCase("BeyondTheWall")] // Beyond the another object
@@ -95,21 +96,21 @@ namespace TestHelper.Monkey
             {
                 await Task.Yield(); // wait for GraphicRaycaster initialization
 
-                var target = InteractiveComponentCollector.FindInteractiveComponents(false)
+                var target = InteractiveComponentCollector.FindInteractiveComponents()
                     .First(x => x.gameObject.name == targetName);
 
-                Assert.That(target.IsReallyInteractiveFromUser(), Is.False);
+                Assert.That(target.IsReallyInteractiveFromUser(DefaultScreenPointStrategy.GetScreenPoint), Is.False);
             }
 
             [TestCase("Button", "ReceiveOnClick")]
             [LoadScene(TestScene)]
             public void Tap_Tapped(string targetName, string expectedMessage)
             {
-                var target = InteractiveComponentCollector.FindInteractiveComponents(false)
+                var target = InteractiveComponentCollector.FindInteractiveComponents()
                     .First(x => x.gameObject.name == targetName);
 
                 Assert.That(target.CanTap(), Is.True);
-                target.Tap();
+                target.Tap(DefaultScreenPointStrategy.GetScreenPoint);
 
                 LogAssert.Expect(LogType.Log, $"{targetName}.{expectedMessage}");
             }

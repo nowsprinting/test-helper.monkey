@@ -1,9 +1,9 @@
 ﻿// Copyright (c) 2023 Koji Hasegawa.
 // This software is released under the MIT License.
 
+using System;
 using System.Linq;
 using TestHelper.Monkey.Annotations;
-using TestHelper.Monkey.Extensions;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -26,7 +26,7 @@ namespace TestHelper.Monkey.Operators
             return component.GetType().GetInterfaces().Contains(typeof(IPointerClickHandler));
         }
 
-        internal static void Click(MonoBehaviour component)
+        internal static void Click(MonoBehaviour component, Func<GameObject, Vector2> screenPointStrategy)
         {
             if (!(component is IPointerClickHandler handler))
             {
@@ -35,7 +35,7 @@ namespace TestHelper.Monkey.Operators
 
             var eventData = new PointerEventData(EventSystem.current)
             {
-                position = OperationPosition.GetAsScreenPoint(component.gameObject)
+                position = screenPointStrategy(component.gameObject)
             };
             handler.OnPointerClick(eventData);
         }

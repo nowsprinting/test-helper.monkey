@@ -11,6 +11,7 @@ using NUnit.Framework;
 using TestHelper.Attributes;
 using TestHelper.Monkey.Annotations;
 using TestHelper.Monkey.Random;
+using TestHelper.Monkey.ScreenPointStrategies;
 using TestHelper.Monkey.TestDoubles;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -41,7 +42,7 @@ namespace TestHelper.Monkey
         [LoadScene(TestScene)]
         public async Task RunStep_noInteractiveComponent_abort()
         {
-            foreach (var component in InteractiveComponentCollector.FindInteractiveComponents(false))
+            foreach (var component in InteractiveComponentCollector.FindInteractiveComponents())
             {
                 component.gameObject.SetActive(false);
             }
@@ -96,7 +97,7 @@ namespace TestHelper.Monkey
         [LoadScene(TestScene)]
         public async Task Run_noInteractiveComponent_abort()
         {
-            foreach (var component in InteractiveComponentCollector.FindInteractiveComponents(false))
+            foreach (var component in InteractiveComponentCollector.FindInteractiveComponents())
             {
                 component.gameObject.SetActive(false);
             }
@@ -162,12 +163,12 @@ namespace TestHelper.Monkey
         [LoadScene(TestScene)]
         public void Lottery_hitInteractiveComponent_returnComponent()
         {
-            var components = InteractiveComponentCollector.FindInteractiveComponents(false).ToList();
+            var components = InteractiveComponentCollector.FindInteractiveComponents().ToList();
             for (var i = 0; i < components.Count; i++)
             {
                 var random = new StubRandom(i);
                 var expected = components[i];
-                var actual = Monkey.Lottery(ref components, random);
+                var actual = Monkey.Lottery(ref components, random, DefaultScreenPointStrategy.GetScreenPoint);
 
                 Assert.That(actual.gameObject.name, Is.EqualTo(expected.gameObject.name));
             }
@@ -192,7 +193,7 @@ namespace TestHelper.Monkey
 
             var random = new StubRandom(0, 1);
             var expected = components[2];
-            var actual = Monkey.Lottery(ref components, random);
+            var actual = Monkey.Lottery(ref components, random, DefaultScreenPointStrategy.GetScreenPoint);
 
             Assert.That(actual.gameObject.name, Is.EqualTo(expected.gameObject.name));
             Assert.That(components, Has.Count.EqualTo(3)); // Removed not interactive objects.
@@ -210,7 +211,7 @@ namespace TestHelper.Monkey
             components[0].gameObject.SetActive(false);
 
             var random = new StubRandom(0);
-            var actual = Monkey.Lottery(ref components, random);
+            var actual = Monkey.Lottery(ref components, random, DefaultScreenPointStrategy.GetScreenPoint);
 
             Assert.That(actual, Is.Null);
             Assert.That(components, Has.Count.EqualTo(0)); // Removed not interactive objects.
@@ -228,7 +229,7 @@ namespace TestHelper.Monkey
             components[0].gameObject.AddComponent<IgnoreAnnotation>();
 
             var random = new StubRandom(0);
-            var actual = Monkey.Lottery(ref components, random);
+            var actual = Monkey.Lottery(ref components, random, DefaultScreenPointStrategy.GetScreenPoint);
 
             Assert.That(actual, Is.Null);
             Assert.That(components, Has.Count.EqualTo(0)); // Removed not interactive objects.
@@ -248,7 +249,7 @@ namespace TestHelper.Monkey
         [LoadScene(TestScene)]
         public async Task DoOperation_invokeOperationByLottery(string target, int index, string operation)
         {
-            var component = InteractiveComponentCollector.FindInteractiveComponents(false)
+            var component = InteractiveComponentCollector.FindInteractiveComponents()
                 .First(x => x.gameObject.name == target);
             var spyLogger = new SpyLogger();
             var config = new MonkeyConfig
@@ -271,7 +272,7 @@ namespace TestHelper.Monkey
             const int Index = 0;
             const string Operation = "TouchAndHold";
 
-            var component = InteractiveComponentCollector.FindInteractiveComponents(false)
+            var component = InteractiveComponentCollector.FindInteractiveComponents()
                 .First(x => x.gameObject.name == Target);
             var spyLogger = new SpyLogger();
             var config = new MonkeyConfig

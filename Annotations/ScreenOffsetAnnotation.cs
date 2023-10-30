@@ -9,18 +9,12 @@ namespace TestHelper.Monkey.Annotations
     /// An annotation class that indicate the screen position offset on screen space that where monkey operators operate
     /// on
     /// </summary>
-    public class ScreenOffsetAnnotation : PositionAnnotation
+    public sealed class ScreenOffsetAnnotation : MonoBehaviour
     {
         /// <summary>
         /// Offset from a screen point of the GameObject that the annotation attached to
         /// </summary>
         [SerializeField]
         public Vector2 offset;
-        
-        /// <inheritdoc />
-        public override Vector2 GetScreenPoint()
-        {
-            return base.GetScreenPoint() + offset;
-        }
     }
 }

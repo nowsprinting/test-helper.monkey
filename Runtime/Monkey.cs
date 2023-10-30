@@ -61,8 +61,10 @@ namespace TestHelper.Monkey
         /// <returns></returns>
         public static async UniTask<bool> RunStep(MonkeyConfig config, CancellationToken cancellationToken = default)
         {
-            var components = InteractiveComponentCollector.FindInteractiveComponents(false).ToList();
-            var component = Lottery(ref components, config.Random);
+            var components = InteractiveComponentCollector
+                .FindInteractiveComponents()
+                .ToList();
+            var component = Lottery(ref components, config.Random, config.ScreenPointStrategy);
             if (component == null)
             {
                 return false;
@@ -72,7 +74,7 @@ namespace TestHelper.Monkey
             return true;
         }
 
-        internal static InteractiveComponent Lottery(ref List<InteractiveComponent> components, IRandom random)
+        internal static InteractiveComponent Lottery(ref List<InteractiveComponent> components, IRandom random, Func<GameObject, Vector2> screenPointStrategy)
         {
             if (components == null || components.Count == 0)
             {
@@ -87,7 +89,7 @@ namespace TestHelper.Monkey
                 }
 
                 var next = components[random.Next(components.Count)];
-                if (next.IsReallyInteractiveFromUser() && GetCanOperations(next).Any())
+                if (next.IsReallyInteractiveFromUser(screenPointStrategy) && GetCanOperations(next).Any())
                 {
                     return next;
                 }
@@ -117,10 +119,10 @@ namespace TestHelper.Monkey
             switch (operation)
             {
                 case SupportOperation.Click:
-                    component.Click();
+                    component.Click(config.ScreenPointStrategy);
                     break;
                 case SupportOperation.TouchAndHold:
-                    await component.TouchAndHold(config.TouchAndHoldDelayMillis, cancellationToken);
+                    await component.TouchAndHold(config.ScreenPointStrategy, config.TouchAndHoldDelayMillis, cancellationToken);
                     break;
                 default:
                     throw new IndexOutOfRangeException();

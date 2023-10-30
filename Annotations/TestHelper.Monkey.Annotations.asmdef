@@ -1,9 +1,7 @@
 {
     "name": "TestHelper.Monkey.Annotations",
     "rootNamespace": "TestHelper.Monkey",
-    "references": [
-        "TestHelper.Monkey.Extensions"
-    ],
+    "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
