@@ -9,7 +9,7 @@ using TestHelper.Monkey.ScreenPointStrategies;
 namespace TestHelper.Monkey.Annotations
 {
     [TestFixture]
-    [GameViewResolution(640, 480, "VGA")]
+    [GameViewResolution(GameViewResolution.VGA)]
     public class PositionAnnotationTest
     {
         private const string TestScene = "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/Annotations.unity";
