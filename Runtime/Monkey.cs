@@ -171,12 +171,14 @@ namespace TestHelper.Monkey
         {
             Click,
             TouchAndHold,
+            TextInput,
         }
 
         private static IEnumerable<SupportOperation> GetCanOperations(InteractiveComponent component)
         {
             if (component.CanClick()) yield return SupportOperation.Click;
             if (component.CanTouchAndHold()) yield return SupportOperation.TouchAndHold;
+            if (component.CanTextInput()) yield return SupportOperation.TextInput;
         }
 
         internal static async UniTask DoOperation(InteractiveComponent component, MonkeyConfig config,
@@ -193,6 +195,9 @@ namespace TestHelper.Monkey
                 case SupportOperation.TouchAndHold:
                     await component.TouchAndHold(config.ScreenPointStrategy, config.TouchAndHoldDelayMillis,
                         cancellationToken);
+                    break;
+                case SupportOperation.TextInput:
+                    component.TextInput(config.RandomStringParametersStrategy, config.RandomString);
                     break;
                 default:
                     throw new IndexOutOfRangeException();

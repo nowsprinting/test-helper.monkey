@@ -36,9 +36,14 @@ namespace TestHelper.Monkey
         public int TouchAndHoldDelayMillis = 1000;
 
         /// <summary>
-        /// Random generator
+        /// Random number generator
         /// </summary>
         public IRandom Random = new RandomImpl();
+
+        /// <summary>
+        /// Random string generator
+        /// </summary>
+        public IRandomString RandomString = new RandomStringImpl(new RandomImpl());
 
         /// <summary>
         /// Logger
@@ -49,6 +54,12 @@ namespace TestHelper.Monkey
         /// Function returns the screen position where monkey operators operate on for the specified gameObject
         /// </summary>
         public Func<GameObject, Vector2> ScreenPointStrategy = DefaultScreenPointStrategy.GetScreenPoint;
+
+        /// <summary>
+        /// Function returns the random string generation parameters
+        /// </summary>
+        public Func<GameObject, RandomStringParameters>
+            RandomStringParametersStrategy = DefaultRandomStringParameterGen;
 
         /// <summary>
         /// Show Gizmos on <c>GameView</c> during running monkey test if true
@@ -72,5 +83,8 @@ namespace TestHelper.Monkey
         /// Using caller method name when run in runtime context.
         /// </summary>
         public string ScreenshotsFilenamePrefix = null;
+
+        private static RandomStringParameters DefaultRandomStringParameterGen(GameObject _) =>
+            RandomStringParameters.Default;
     }
 }
