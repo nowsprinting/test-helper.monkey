@@ -7,7 +7,7 @@
   "changelogUrl": "https://github.com/nowsprinting/test-helper.monkey/releases",
   "dependencies": {
     "com.cysharp.unitask": "2.3.3",
-    "com.nowsprinting.test-helper": "0.4.0",
+    "com.nowsprinting.test-helper": "0.4.1",
     "com.unity.ugui": "1.0.0"
   },
   "displayName": "Monkey Test Helper",
