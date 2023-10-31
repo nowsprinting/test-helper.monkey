@@ -106,6 +106,10 @@ namespace TestHelper.Monkey
             }
         }
 
+        private class CoroutineRunner : MonoBehaviour
+        {
+        }
+
         /// <summary>
         /// Run a step of monkey testing.
         /// </summary>
@@ -127,9 +131,11 @@ namespace TestHelper.Monkey
 
             if (config.TakeScreenshots)
             {
+                var coroutineRunner = new GameObject().AddComponent<CoroutineRunner>();
                 await ScreenshotHelper.TakeScreenshot(
-                    directory: config.ScreenshotsDirectory,
-                    filename: $"{config.ScreenshotsFilenamePrefix}_{stepCount:D4}.png");
+                        directory: config.ScreenshotsDirectory,
+                        filename: $"{config.ScreenshotsFilenamePrefix}_{stepCount:D4}.png")
+                    .ToUniTask(coroutineRunner);
             }
 
             await DoOperation(component, config, cancellationToken);

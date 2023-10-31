@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,7 +36,7 @@ namespace TestHelper.Monkey
                 TouchAndHoldDelayMillis = 1, // 1ms
             };
 
-            var didAct = await Monkey.RunStep(config);
+            var didAct = await Monkey.RunStep(config, 0);
             Assert.That(didAct, Is.EqualTo(true));
         }
 
@@ -54,7 +55,7 @@ namespace TestHelper.Monkey
                 TouchAndHoldDelayMillis = 1, // 1ms
             };
 
-            var didAct = await Monkey.RunStep(config);
+            var didAct = await Monkey.RunStep(config, 0);
             Assert.That(didAct, Is.EqualTo(false));
         }
 
@@ -173,11 +174,38 @@ namespace TestHelper.Monkey
                 TouchAndHoldDelayMillis = 1, // 1ms
                 Gizmos = true, // show Gizmos
             };
-            var task = Monkey.Run(config);
+            var task = Monkey.Run(config); // Shown Gizmos, See for yourself! Be a witness!!
             await UniTask.Delay(1000, DelayType.DeltaTime);
 
             Assert.That(task.Status, Is.EqualTo(UniTaskStatus.Succeeded));
             Assert.That(GameViewControlHelper.GetGizmos(), Is.False, "Reverted Gizmos");
+        }
+
+        [Test]
+        [LoadScene(TestScene)]
+        public async Task Run_withTakeScreenshots_TakeScreenshotAndSaveToDefaultPath()
+        {
+            var path = Path.Combine(Application.persistentDataPath, "TestHelper.Monkey", "Screenshots",
+                $"{nameof(Run_withTakeScreenshots_TakeScreenshotAndSaveToDefaultPath)}_0001.png");
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
+
+            Assume.That(path, Does.Not.Exist);
+
+            var config = new MonkeyConfig
+            {
+                Lifetime = TimeSpan.FromMilliseconds(200), // 200ms
+                DelayMillis = 1, // 1ms
+                TouchAndHoldDelayMillis = 1, // 1ms
+                TakeScreenshots = true, // take screenshots and save files
+            };
+            var task = Monkey.Run(config);
+            await UniTask.Delay(1000, DelayType.DeltaTime);
+
+            Assert.That(task.Status, Is.EqualTo(UniTaskStatus.Succeeded));
+            Assert.That(path, Does.Exist);
         }
 
         [Test]
