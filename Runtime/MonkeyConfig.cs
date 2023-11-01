@@ -49,10 +49,28 @@ namespace TestHelper.Monkey
         /// Function returns the screen position where monkey operators operate on for the specified gameObject
         /// </summary>
         public Func<GameObject, Vector2> ScreenPointStrategy = DefaultScreenPointStrategy.GetScreenPoint;
-        
+
         /// <summary>
         /// Show Gizmos on <c>GameView</c> during running monkey test if true
         /// </summary>
         public bool Gizmos = false;
+
+        /// <summary>
+        /// Take screenshots during running monkey test if true.
+        /// </summary>
+        public bool TakeScreenshots = false;
+
+        /// <summary>
+        /// Directory path to save screenshots.
+        /// Default save path is <c>Application.persistentDataPath</c> + "/TestHelper.Monkey/Screenshots/".
+        /// </summary>
+        public string ScreenshotsDirectory = null;
+
+        /// <summary>
+        /// Prefix of screenshots filename.
+        /// Default prefix is <c>CurrentTest.Name</c> when run in test-framework context.
+        /// Using caller method name when run in runtime context.
+        /// </summary>
+        public string ScreenshotsFilenamePrefix = null;
     }
 }
