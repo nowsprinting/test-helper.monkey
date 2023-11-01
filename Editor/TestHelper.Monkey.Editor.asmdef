@@ -1,7 +1,8 @@
 {
     "name": "TestHelper.Monkey.Editor",
     "references": [
-        "TestHelper.Monkey.Annotations"
+        "TestHelper.Monkey.Annotations",
+        "TestHelper.Monkey"
     ],
     "includePlatforms": [
         "Editor"

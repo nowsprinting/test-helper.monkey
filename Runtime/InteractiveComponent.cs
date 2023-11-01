@@ -70,6 +70,10 @@ namespace TestHelper.Monkey
             results = results ?? new List<RaycastResult>();
             results.Clear();
 
+            if (EventSystem.current == null)
+            {
+                return false;
+            }
             EventSystem.current.RaycastAll(eventData, results);
             return results.Count > 0 && IsSameOrChildObject(results[0].gameObject.transform);
         }
