@@ -15,11 +15,10 @@ namespace TestHelper.Monkey.Random
             // Property-based testing
             for (var i = 0; i < 1000; i++)
             {
-                var random = new RandomImpl(i);
+                var random = new RandomImpl(i); // Make deterministic, and choose a number from wide range
                 var randomString = new RandomStringImpl(random);
                 var result = randomString.Next(new RandomStringParameters(5, 10, CharactersKind.Digits));
-                Assert.That(result.Length, Is.GreaterThanOrEqualTo(5));
-                Assert.That(result.Length, Is.LessThanOrEqualTo(10));
+                Assert.That(result.Length, Is.GreaterThanOrEqualTo(5).And.LessThanOrEqualTo(10));
                 Assert.That(result.All(c => char.IsDigit(c)), Is.True);
             }
         }
@@ -30,7 +29,7 @@ namespace TestHelper.Monkey.Random
             // Property-based testing
             for (var i = 0; i < 1000; i++)
             {
-                var random = new RandomImpl(i);
+                var random = new RandomImpl(i); // Make deterministic, and choose a number from wide range
                 var randomString = new RandomStringImpl(random);
                 var result = randomString.Next(new RandomStringParameters(5, 10, CharactersKind.Alphanumeric));
                 Assert.That(result.Length, Is.GreaterThanOrEqualTo(5).And.LessThanOrEqualTo(10));
@@ -44,11 +43,10 @@ namespace TestHelper.Monkey.Random
             // Property-based testing
             for (var i = 0; i < 1000; i++)
             {
-                var random = new RandomImpl(i);
+                var random = new RandomImpl(i); // Make deterministic, and choose a number from wide range
                 var randomString = new RandomStringImpl(random);
                 var result = randomString.Next(new RandomStringParameters(5, 10, CharactersKind.Printable));
-                Assert.That(result.Length, Is.GreaterThanOrEqualTo(5));
-                Assert.That(result.Length, Is.LessThanOrEqualTo(10));
+                Assert.That(result.Length, Is.GreaterThanOrEqualTo(5).And.LessThanOrEqualTo(10));
                 Assert.That(result.All(c => !char.IsControl(c)), Is.True);
             }
         }
