@@ -4,9 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Threading;
-using Cysharp.Threading.Tasks;
-using TestHelper.Monkey.Operators;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -56,7 +53,8 @@ namespace TestHelper.Monkey
         /// <param name="eventData">Specify if avoid GC memory allocation</param>
         /// <param name="results">Specify if avoid GC memory allocation</param>
         /// <returns>true: this object can control by user</returns>
-        public bool IsReallyInteractiveFromUser(Func<GameObject, Vector2> screenPointStrategy, PointerEventData eventData = null, List<RaycastResult> results = null)
+        public bool IsReallyInteractiveFromUser(Func<GameObject, Vector2> screenPointStrategy,
+            PointerEventData eventData = null, List<RaycastResult> results = null)
         {
             if (!IsInteractable())
             {
@@ -93,46 +91,5 @@ namespace TestHelper.Monkey
 
             return false;
         }
-
-        /// <summary>
-        /// Check inner component can receive click event
-        /// </summary>
-        /// <returns>true: Can click</returns>
-        public bool CanClick() => ClickOperator.CanClick(component);
-
-        /// <summary>
-        /// Click inner component
-        /// </summary>
-        /// <param name="screenPointStrategy">Function returns the screen position where monkey operators operate on for the specified gameObject</param>
-        public void Click(Func<GameObject, Vector2> screenPointStrategy) => ClickOperator.Click(component, screenPointStrategy);
-
-        /// <summary>
-        /// Check inner component can receive tap (click) event
-        /// </summary>
-        /// <returns>true: Can tap</returns>
-        public bool CanTap() => ClickOperator.CanClick(component);
-
-        /// <summary>
-        /// Tap (click) inner component
-        /// </summary>
-        /// <param name="screenPointStrategy">Function returns the screen position where monkey operators operate on for the specified gameObject</param>
-        public void Tap(Func<GameObject, Vector2> screenPointStrategy) => ClickOperator.Click(component, screenPointStrategy);
-
-        /// <summary>
-        /// Check inner component can receive touch-and-hold event
-        /// </summary>
-        /// <returns>true: Can touch-and-hold</returns>
-        public bool CanTouchAndHold() => TouchAndHoldOperator.CanTouchAndHold(component);
-
-        /// <summary>
-        /// Touch-and-hold inner component
-        /// </summary>
-        /// <param name="screenPointStrategy">Function returns the screen position where monkey operators operate on for the specified gameObject</param>
-        /// <param name="delayMillis">Delay time between down to up</param>
-        /// <param name="cancellationToken">Task cancellation token</param>
-        public async UniTask TouchAndHold(Func<GameObject, Vector2> screenPointStrategy, int delayMillis = 1000, CancellationToken cancellationToken = default)
-            => await TouchAndHoldOperator.TouchAndHold(component, screenPointStrategy, delayMillis, cancellationToken);
-
-        // TODO: drag, swipe, flick, etc...
     }
 }
