@@ -4,6 +4,7 @@
     "references": [
         "TestHelper.Monkey.Annotations",
         "TestHelper.RuntimeInternals",
+        "TestHelper.Random",
         "UniTask"
     ],
     "includePlatforms": [],

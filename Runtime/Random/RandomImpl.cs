@@ -9,6 +9,7 @@ namespace TestHelper.Monkey.Random
     /// Reference implementation of <c>IRandom</c>, wrapping <c>System.Random</c>.
     /// </summary>
     /// <seealso cref="System.Random"/>
+    [Obsolete("Use TestHelper.Random package")]
     public class RandomImpl : IRandom
     {
         private readonly System.Random _random;

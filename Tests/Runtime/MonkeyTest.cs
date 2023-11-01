@@ -11,9 +11,9 @@ using Cysharp.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
 using TestHelper.Monkey.Annotations;
-using TestHelper.Monkey.Random;
 using TestHelper.Monkey.ScreenPointStrategies;
 using TestHelper.Monkey.TestDoubles;
+using TestHelper.Random;
 using TestHelper.RuntimeInternals;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -158,7 +158,7 @@ namespace TestHelper.Monkey
 
             await Monkey.Run(config);
 
-            Assert.That(spyLogger.Messages, Does.Contain("Using wrapping System.Random, seed=0"));
+            Assert.That(spyLogger.Messages, Does.Contain("Using Random using System.Random, seed=0"));
         }
 
         [Test]
