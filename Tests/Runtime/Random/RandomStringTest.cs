@@ -33,8 +33,7 @@ namespace TestHelper.Monkey.Random
                 var random = new RandomImpl(i);
                 var randomString = new RandomStringImpl(random);
                 var result = randomString.Next(new RandomStringParameters(5, 10, CharactersKind.Alphanumeric));
-                Assert.That(result.Length, Is.GreaterThanOrEqualTo(5));
-                Assert.That(result.Length, Is.LessThanOrEqualTo(10));
+                Assert.That(result.Length, Is.GreaterThanOrEqualTo(5).And.LessThanOrEqualTo(10));
                 Assert.That(result.All(c => char.IsLetterOrDigit(c)), Is.True);
             }
         }
