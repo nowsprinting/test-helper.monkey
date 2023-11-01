@@ -2,31 +2,18 @@
 // This software is released under the MIT License.
 
 using System;
-using System.Linq;
-using TestHelper.Monkey.Annotations;
+using System.Threading;
+using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace TestHelper.Monkey.Operators
 {
-    internal static class ClickOperator
+    public class ClickOperator : IOperator
     {
-        internal static bool CanClick(MonoBehaviour component)
-        {
-            if (component.gameObject.TryGetComponent(typeof(IgnoreAnnotation), out _))
-            {
-                return false;
-            }
-
-            if (component as EventTrigger)
-            {
-                return ((EventTrigger)component).triggers.Any(x => x.eventID == EventTriggerType.PointerClick);
-            }
-
-            return component.GetType().GetInterfaces().Contains(typeof(IPointerClickHandler));
-        }
-
-        internal static void Click(MonoBehaviour component, Func<GameObject, Vector2> screenPointStrategy)
+        public async UniTask DoOperation(MonoBehaviour component, Func<GameObject, Vector2> screenPointStrategy,
+            CancellationToken cancellationToken = default)
         {
             if (!(component is IPointerClickHandler handler))
             {
@@ -37,7 +24,9 @@ namespace TestHelper.Monkey.Operators
             {
                 position = screenPointStrategy(component.gameObject)
             };
+
             handler.OnPointerClick(eventData);
+            await Task.Yield();
         }
     }
 }

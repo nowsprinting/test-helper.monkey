@@ -2,13 +2,28 @@
 // This software is released under the MIT License.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using TestHelper.Monkey.Matchers;
+using TestHelper.Monkey.Operators;
 using TestHelper.Monkey.Random;
 using TestHelper.Monkey.ScreenPointStrategies;
 using UnityEngine;
 
 namespace TestHelper.Monkey
 {
+    public struct MatcherOperatorPair
+    {
+        public IComponentMatcher _matcher;
+        public IOperator _operator;
+
+        public MatcherOperatorPair(IComponentMatcher matcher, IOperator @operator)
+        {
+            _matcher = matcher;
+            _operator = @operator;
+        }
+    }
+
     /// <summary>
     /// Run configuration for monkey testing
     /// </summary>
@@ -30,10 +45,17 @@ namespace TestHelper.Monkey
         /// </summary>
         public int SecondsToErrorForNoInteractiveComponent = 5;
 
-        /// <summary>
-        /// Delay time for touch-and-hold
-        /// </summary>
-        public int TouchAndHoldDelayMillis = 1000;
+        // First, if there is a match in the PrimaryOperators.matcher, so draw a lottery.
+        public List<MatcherOperatorPair> PrimaryOperators = new List<MatcherOperatorPair>();
+        // e.g., new MatcherOperatorPair(new GameObjectNameMatcher("Phone"), new TextInputOperator(CharactersKind.Digits, 9, 12))
+
+        // If there is no match in the PrimaryOperators.matcher, so use the SecondaryOperators.
+        public List<MatcherOperatorPair> SecondaryOperators = new List<MatcherOperatorPair>()
+        {
+            new MatcherOperatorPair(new ClickableComponentMatcher(), new ClickOperator()),
+            new MatcherOperatorPair(new TouchAndHoldableComponentMatcher(), new TouchAndHoldOperator(1000)),
+            // new MatcherOperatorPair(new TextInputComponentMatcher(), new TextInputOperator(CharactersKind.Alphanumeric, 5, 10)),
+        };
 
         /// <summary>
         /// Random generator

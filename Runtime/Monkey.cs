@@ -8,6 +8,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using TestHelper.Monkey.Operators;
 using TestHelper.Monkey.Random;
 using TestHelper.RuntimeInternals;
 using UnityEngine;
@@ -173,30 +174,30 @@ namespace TestHelper.Monkey
             TouchAndHold,
         }
 
-        private static IEnumerable<SupportOperation> GetCanOperations(InteractiveComponent component)
+        private static IEnumerable<IOperator> GetCanOperations(InteractiveComponent component,
+            List<MatcherOperatorPair> pairs)
         {
-            if (component.CanClick()) yield return SupportOperation.Click;
-            if (component.CanTouchAndHold()) yield return SupportOperation.TouchAndHold;
+            foreach (var pair in pairs)
+            {
+                if (pair._matcher.IsMatch(component))
+                {
+                    yield return pair._operator;
+                }
+            }
         }
 
         internal static async UniTask DoOperation(InteractiveComponent component, MonkeyConfig config,
             CancellationToken cancellationToken = default)
         {
-            var operations = GetCanOperations(component).ToArray();
+            var operations = GetCanOperations(component, config.PrimaryOperators).ToArray();
+            if (operations.Length == 0)
+            {
+                operations = GetCanOperations(component, config.SecondaryOperators).ToArray();
+            }
+
             var operation = operations[config.Random.Next(operations.Length)];
             config.Logger.Log($"Do operation {component.gameObject.name} {operation.ToString()}");
-            switch (operation)
-            {
-                case SupportOperation.Click:
-                    component.Click(config.ScreenPointStrategy);
-                    break;
-                case SupportOperation.TouchAndHold:
-                    await component.TouchAndHold(config.ScreenPointStrategy, config.TouchAndHoldDelayMillis,
-                        cancellationToken);
-                    break;
-                default:
-                    throw new IndexOutOfRangeException();
-            }
+            operation.DoOperation(component, config.ScreenPointStrategy, cancellationToken);
         }
     }
 }

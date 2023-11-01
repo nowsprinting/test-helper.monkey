@@ -2,40 +2,24 @@
 // This software is released under the MIT License.
 
 using System;
-using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using TestHelper.Monkey.Annotations;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
 namespace TestHelper.Monkey.Operators
 {
-    internal static class TouchAndHoldOperator
+    public class TouchAndHoldOperator : IOperator
     {
-        internal static bool CanTouchAndHold(MonoBehaviour component)
+        private readonly int _holdMillis;
+
+        public TouchAndHoldOperator(int holdMillis = 1000)
         {
-            if (component.gameObject.TryGetComponent(typeof(IgnoreAnnotation), out _))
-            {
-                return false;
-            }
-
-            if (component as EventTrigger)
-            {
-                return ((EventTrigger)component).triggers.Any(x => x.eventID == EventTriggerType.PointerDown) &&
-                       ((EventTrigger)component).triggers.Any(x => x.eventID == EventTriggerType.PointerUp);
-            }
-
-            var interfaces = component.GetType().GetInterfaces();
-            return interfaces.Contains(typeof(IPointerDownHandler)) && interfaces.Contains(typeof(IPointerUpHandler));
+            _holdMillis = holdMillis;
         }
 
-        internal static async UniTask TouchAndHold(
-            MonoBehaviour component,
-            Func<GameObject, Vector2> screenPointStrategy,
-            int delayMillis = 1000,
-            CancellationToken cancellationToken = default
-        )
+        public async UniTask DoOperation(MonoBehaviour component, Func<GameObject, Vector2> screenPointStrategy,
+            CancellationToken cancellationToken = default)
         {
             if (!(component is IPointerDownHandler downHandler) || !(component is IPointerUpHandler upHandler))
             {
@@ -48,7 +32,7 @@ namespace TestHelper.Monkey.Operators
             };
 
             downHandler.OnPointerDown(eventData);
-            await UniTask.Delay(TimeSpan.FromMilliseconds(delayMillis), cancellationToken: cancellationToken);
+            await UniTask.Delay(TimeSpan.FromMilliseconds(_holdMillis), cancellationToken: cancellationToken);
 
             if (component == null)
             {
