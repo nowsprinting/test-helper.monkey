@@ -9,6 +9,7 @@ using Cysharp.Threading.Tasks;
 using TestHelper.Monkey.Annotations;
 using TestHelper.Monkey.Operators;
 using TestHelper.Monkey.ScreenPointStrategies;
+using TestHelper.Monkey.Settings;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -117,19 +118,19 @@ namespace TestHelper.Monkey
             switch (_state)
             {
                 case InteractiveState.Ignore:
-                    Gizmos.color = Color.red;
+                    Gizmos.color = SettingsManager.IgnoreColor;
                     Gizmos.DrawSphere(transform.position, 0.2f); // TODO: mizaru
                     break;
                 case InteractiveState.Unreachable:
-                    Gizmos.color = new Color(0xef, 0x81, 0x0f);
+                    Gizmos.color = SettingsManager.UnreachableColor;
                     Gizmos.DrawSphere(transform.position, 0.2f); // TODO: mizaru
                     break;
                 case InteractiveState.Reachable:
-                    Gizmos.color = Color.yellow;
+                    Gizmos.color = SettingsManager.ReachableColor;
                     Gizmos.DrawSphere(transform.position, 0.2f); // TODO: saru
                     break;
                 case InteractiveState.OperationTarget:
-                    Gizmos.color = Color.green;
+                    Gizmos.color = SettingsManager.OperationTargetColor;
                     Gizmos.DrawSphere(transform.position, 0.2f); // TODO: saru
                     // TODO: with draw _operationLabel
                     break;

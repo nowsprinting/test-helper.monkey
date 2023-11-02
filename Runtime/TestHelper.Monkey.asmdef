@@ -4,7 +4,8 @@
     "references": [
         "TestHelper.Monkey.Annotations",
         "TestHelper.RuntimeInternals",
-        "UniTask"
+        "UniTask",
+        "Unity.Settings.Editor"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
