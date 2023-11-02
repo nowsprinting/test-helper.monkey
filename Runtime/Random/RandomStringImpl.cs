@@ -3,6 +3,7 @@
 
 using System;
 using System.Text;
+using TestHelper.Random;
 using UnityEngine.Assertions;
 
 namespace TestHelper.Monkey.Random
@@ -17,7 +18,7 @@ namespace TestHelper.Monkey.Random
         internal const string CharsASCIIPrintable = CharsASCIIAlphanumeric + CharsASCIISymbols;
 
         private static StringBuilder _sb = new StringBuilder();
-        private readonly TestHelper.Random.IRandom _random;
+        private readonly IRandom _random;
 
 
         /// <summary>
@@ -26,7 +27,7 @@ namespace TestHelper.Monkey.Random
         /// <remarks>This class is not thread-safe.</remarks>
         /// </summary>
         /// <param name="random">Random number generator</param>
-        public RandomStringImpl(TestHelper.Random.IRandom random)
+        public RandomStringImpl(IRandom random)
         {
             _random = random;
         }

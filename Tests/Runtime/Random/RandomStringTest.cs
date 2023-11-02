@@ -3,6 +3,7 @@
 
 using System.Linq;
 using NUnit.Framework;
+using TestHelper.Random;
 
 namespace TestHelper.Monkey.Random
 {
@@ -15,7 +16,7 @@ namespace TestHelper.Monkey.Random
             // Property-based testing
             for (var i = 0; i < 1000; i++)
             {
-                var random = new TestHelper.Random.RandomImpl(i); // Make deterministic, and choose a number from wide range
+                var random = new RandomImpl(i); // Make deterministic, and choose a number from wide range
                 var randomString = new RandomStringImpl(random);
                 var result = randomString.Next(new RandomStringParameters(5, 10, CharactersKind.Digits));
                 Assert.That(result.Length, Is.GreaterThanOrEqualTo(5).And.LessThanOrEqualTo(10));
@@ -29,7 +30,7 @@ namespace TestHelper.Monkey.Random
             // Property-based testing
             for (var i = 0; i < 1000; i++)
             {
-                var random = new TestHelper.Random.RandomImpl(i); // Make deterministic, and choose a number from wide range
+                var random = new RandomImpl(i); // Make deterministic, and choose a number from wide range
                 var randomString = new RandomStringImpl(random);
                 var result = randomString.Next(new RandomStringParameters(5, 10, CharactersKind.Alphanumeric));
                 Assert.That(result.Length, Is.GreaterThanOrEqualTo(5).And.LessThanOrEqualTo(10));
@@ -43,7 +44,7 @@ namespace TestHelper.Monkey.Random
             // Property-based testing
             for (var i = 0; i < 1000; i++)
             {
-                var random = new TestHelper.Random.RandomImpl(i); // Make deterministic, and choose a number from wide range
+                var random = new RandomImpl(i); // Make deterministic, and choose a number from wide range
                 var randomString = new RandomStringImpl(random);
                 var result = randomString.Next(new RandomStringParameters(5, 10, CharactersKind.Printable));
                 Assert.That(result.Length, Is.GreaterThanOrEqualTo(5).And.LessThanOrEqualTo(10));
