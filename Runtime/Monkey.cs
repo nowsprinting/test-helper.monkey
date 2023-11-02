@@ -82,6 +82,11 @@ namespace TestHelper.Monkey
             var components = InteractiveComponentCollector
                 .FindInteractiveComponents()
                 .ToList();
+            foreach (var c in components)
+            {
+                c.UpdateState(); // reset all components
+            }
+
             var component = Lottery(ref components, config.Random, config.ScreenPointStrategy);
             if (component == null)
             {
@@ -138,9 +143,11 @@ namespace TestHelper.Monkey
             switch (operation)
             {
                 case SupportOperation.Click:
+                    component.UpdateState(true,"Click");
                     component.Click(config.ScreenPointStrategy);
                     break;
                 case SupportOperation.TouchAndHold:
+                    component.UpdateState(true,"Touch and Hold");
                     await component.TouchAndHold(config.ScreenPointStrategy, config.TouchAndHoldDelayMillis,
                         cancellationToken);
                     break;

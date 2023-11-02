@@ -90,7 +90,7 @@ namespace TestHelper.Monkey
             return false;
         }
 
-        public void UpdateSituation(bool operationTarget = false, string operationLabel = null)
+        public void UpdateState(bool operationTarget = false, string operationLabel = null)
         {
             if (operationTarget)
             {
