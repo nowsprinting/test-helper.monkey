@@ -8,7 +8,8 @@
         "TestHelper.Monkey.Annotations",
         "UniTask",
         "TestHelper",
-        "TestHelper.RuntimeInternals"
+        "TestHelper.RuntimeInternals",
+        "TestHelper.Random"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

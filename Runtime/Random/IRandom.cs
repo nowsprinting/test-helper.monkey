@@ -1,12 +1,15 @@
 ﻿// Copyright (c) 2023 Koji Hasegawa.
 // This software is released under the MIT License.
 
+using System;
+
 namespace TestHelper.Monkey.Random
 {
     /// <summary>
     /// Random number generator interface like a <c>System.Random</c> class.
     /// </summary>
     /// <seealso cref="System.Random"/>
+    [Obsolete("Use TestHelper.Random package")]
     public interface IRandom
     {
         /// <summary>

@@ -8,7 +8,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using TestHelper.Monkey.Random;
+using TestHelper.Random;
 using TestHelper.RuntimeInternals;
 using UnityEngine;
 #if UNITY_INCLUDE_TESTS
