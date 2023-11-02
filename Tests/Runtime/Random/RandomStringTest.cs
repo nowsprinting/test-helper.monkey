@@ -3,6 +3,7 @@
 
 using System.Linq;
 using NUnit.Framework;
+using TestHelper.Random;
 
 namespace TestHelper.Monkey.Random
 {

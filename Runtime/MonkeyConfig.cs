@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using TestHelper.Monkey.Random;
 using TestHelper.Monkey.ScreenPointStrategies;
 using TestHelper.Random;
 using UnityEngine;
