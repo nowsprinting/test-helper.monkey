@@ -8,6 +8,7 @@
   "dependencies": {
     "com.cysharp.unitask": "2.3.3",
     "com.nowsprinting.test-helper": "0.4.0",
+    "com.unity.settings-manager": "2.0.1",
     "com.unity.ugui": "1.0.0"
   },
   "displayName": "Monkey Test Helper",
