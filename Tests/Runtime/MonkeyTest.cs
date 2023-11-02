@@ -212,7 +212,8 @@ namespace TestHelper.Monkey
         [LoadScene(TestScene)]
         public void Lottery_hitInteractiveComponent_returnComponent()
         {
-            var components = InteractiveComponentCollector.FindInteractiveComponents().ToList();
+            var components = InteractiveComponentCollector
+                .FindReallyInteractiveComponents(DefaultScreenPointStrategy.GetScreenPoint).ToList();
             for (var i = 0; i < components.Count; i++)
             {
                 var random = new StubRandom(i);
