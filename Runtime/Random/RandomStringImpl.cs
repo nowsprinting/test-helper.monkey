@@ -17,7 +17,7 @@ namespace TestHelper.Monkey.Random
         internal const string CharsASCIIPrintable = CharsASCIIAlphanumeric + CharsASCIISymbols;
 
         private static StringBuilder _sb = new StringBuilder();
-        private readonly IRandom _random;
+        private readonly TestHelper.Random.IRandom _random;
 
 
         /// <summary>
@@ -26,7 +26,7 @@ namespace TestHelper.Monkey.Random
         /// <remarks>This class is not thread-safe.</remarks>
         /// </summary>
         /// <param name="random">Random number generator</param>
-        public RandomStringImpl(IRandom random)
+        public RandomStringImpl(TestHelper.Random.IRandom random)
         {
             _random = random;
         }

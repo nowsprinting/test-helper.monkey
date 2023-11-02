@@ -3,9 +3,11 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using TestHelper.Monkey.Random;
 using TestHelper.Monkey.ScreenPointStrategies;
-using TestHelper.Random;
 using UnityEngine;
+using IRandom = TestHelper.Random.IRandom;
+using RandomImpl = TestHelper.Random.RandomImpl;
 
 namespace TestHelper.Monkey
 {
