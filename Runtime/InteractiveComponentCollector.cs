@@ -29,11 +29,16 @@ namespace TestHelper.Monkey
                 if (component.GetType() == typeof(EventTrigger) ||
                     component.GetType().GetInterfaces().Contains(typeof(IEventSystemHandler)))
                 {
-                    yield return new InteractiveComponent(component);
+                    var interactiveComponent = component.gameObject.GetComponent<InteractiveComponent>();
+                    if (interactiveComponent == null)
+                    {
+                        interactiveComponent = component.gameObject.AddComponent<InteractiveComponent>();
+                    }
+
+                    yield return interactiveComponent;
                 }
             }
         }
-
 
         /// <summary>
         /// Find components attached EventTrigger or implements IEventSystemHandler in scene.
@@ -59,7 +64,12 @@ namespace TestHelper.Monkey
                 if (component.GetType() == typeof(EventTrigger) ||
                     component.GetType().GetInterfaces().Contains(typeof(IEventSystemHandler)))
                 {
-                    var interactiveComponent = new InteractiveComponent(component);
+                    var interactiveComponent = component.gameObject.GetComponent<InteractiveComponent>();
+                    if (interactiveComponent == null)
+                    {
+                        interactiveComponent = component.gameObject.AddComponent<InteractiveComponent>();
+                    }
+
                     if (interactiveComponent.IsReallyInteractiveFromUser(screenPointStrategy, data, results))
                     {
                         yield return interactiveComponent;
@@ -67,7 +77,6 @@ namespace TestHelper.Monkey
                 }
             }
         }
-
 
         private static IEnumerable<MonoBehaviour> FindMonoBehaviours()
         {
