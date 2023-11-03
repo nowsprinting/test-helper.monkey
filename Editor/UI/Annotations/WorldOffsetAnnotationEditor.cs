@@ -5,7 +5,7 @@ using TestHelper.Monkey.Annotations;
 using UnityEditor;
 using UnityEngine;
 
-namespace TestHelper.Monkey.Editor.Annotations
+namespace TestHelper.Monkey.Editor.UI.Annotations
 {
     /// <summary>
     /// Editor GUI for WorldOffsetAnnotation
