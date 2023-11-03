@@ -67,28 +67,28 @@ msgstr "このコンポーネントが付属している GameObject に対する
 #: Editor/UI/Hints/InteractiveComponentHintEditor.cs
 
 # label
-msgid "Active Point"
-msgstr "操作可能点"
+msgid "Corrected Point (reachable)"
+msgstr "操作可能点（補正済）"
 
 # description tooltip
-msgid "Color for interactive components that user can operate"
-msgstr "インタラクティブなコンポーネントのうちユーザーが操作可能なものの色"
+msgid "Color for corrected points of interactive components that monkey operators can operate"
+msgstr "ユーザーが操作可能なインタラクティブコンポーネントの補正済み操作位置の色"
 
 # label
-msgid "Inactive Point"
-msgstr "操作不能点"
+msgid "Corrected Point (unreachable)"
+msgstr "操作不能点（補正済）"
 
 # description tooltip
-msgid "Color for interactive components that user cannot operate"
-msgstr "インタラクティブなコンポーネントのうちユーザーが操作不能なものの色"
+msgid "Color for corrected points of interactive components that monkey operators cannot operate"
+msgstr "ユーザーが操作不能なインタラクティブコンポーネントの補正済み操作位置の色"
 
 # label
 msgid "Original Point"
-msgstr "基準点"
+msgstr "補正基準点"
 
 # description tooltip
-msgid "Color for the default operation point for interactive components that is used for the origin point of position annotations"
-msgstr "インタラクティブなコンポーネントに対するアノテーションの基準位置の色"
+msgid "Color for default operation points for interactive components that is used for the origin point of position annotations"
+msgstr "インタラクティブなコンポーネントに対する位置補正アノテーションの基準位置の色"
 
 # label
 msgid "Frames/Refresh"

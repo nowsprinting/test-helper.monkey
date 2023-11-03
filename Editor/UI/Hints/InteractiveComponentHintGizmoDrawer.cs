@@ -34,9 +34,9 @@ namespace Editor.UI
             {
                 var (worldPoint, camNorm) = worldPointAndLabel.Key;
                 var label = worldPointAndLabel.Value;
-                Handles.color = hint.inactivePointColor;
+                Handles.color = hint.unreachableColor;
                 Handles.DrawWireDisc(worldPoint, camNorm, 0.1f);
-                GUI.color = hint.inactivePointColor;
+                GUI.color = hint.unreachableColor;
                 Handles.Label(worldPoint + s_labelOffset, label);
             }
             
@@ -44,9 +44,9 @@ namespace Editor.UI
             {
                 var (worldPoint, camNorm) = worldPointAndLabel.Key;
                 var label = worldPointAndLabel.Value;
-                Handles.color = hint.activePointColor;
+                Handles.color = hint.reachableColor;
                 Handles.DrawWireDisc(worldPoint, camNorm, 0.1f);
-                GUI.color = hint.activePointColor;
+                GUI.color = hint.reachableColor;
                 Handles.Label(worldPoint + s_labelOffset, label);
             }
         }

@@ -13,6 +13,8 @@ namespace TestHelper.Monkey
     /// </summary>
     public class InteractiveComponentHint : MonoBehaviour
     {
+        private static readonly Color s_orange = new Color(0xef, 0x81, 0x0f);
+        
         /// <summary>
         /// Color for interactive components that users can operate
         /// </summary>
@@ -23,7 +25,7 @@ namespace TestHelper.Monkey
         /// Color for interactive components that users cannot operate
         /// </summary>
         [SerializeField]
-        public Color unreachableColor = new Color(0xef, 0x81, 0x0f);
+        public Color unreachableColor = s_orange;
 
         /// <summary>
         /// Color for points that is the origin of position annotations
@@ -37,14 +39,12 @@ namespace TestHelper.Monkey
         [SerializeField]
         public int framesPerRefresh = 100;
 
-
         /// <summary>
         /// Screen point strategy. You should use a same strategy that monkey operators use.
         /// </summary>
         /// <param name="go">GameObject where monkey operators operate on</param>
         /// <returns></returns>
         public virtual Vector2 GetScreenPoint(GameObject go) => DefaultScreenPointStrategy.GetScreenPoint(go);
-
 
         /// <summary>
         /// Operation point and the hint texts for interactive components that users cannot operate
@@ -82,7 +82,6 @@ namespace TestHelper.Monkey
         private readonly Dictionary<(Vector3, Vector3), HashSet<GameObject>> _tmpReallyInteractives =
             new Dictionary<(Vector3, Vector3), HashSet<GameObject>>();
 
-
         private void Start()
         {
             Refresh();
@@ -95,7 +94,6 @@ namespace TestHelper.Monkey
                 Refresh();
             }
         }
-
 
         private void Refresh()
         {
@@ -130,7 +128,6 @@ namespace TestHelper.Monkey
             RefreshLabels();
         }
 
-
         private void Clear()
         {
             _reallyInteractives.Clear();
@@ -147,7 +144,6 @@ namespace TestHelper.Monkey
                 worldPointAndGameObjects.Value.Clear();
             }
         }
-
 
         private void RefreshLabels()
         {

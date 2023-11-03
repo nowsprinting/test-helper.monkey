@@ -12,26 +12,26 @@ namespace TestHelper.Monkey.Editor.Hints
     [CustomEditor(typeof(InteractiveComponentHint))]
     public class InteractiveComponentHintEditor : UnityEditor.Editor
     {
-        private static readonly string s_activePointColor = L10n.Tr("Active Point");
+        private static readonly string s_reachablePointColor = L10n.Tr("Corrected Point (reachable)");
 
-        private static readonly string s_activePointTooltip =
-            L10n.Tr("Color for interactive components that user can operate");
+        private static readonly string s_reachablePointTooltip =
+            L10n.Tr("Color for corrected points of interactive components that monkey operators can operate");
 
-        private SerializedProperty _activePointColorProp;
-        private GUIContent _activePointColorContent;
+        private SerializedProperty _reachablePointColorProp;
+        private GUIContent _reachablePointColorContent;
 
-        private static readonly string s_inactiveColor = L10n.Tr("Inactive Point");
+        private static readonly string s_unreachableColor = L10n.Tr("Corrected Point (unreachable)");
 
-        private static readonly string s_inactiveTooltip =
-            L10n.Tr("Color for interactive components that user cannot operate");
+        private static readonly string s_unreachableTooltip =
+            L10n.Tr("Color for corrected points of interactive components that monkey operators cannot operate");
 
-        private SerializedProperty _inactivePointColorProp;
-        private GUIContent _inactivePointColorContent;
+        private SerializedProperty _unreachablePointColorProp;
+        private GUIContent _unreachablePointColorContent;
 
         private static readonly string s_originalPointColor = L10n.Tr("Original Point");
 
         private static readonly string s_originalPointTooltip = L10n.Tr(
-            "Color for the default operation point for interactive components that is used for the origin point of position annotations"
+            "Color for default operation points for interactive components that is used for the origin point of position annotations"
         );
 
         private SerializedProperty _originalPointColorProp;
@@ -45,11 +45,11 @@ namespace TestHelper.Monkey.Editor.Hints
 
         private void OnEnable()
         {
-            _activePointColorProp = serializedObject.FindProperty(nameof(InteractiveComponentHint.activePointColor));
-            _activePointColorContent = new GUIContent(s_activePointColor, s_activePointTooltip);
-            _inactivePointColorProp =
-                serializedObject.FindProperty(nameof(InteractiveComponentHint.inactivePointColor));
-            _inactivePointColorContent = new GUIContent(s_inactiveColor, s_inactiveTooltip);
+            _reachablePointColorProp = serializedObject.FindProperty(nameof(InteractiveComponentHint.reachableColor));
+            _reachablePointColorContent = new GUIContent(s_reachablePointColor, s_reachablePointTooltip);
+            _unreachablePointColorProp =
+                serializedObject.FindProperty(nameof(InteractiveComponentHint.unreachableColor));
+            _unreachablePointColorContent = new GUIContent(s_unreachableColor, s_unreachableTooltip);
             _originalPointColorProp = serializedObject.FindProperty(nameof(InteractiveComponentHint.originalPointColor));
             _originalPointColorContent = new GUIContent(s_originalPointColor, s_originalPointTooltip);
             _refreshFrameCountProp = serializedObject.FindProperty(nameof(InteractiveComponentHint.framesPerRefresh));
@@ -61,8 +61,8 @@ namespace TestHelper.Monkey.Editor.Hints
         {
             serializedObject.Update();
 
-            EditorGUILayout.PropertyField(_activePointColorProp, _activePointColorContent);
-            EditorGUILayout.PropertyField(_inactivePointColorProp, _inactivePointColorContent);
+            EditorGUILayout.PropertyField(_reachablePointColorProp, _reachablePointColorContent);
+            EditorGUILayout.PropertyField(_unreachablePointColorProp, _unreachablePointColorContent);
             EditorGUILayout.PropertyField(_originalPointColorProp, _originalPointColorContent);
             EditorGUILayout.PropertyField(_refreshFrameCountProp, _refreshFrameCountContent);
 
