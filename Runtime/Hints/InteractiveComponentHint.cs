@@ -83,16 +83,16 @@ namespace TestHelper.Monkey
             new Dictionary<(Vector3, Vector3), HashSet<GameObject>>();
 
 
+        private void Start()
+        {
+            Refresh();
+        }
+
         private void Update()
         {
-            if (_count == 0)
+            if (Time.frameCount % framesPerRefresh == 0)
             {
                 Refresh();
-                _count = framesPerRefresh;
-            }
-            else
-            {
-                _count--;
             }
         }
 
