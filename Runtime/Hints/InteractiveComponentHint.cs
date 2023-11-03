@@ -19,7 +19,7 @@ namespace TestHelper.Monkey
         /// Color for interactive components that users can operate
         /// </summary>
         [SerializeField]
-        public Color reachableColor = Color.yellow;
+        public Color reachableColor = Color.blue;
 
         /// <summary>
         /// Color for interactive components that users cannot operate
