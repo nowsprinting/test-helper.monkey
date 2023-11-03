@@ -23,7 +23,7 @@ namespace TestHelper.Monkey
         /// Color for interactive components that users cannot operate
         /// </summary>
         [SerializeField]
-        public Color inactivePointColor = Color.red;
+        public Color unreachableColor = new Color(0xef, 0x81, 0x0f);
 
         /// <summary>
         /// Color for points that is the origin of position annotations
