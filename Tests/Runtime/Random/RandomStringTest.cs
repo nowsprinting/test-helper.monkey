@@ -3,6 +3,7 @@
 
 using System.Linq;
 using NUnit.Framework;
+using TestHelper.Monkey.Annotations.Enums;
 using TestHelper.Random;
 
 namespace TestHelper.Monkey.Random

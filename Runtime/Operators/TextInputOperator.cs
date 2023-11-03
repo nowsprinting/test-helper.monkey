@@ -11,7 +11,6 @@ namespace TestHelper.Monkey.Operators
 {
     internal static class TextInputOperator
     {
-        
         internal static bool CanTextInput(MonoBehaviour component)
         {
             if (component.gameObject.TryGetComponent(typeof(IgnoreAnnotation), out _))
@@ -31,6 +30,16 @@ namespace TestHelper.Monkey.Operators
             if (!(component is InputField inputField))
             {
                 return;
+            }
+
+            var annotation = component.gameObject.GetComponent<InputFieldAnnotation>();
+            if (annotation != null)
+            {
+                // Overwrite rule if annotation is attached.
+                randomStringParams = _ => new RandomStringParameters(
+                    annotation.minimumLength,
+                    annotation.maximumLength,
+                    annotation.charactersKind);
             }
 
             inputField.text = randomString.Next(randomStringParams(component.gameObject));
