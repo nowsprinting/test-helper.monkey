@@ -61,8 +61,6 @@ namespace TestHelper.Monkey
         /// </summary>
         public IReadOnlyList<(Vector3, Vector3, Vector3)> OriginalRelation => _originalRel;
 
-        private int _count;
-
         private readonly StringBuilder _sb = new StringBuilder();
 
         private readonly Dictionary<(Vector3, Vector3), string> _notReallyInteractives =
