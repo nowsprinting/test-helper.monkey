@@ -15,10 +15,8 @@ namespace TestHelper.Monkey.ScreenPointStrategies
         /// </summary>
         /// <param name="gameObject">GameObject that monkey operators operate</param>
         /// <returns>The screen point of the <paramref name="gameObject"/> transform position</returns>
-        public static Vector2 GetScreenPoint(GameObject gameObject)
-        {
-            return GetScreenPointByWorldPosition(gameObject, gameObject.transform.position);
-        }
+        public static Vector2 GetScreenPoint(GameObject gameObject) =>
+            GetScreenPointByWorldPosition(gameObject, gameObject.transform.position);
 
         /// <summary>
         /// Returns 
@@ -26,41 +24,7 @@ namespace TestHelper.Monkey.ScreenPointStrategies
         /// <param name="gameObject">GameObject that monkey operators operate</param>
         /// <param name="pos">The world position where monkey operators operate on</param>
         /// <returns>The screen point of the <paramref name="pos"/></returns>
-        public static Vector2 GetScreenPointByWorldPosition(GameObject gameObject, Vector3 pos)
-        {
-            var canvas = gameObject.GetComponentInParent<Canvas>();
-            if (canvas != null)
-            {
-                if (!canvas.isRootCanvas)
-                {
-                    canvas = canvas.rootCanvas;
-                }
-
-                if (canvas.renderMode == RenderMode.ScreenSpaceOverlay)
-                {
-                    return RectTransformUtility.WorldToScreenPoint(null, pos);
-                }
-
-                return RectTransformUtility.WorldToScreenPoint(canvas.worldCamera, pos);
-            }
-
-            return RectTransformUtility.WorldToScreenPoint(GetMainCamera(), pos);
-        }
-
-
-        private static Camera s_cachedMainCamera;
-        private static int s_cachedFrame;
-
-
-        private static Camera GetMainCamera()
-        {
-            if (Time.frameCount == s_cachedFrame)
-            {
-                return s_cachedMainCamera;
-            }
-
-            s_cachedFrame = Time.frameCount;
-            return s_cachedMainCamera = Camera.main;
-        }
+        public static Vector2 GetScreenPointByWorldPosition(GameObject gameObject, Vector3 pos) =>
+            RectTransformUtility.WorldToScreenPoint(CameraSelector.SelectBy(gameObject), pos);
     }
 }

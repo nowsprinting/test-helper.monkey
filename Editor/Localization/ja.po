@@ -22,7 +22,7 @@ msgstr ""
 
 #: Editor/UI/Annotations/ScreenOffsetAnnotationEditor.cs
 
-# offset
+# label
 msgid "Offset"
 msgstr "オフセット"
 
@@ -33,7 +33,7 @@ msgstr "このコンポーネントが付属している GameObject のスクリ
 
 #: Editor/UI/Annotations/WorldOffsetAnnotationEditor.cs
 
-# offset
+# label
 msgid "Offset"
 msgstr "オフセット"
 
@@ -44,7 +44,7 @@ msgstr "このコンポーネントが付属している GameObject のワール
 
 #: Editor/UI/Annotations/ScreenPositionAnnotationEditor.cs
 
-# offset
+# label
 msgid "Position"
 msgstr "位置"
 
@@ -55,10 +55,45 @@ msgstr "このコンポーネントが付属している GameObject に対する
 
 #: Editor/UI/Annotations/WorldPositionAnnotationEditor.cs
 
-# offset
+# label
 msgid "Position"
 msgstr "位置"
 
 # description tooltip
 msgid "A world position that where monkey operators operate on"
 msgstr "このコンポーネントが付属している GameObject に対するモンキー操作をするスクリーン座標"
+
+
+#: Editor/UI/Hints/InteractiveComponentHintEditor.cs
+
+# label
+msgid "Corrected Point (reachable)"
+msgstr "操作可能点（補正済）"
+
+# description tooltip
+msgid "Color for corrected points of interactive components that monkey operators can operate"
+msgstr "ユーザーが操作可能なインタラクティブコンポーネントの補正済み操作位置の色"
+
+# label
+msgid "Corrected Point (unreachable)"
+msgstr "操作不能点（補正済）"
+
+# description tooltip
+msgid "Color for corrected points of interactive components that monkey operators cannot operate"
+msgstr "ユーザーが操作不能なインタラクティブコンポーネントの補正済み操作位置の色"
+
+# label
+msgid "Original Point"
+msgstr "補正基準点"
+
+# description tooltip
+msgid "Color for default operation points for interactive components that is used for the origin point of position annotations"
+msgstr "インタラクティブなコンポーネントに対する位置補正アノテーションの基準位置の色"
+
+# label
+msgid "Frames/Refresh"
+msgstr "フレーム数/更新"
+
+# description tooltip
+msgid "Number of frames per refresh hints"
+msgstr "何フレームごとにヒントを更新するか"
