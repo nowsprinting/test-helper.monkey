@@ -2,56 +2,26 @@
 // This software is released under the MIT License.
 
 using System;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
 using TestHelper.Monkey.Annotations.Enums;
+using TestHelper.Monkey.TestDoubles;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace TestHelper.Monkey.Annotations
 {
     [TestFixture]
     [GameViewResolution(GameViewResolution.VGA)]
-    public class InputFieldAnnotationTest
+    public partial class InputFieldAnnotationTest
     {
         private const string TestScene = "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/InputFields.unity";
         private GameObject _annotationAttachedGameObject;
 
-        private class InputFieldValidator : MonoBehaviour
-        {
-            private InputField _inputField;
-            private Regex _pattern;
-
-            public void SetValidPattern(string pattern)
-            {
-                _pattern = new Regex(pattern);
-            }
-
-            private void Start()
-            {
-                _inputField = GetComponent<InputField>();
-            }
-
-            private void Update()
-            {
-                if (_inputField.text == string.Empty)
-                {
-                    return;
-                }
-
-                if (!_pattern.IsMatch(_inputField.text))
-                {
-                    Debug.LogError($"{gameObject.name}: {_inputField.text} is not match pattern.");
-                }
-            }
-        }
-
         [SetUp]
         public void SetUp()
         {
-            var defaultTextValidator = GameObject.Find("InputField").AddComponent<InputFieldValidator>();
+            var defaultTextValidator = GameObject.Find("InputField").AddComponent<SpyInputFieldValidator>();
             defaultTextValidator.SetValidPattern("^[a-zA-Z0-9]{5,10}$");
 
             _annotationAttachedGameObject = GameObject.Find("InputFieldWithAnnotation");
@@ -79,7 +49,7 @@ namespace TestHelper.Monkey.Annotations
             annotation.minimumLength = 6;
             annotation.maximumLength = 9;
 
-            var validator = _annotationAttachedGameObject.AddComponent<InputFieldValidator>();
+            var validator = _annotationAttachedGameObject.AddComponent<SpyInputFieldValidator>();
             validator.SetValidPattern("^[0-9]{6,9}$");
 
             var config = new MonkeyConfig
@@ -100,7 +70,7 @@ namespace TestHelper.Monkey.Annotations
             annotation.minimumLength = 4;
             annotation.maximumLength = 11;
 
-            var validator = _annotationAttachedGameObject.AddComponent<InputFieldValidator>();
+            var validator = _annotationAttachedGameObject.AddComponent<SpyInputFieldValidator>();
             validator.SetValidPattern("^.{4,11}$");
 
             var config = new MonkeyConfig
