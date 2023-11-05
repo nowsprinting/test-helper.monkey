@@ -17,11 +17,11 @@ namespace TestHelper.Monkey.Annotations
         /// <summary>
         /// Minimum length of generated strings. Length of the strings must be greater than or equal the value.
         /// </summary>
-        public int minimumLength = 5;
+        public uint minimumLength = 5;
 
         /// <summary>
         /// Maximum length of generated strings. Length of the strings must be lower than or equal the value.
         /// </summary>
-        public int maximumLength = 10;
+        public uint maximumLength = 10;
     }
 }

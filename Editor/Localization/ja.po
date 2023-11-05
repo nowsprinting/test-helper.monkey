@@ -97,3 +97,30 @@ msgstr "フレーム数/更新"
 # description tooltip
 msgid "Number of frames per refresh hints"
 msgstr "何フレームごとにヒントを更新するか"
+
+
+#: Editor/UI/Annotations/InputFieldAnnotationEditor.cs
+
+# Character kind
+msgid "Character Kind"
+msgstr "文字種類"
+
+# Character kind tooltip
+msgid "Character kind of random input text by Monkey"
+msgstr "モンキーテストがランダムに入力する文字種類"
+
+# Minimum length
+msgid "Minimum Length"
+msgstr "最小文字数"
+
+# Minimum length tooltip
+msgid "Minimum length of random input text by Monkey"
+msgstr "モンキーテストがランダムに入力する最小文字数"
+
+# Maximum length
+msgid "Maximum Length"
+msgstr "最大文字数"
+
+# Maximum length tooltip
+msgid "Maximum length of random input text by Monkey"
+msgstr "モンキーテストがランダムに入力する最大文字数"

@@ -37,8 +37,8 @@ namespace TestHelper.Monkey.Operators
             {
                 // Overwrite rule if annotation is attached.
                 randomStringParams = _ => new RandomStringParameters(
-                    annotation.minimumLength,
-                    annotation.maximumLength,
+                    (int)annotation.minimumLength,
+                    (int)annotation.maximumLength,
                     annotation.charactersKind);
             }
 
