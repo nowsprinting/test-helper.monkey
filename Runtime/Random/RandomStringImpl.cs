@@ -3,7 +3,9 @@
 
 using System;
 using System.Text;
+using TestHelper.Monkey.Annotations.Enums;
 using TestHelper.Random;
+using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace TestHelper.Monkey.Random

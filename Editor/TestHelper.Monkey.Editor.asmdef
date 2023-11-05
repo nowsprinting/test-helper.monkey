@@ -1,5 +1,6 @@
 {
     "name": "TestHelper.Monkey.Editor",
+    "rootNamespace": "TestHelper.Monkey",
     "references": [
         "TestHelper.Monkey.Annotations",
         "TestHelper.Monkey"

@@ -57,6 +57,35 @@ Configurations in `MonkeyConfig`:
 - **Screenshots**: Take screenshots during running the monkey test if set a `ScreenshotOptions` instance.
 
 
+### Annotations for Monkey's behavior
+
+You can control the Monkey's behavior by attaching the annotation components to the GameObject.
+
+#### IgnoreAnnotation
+
+Monkey will not operate objects with `IgnoreAnnotation` attached.
+
+#### InputFieldAnnotation
+
+Specify the character kind and length input into `InputField` with `InputFieldAnnotation`.
+
+#### ScreenOffsetAnnotation
+
+Specify the screen position offset on the screen space where Monkey operates.
+
+#### ScreenPositionAnnotation
+
+Specify the screen position where Monkey operates.
+
+#### WorldOffsetAnnotation
+
+Specify the screen position offset on world space where Monkey operates.
+
+#### WorldPositionAnnotation
+
+Specify the world position where Monkey operates.
+
+
 ### Find and operate interactive uGUI elements API
 
 #### InteractiveComponentCollector.FindInteractiveComponents
