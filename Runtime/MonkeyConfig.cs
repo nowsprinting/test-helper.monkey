@@ -69,21 +69,8 @@ namespace TestHelper.Monkey
         public bool Gizmos { get; set; } = false;
 
         /// <summary>
-        /// Take screenshots during running monkey test if true.
+        /// Take screenshots during running the monkey test if set a <c>ScreenshotOptions</c> instance.
         /// </summary>
-        public bool TakeScreenshots { get; set; } = false;
-
-        /// <summary>
-        /// Directory path to save screenshots.
-        /// Default save path is <c>Application.persistentDataPath</c> + "/TestHelper.Monkey/Screenshots/".
-        /// </summary>
-        public string ScreenshotsDirectory { get; set; } = null;
-
-        /// <summary>
-        /// Prefix of screenshots filename.
-        /// Default prefix is <c>CurrentTest.Name</c> when run in test-framework context.
-        /// Using caller method name when run in runtime context.
-        /// </summary>
-        public string ScreenshotsFilenamePrefix { get; set; } = null;
+        public ScreenshotOptions Screenshots { get; set; } = null;
     }
 }

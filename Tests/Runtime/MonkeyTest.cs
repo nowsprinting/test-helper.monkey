@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -183,33 +184,6 @@ namespace TestHelper.Monkey
 
         [Test]
         [LoadScene(TestScene)]
-        public async Task Run_withTakeScreenshots_TakeScreenshotAndSaveToDefaultPath()
-        {
-            var path = Path.Combine(Application.persistentDataPath, "TestHelper.Monkey", "Screenshots",
-                $"{nameof(Run_withTakeScreenshots_TakeScreenshotAndSaveToDefaultPath)}_0001.png");
-            if (File.Exists(path))
-            {
-                File.Delete(path);
-            }
-
-            Assume.That(path, Does.Not.Exist);
-
-            var config = new MonkeyConfig
-            {
-                Lifetime = TimeSpan.FromMilliseconds(200), // 200ms
-                DelayMillis = 1, // 1ms
-                TouchAndHoldDelayMillis = 1, // 1ms
-                TakeScreenshots = true, // take screenshots and save files
-            };
-            var task = Monkey.Run(config);
-            await UniTask.Delay(1000, DelayType.DeltaTime);
-
-            Assert.That(task.Status, Is.EqualTo(UniTaskStatus.Succeeded));
-            Assert.That(path, Does.Exist);
-        }
-
-        [Test]
-        [LoadScene(TestScene)]
         public void Lottery_hitInteractiveComponent_returnComponent()
         {
             var components = InteractiveComponentCollector
@@ -362,6 +336,132 @@ namespace TestHelper.Monkey
             await Monkey.Run(config);
 
             Assert.That(spyLogger.Messages, Does.Contain($"Do operation {target} {operation}"));
+        }
+
+        [TestFixture]
+        [SuppressMessage("ReSharper", "MethodHasAsyncOverload")]
+        public class Screenshots
+        {
+            private const int FileSizeThreshold = 5441; // VGA size solid color file size
+            private const int FileSizeThreshold2X = 100 * 1024; // Normal size is 80 to 90KB
+
+            [Test]
+            [LoadScene(TestScene)]
+            public async Task Run_withScreenshots_takeScreenshotsAndSaveToDefaultPath()
+            {
+                var path = Path.Combine(Application.persistentDataPath, "TestHelper.Monkey", "Screenshots",
+                    $"{nameof(Run_withScreenshots_takeScreenshotsAndSaveToDefaultPath)}_0001.png");
+                if (File.Exists(path))
+                {
+                    File.Delete(path);
+                }
+
+                Assume.That(path, Does.Not.Exist);
+
+                var config = new MonkeyConfig
+                {
+                    Lifetime = TimeSpan.FromMilliseconds(200), // 200ms
+                    DelayMillis = 1, // 1ms
+                    TouchAndHoldDelayMillis = 1, // 1ms
+                    Screenshots = new ScreenshotOptions(), // take screenshots and save files
+                };
+                await Monkey.Run(config);
+
+                Assert.That(path, Does.Exist);
+                Assert.That(File.ReadAllBytes(path), Has.Length.GreaterThan(FileSizeThreshold));
+            }
+
+            [Test]
+            [LoadScene(TestScene)]
+            public async Task Run_withScreenshots_specifyPath_takeScreenshotsAndSaveToSpecifiedPath()
+            {
+                var relativeDirectory = Path.Combine("Logs", "TestHelper.Monkey", "SpecifiedPath");
+                var filenamePrefix = "Run_withScreenshots_specifyPath";
+                var path = Path.Combine(relativeDirectory, $"{filenamePrefix}_0001.png");
+                if (File.Exists(path))
+                {
+                    File.Delete(path);
+                }
+
+                Assume.That(path, Does.Not.Exist);
+
+                var config = new MonkeyConfig
+                {
+                    Lifetime = TimeSpan.FromMilliseconds(200), // 200ms
+                    DelayMillis = 1, // 1ms
+                    TouchAndHoldDelayMillis = 1, // 1ms
+                    Screenshots = new ScreenshotOptions()
+                    {
+                        Directory = relativeDirectory, // Relative path from project root when run in Editor
+                        FilenamePrefix = filenamePrefix, // Prefix of filename
+                        SuperSize = 2,
+                    },
+                };
+                await Monkey.Run(config);
+
+                Assert.That(path, Does.Exist);
+                Assert.That(File.ReadAllBytes(path), Has.Length.GreaterThan(FileSizeThreshold));
+            }
+
+            [Test]
+            [LoadScene(TestScene)]
+            public async Task Run_withScreenshots_superSize_takeScreenshotsSuperSize()
+            {
+                var path = Path.Combine(Application.persistentDataPath, "TestHelper.Monkey", "Screenshots",
+                    $"{nameof(Run_withScreenshots_superSize_takeScreenshotsSuperSize)}_0001.png");
+                if (File.Exists(path))
+                {
+                    File.Delete(path);
+                }
+
+                Assume.That(path, Does.Not.Exist);
+
+                var config = new MonkeyConfig
+                {
+                    Lifetime = TimeSpan.FromMilliseconds(200), // 200ms
+                    DelayMillis = 1, // 1ms
+                    TouchAndHoldDelayMillis = 1, // 1ms
+                    Screenshots = new ScreenshotOptions()
+                    {
+                        SuperSize = 2, // 2x size
+                    },
+                };
+                await Monkey.Run(config);
+
+                Assert.That(path, Does.Exist);
+                Assert.That(File.ReadAllBytes(path), Has.Length.GreaterThan(FileSizeThreshold2X));
+            }
+
+            [Test]
+            [LoadScene(TestScene)]
+            public async Task Run_withScreenshots_stereo_takeScreenshotsStereo()
+            {
+                var path = Path.Combine(Application.persistentDataPath, "TestHelper.Monkey", "Screenshots",
+                    $"{nameof(Run_withScreenshots_stereo_takeScreenshotsStereo)}_0001.png");
+                if (File.Exists(path))
+                {
+                    File.Delete(path);
+                }
+
+                Assume.That(path, Does.Not.Exist);
+
+                var config = new MonkeyConfig
+                {
+                    Lifetime = TimeSpan.FromMilliseconds(200), // 200ms
+                    DelayMillis = 1, // 1ms
+                    TouchAndHoldDelayMillis = 1, // 1ms
+                    Screenshots = new ScreenshotOptions()
+                    {
+                        StereoCaptureMode = ScreenCapture.StereoScreenCaptureMode.BothEyes,
+                    },
+                };
+                await Monkey.Run(config);
+
+                Assert.That(path, Does.Exist);
+                // Is it a stereo screenshot? See for yourself! Be a witness!!
+                // Note: Require stereo rendering settings.
+                // See: https://docs.unity3d.com/Manual/SinglePassStereoRendering.html
+            }
         }
     }
 }

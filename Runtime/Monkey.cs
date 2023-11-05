@@ -49,7 +49,7 @@ namespace TestHelper.Monkey
                 GameViewControlHelper.SetGizmos(true);
             }
 
-            if (config.TakeScreenshots)
+            if (config.Screenshots != null)
             {
                 ApplyScreenshotConfig(config, callerMemberName);
             }
@@ -84,24 +84,25 @@ namespace TestHelper.Monkey
             }
         }
 
+        // ReSharper disable once UnusedParameter.Local
         private static void ApplyScreenshotConfig(MonkeyConfig config, string callerMemberName)
         {
-            if (config.ScreenshotsDirectory == null)
+            if (config.Screenshots.Directory == null)
             {
-                config.ScreenshotsDirectory =
+                config.Screenshots.Directory =
                     Path.Combine(Application.persistentDataPath, "TestHelper.Monkey", "Screenshots");
             }
 
-            if (config.ScreenshotsFilenamePrefix == null)
+            if (config.Screenshots.FilenamePrefix == null)
             {
 #if UNITY_INCLUDE_TESTS
-                config.ScreenshotsFilenamePrefix = TestContext.CurrentTestExecutionContext.CurrentTest.Name
+                config.Screenshots.FilenamePrefix = TestContext.CurrentTestExecutionContext.CurrentTest.Name
                     .Replace('(', '_')
                     .Replace(')', '_')
                     .Replace(',', '-');
                 // Note: Same as the file name created under ActualImages of the Graphics Tests Framework package.
 #else
-                config.ScreenshotsFilenamePrefix = callerMemberName;
+                config.Screenshots.FilenamePrefix = callerMemberName;
 #endif
             }
         }
@@ -129,12 +130,14 @@ namespace TestHelper.Monkey
                 return false;
             }
 
-            if (config.TakeScreenshots)
+            if (config.Screenshots != null)
             {
                 var coroutineRunner = new GameObject().AddComponent<CoroutineRunner>();
                 await ScreenshotHelper.TakeScreenshot(
-                        directory: config.ScreenshotsDirectory,
-                        filename: $"{config.ScreenshotsFilenamePrefix}_{stepCount:D4}.png")
+                        directory: config.Screenshots.Directory,
+                        filename: $"{config.Screenshots.FilenamePrefix}_{stepCount:D4}.png",
+                        superSize: config.Screenshots.SuperSize,
+                        stereoCaptureMode: config.Screenshots.StereoCaptureMode)
                     .ToUniTask(coroutineRunner);
             }
 
