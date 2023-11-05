@@ -4,7 +4,7 @@
 [![Test](https://github.com/nowsprinting/test-helper.monkey/actions/workflows/test.yml/badge.svg)](https://github.com/nowsprinting/test-helper.monkey/actions/workflows/test.yml)
 [![openupm](https://img.shields.io/npm/v/com.nowsprinting.test-helper.monkey?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.nowsprinting.test-helper.monkey/)
 
-Reference implementation that performs object-based Unity UI (uGUI) monkey tests and an API for custom implementation.
+Reference implementation that performs object-based Unity UI (uGUI) monkey tests and API for custom implementation.
 
 This library can use in runtime code because it does not depend on the Unity Test Framework.
 
