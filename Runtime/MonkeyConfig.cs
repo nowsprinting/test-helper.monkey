@@ -2,7 +2,6 @@
 // This software is released under the MIT License.
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using TestHelper.Monkey.Random;
 using TestHelper.Monkey.ScreenPointStrategies;
 using TestHelper.Random;
@@ -13,79 +12,78 @@ namespace TestHelper.Monkey
     /// <summary>
     /// Run configuration for monkey testing
     /// </summary>
-    [SuppressMessage("ReSharper", "InconsistentNaming")]
     public class MonkeyConfig
     {
         /// <summary>
         /// Running time
         /// </summary>
-        public TimeSpan Lifetime = new TimeSpan(0, 0, 1, 0); // 1min
+        public TimeSpan Lifetime { get; set; } = new TimeSpan(0, 0, 1, 0); // 1min
 
         /// <summary>
         /// Delay time between operations
         /// </summary>
-        public int DelayMillis = 200;
+        public int DelayMillis { get; set; } = 200;
 
         /// <summary>
         /// Seconds to determine that an error has occurred when an object that can be interacted with does not exist
         /// </summary>
-        public int SecondsToErrorForNoInteractiveComponent = 5;
+        public int SecondsToErrorForNoInteractiveComponent { get; set; } = 5;
 
         /// <summary>
         /// Delay time for touch-and-hold
         /// </summary>
-        public int TouchAndHoldDelayMillis = 1000;
+        public int TouchAndHoldDelayMillis { get; set; } = 1000;
 
         /// <summary>
         /// Random number generator
         /// </summary>
-        public IRandom Random = new RandomImpl();
+        public IRandom Random { get; set; } = new RandomImpl();
 
         /// <summary>
         /// Random string generator
         /// </summary>
-        public IRandomString RandomString = new RandomStringImpl(new RandomImpl());
+        public IRandomString RandomString { get; set; } = new RandomStringImpl(new RandomImpl());
 
         /// <summary>
         /// Logger
         /// </summary>
-        public ILogger Logger = Debug.unityLogger;
+        public ILogger Logger { get; set; } = Debug.unityLogger;
 
         /// <summary>
         /// Function returns the screen position where monkey operators operate on for the specified gameObject
         /// </summary>
-        public Func<GameObject, Vector2> ScreenPointStrategy = DefaultScreenPointStrategy.GetScreenPoint;
+        public Func<GameObject, Vector2> ScreenPointStrategy { get; set; } = DefaultScreenPointStrategy.GetScreenPoint;
 
         /// <summary>
         /// Function returns the random string generation parameters
         /// </summary>
-        public Func<GameObject, RandomStringParameters>
-            RandomStringParametersStrategy = DefaultRandomStringParameterGen;
+        public Func<GameObject, RandomStringParameters> RandomStringParametersStrategy { get; set; } =
+            DefaultRandomStringParameterGen;
+
+        private static RandomStringParameters DefaultRandomStringParameterGen(GameObject _) =>
+            RandomStringParameters.Default;
 
         /// <summary>
         /// Show Gizmos on <c>GameView</c> during running monkey test if true
         /// </summary>
-        public bool Gizmos = false;
+        public bool Gizmos { get; set; } = false;
 
         /// <summary>
         /// Take screenshots during running monkey test if true.
         /// </summary>
-        public bool TakeScreenshots = false;
+        public bool TakeScreenshots { get; set; } = false;
 
         /// <summary>
         /// Directory path to save screenshots.
         /// Default save path is <c>Application.persistentDataPath</c> + "/TestHelper.Monkey/Screenshots/".
         /// </summary>
-        public string ScreenshotsDirectory = null;
+        public string ScreenshotsDirectory { get; set; } = null;
 
         /// <summary>
         /// Prefix of screenshots filename.
         /// Default prefix is <c>CurrentTest.Name</c> when run in test-framework context.
         /// Using caller method name when run in runtime context.
         /// </summary>
-        public string ScreenshotsFilenamePrefix = null;
-
-        private static RandomStringParameters DefaultRandomStringParameterGen(GameObject _) =>
-            RandomStringParameters.Default;
+        public string ScreenshotsFilenamePrefix { get; set; } = null;
     }
 }
