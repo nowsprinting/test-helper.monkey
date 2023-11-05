@@ -27,6 +27,8 @@ namespace TestHelper.Monkey
     /// </summary>
     public static class Monkey
     {
+        private static MonoBehaviour s_coroutineRunner; // for take screenshots
+
         /// <summary>
         /// Run monkey testing by repeating to call <c cref="RunStep" /> and wait.
         /// </summary>
@@ -132,13 +134,17 @@ namespace TestHelper.Monkey
 
             if (config.Screenshots != null)
             {
-                var coroutineRunner = new GameObject().AddComponent<CoroutineRunner>();
+                if (s_coroutineRunner == null || (bool)s_coroutineRunner == false)
+                {
+                    s_coroutineRunner = new GameObject().AddComponent<CoroutineRunner>();
+                }
+
                 await ScreenshotHelper.TakeScreenshot(
                         directory: config.Screenshots.Directory,
                         filename: $"{config.Screenshots.FilenamePrefix}_{stepCount:D4}.png",
                         superSize: config.Screenshots.SuperSize,
                         stereoCaptureMode: config.Screenshots.StereoCaptureMode)
-                    .ToUniTask(coroutineRunner);
+                    .ToUniTask(s_coroutineRunner);
             }
 
             await DoOperation(component, config, cancellationToken);
