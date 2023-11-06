@@ -17,6 +17,7 @@
     "Annotations*",
     "Documentation~",
     "Runtime*",
+    "Editor*",
     "Tests*",
     "LICENSE.md*",
     "package.json*",
