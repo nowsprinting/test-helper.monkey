@@ -13,6 +13,7 @@ using NUnit.Framework;
 using TestHelper.Attributes;
 using TestHelper.Monkey.Annotations;
 using TestHelper.Monkey.ScreenPointStrategies;
+using TestHelper.Monkey.ScreenshotFilenameStrategies;
 using TestHelper.Monkey.TestDoubles;
 using TestHelper.Random;
 using TestHelper.RuntimeInternals;
@@ -37,7 +38,7 @@ namespace TestHelper.Monkey
                 TouchAndHoldDelayMillis = 1, // 1ms
             };
 
-            var didAct = await Monkey.RunStep(config, 0);
+            var didAct = await Monkey.RunStep(config);
             Assert.That(didAct, Is.EqualTo(true));
         }
 
@@ -56,7 +57,7 @@ namespace TestHelper.Monkey
                 TouchAndHoldDelayMillis = 1, // 1ms
             };
 
-            var didAct = await Monkey.RunStep(config, 0);
+            var didAct = await Monkey.RunStep(config);
             Assert.That(didAct, Is.EqualTo(false));
         }
 
@@ -363,7 +364,10 @@ namespace TestHelper.Monkey
                     Lifetime = TimeSpan.FromMilliseconds(200), // 200ms
                     DelayMillis = 1, // 1ms
                     TouchAndHoldDelayMillis = 1, // 1ms
-                    Screenshots = new ScreenshotOptions(), // take screenshots and save files
+                    Screenshots = new ScreenshotOptions()
+                    {
+                        FilePathStrategy = CounterBasedStrategy.Create(new Counter()), // dont use Counter.Global
+                    }, // take screenshots and save files
                 };
                 await Monkey.Run(config);
 
@@ -392,8 +396,7 @@ namespace TestHelper.Monkey
                     TouchAndHoldDelayMillis = 1, // 1ms
                     Screenshots = new ScreenshotOptions()
                     {
-                        Directory = relativeDirectory, // Relative path from project root when run in Editor
-                        FilenamePrefix = filenamePrefix, // Prefix of filename
+                        FilePathStrategy = CounterBasedStrategy.Create(new Counter(), relativeDirectory, filenamePrefix),
                         SuperSize = 2,
                     },
                 };
@@ -424,6 +427,7 @@ namespace TestHelper.Monkey
                     TouchAndHoldDelayMillis = 1, // 1ms
                     Screenshots = new ScreenshotOptions()
                     {
+                        FilePathStrategy = CounterBasedStrategy.Create(new Counter()), // dont use Counter.Global
                         SuperSize = 2, // 2x size
                     },
                 };
@@ -455,6 +459,7 @@ namespace TestHelper.Monkey
                     TouchAndHoldDelayMillis = 1, // 1ms
                     Screenshots = new ScreenshotOptions()
                     {
+                        FilePathStrategy = CounterBasedStrategy.Create(new Counter()), // dont use Counter.Global
                         StereoCaptureMode = ScreenCapture.StereoScreenCaptureMode.BothEyes,
                     },
                 };
