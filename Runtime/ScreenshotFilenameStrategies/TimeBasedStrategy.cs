@@ -19,7 +19,7 @@ namespace TestHelper.Monkey.ScreenshotFilenameStrategies
         ///     <c cref="ScreenshotFilenameStrategy.GetDefaultDirectory" />
         /// </param>
         /// <param name="filenamePrefix">
-        ///     Directory for screenshot images. If null or empty, use returned one from
+        ///     Filename prefix for screenshot images. If null or empty, use returned one from
         ///     <c cref="ScreenshotFilenameStrategy.GetDefaultFilenamePrefix" />
         /// </param>
         /// <returns>
