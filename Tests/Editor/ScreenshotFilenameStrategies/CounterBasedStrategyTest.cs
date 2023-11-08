@@ -25,11 +25,11 @@ namespace TestHelper.Monkey.ScreenshotFilenameStrategies
             var actual = Enumerable.Repeat(0, 5).Select(_ => getFilePath()).ToList();
             var expected = new List<ScreenshotOptions.FilePath>
             {
-                new ScreenshotOptions.FilePath(directory, "prefix_0000.png"),
                 new ScreenshotOptions.FilePath(directory, "prefix_0001.png"),
                 new ScreenshotOptions.FilePath(directory, "prefix_0002.png"),
                 new ScreenshotOptions.FilePath(directory, "prefix_0003.png"),
-                new ScreenshotOptions.FilePath(directory, "prefix_0004.png")
+                new ScreenshotOptions.FilePath(directory, "prefix_0004.png"),
+                new ScreenshotOptions.FilePath(directory, "prefix_0005.png")
             };
             Assert.That(actual, Is.EquivalentTo(expected));
         }
