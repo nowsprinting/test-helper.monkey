@@ -13,7 +13,6 @@ using NUnit.Framework;
 using TestHelper.Attributes;
 using TestHelper.Monkey.Annotations;
 using TestHelper.Monkey.ScreenPointStrategies;
-using TestHelper.Monkey.ScreenshotFilenameStrategies;
 using TestHelper.Monkey.TestDoubles;
 using TestHelper.Random;
 using TestHelper.RuntimeInternals;
@@ -350,8 +349,8 @@ namespace TestHelper.Monkey
             [LoadScene(TestScene)]
             public async Task Run_withScreenshots_takeScreenshotsAndSaveToDefaultPath()
             {
-                var path = Path.Combine(Application.persistentDataPath, "TestHelper.Monkey", "Screenshots",
-                    $"{nameof(Run_withScreenshots_takeScreenshotsAndSaveToDefaultPath)}_0001.png");
+                var directory = Path.Combine(Application.persistentDataPath, "TestHelper.Monkey", "Screenshots");
+                var path = Path.Combine(directory, $"{nameof(Run_withScreenshots_takeScreenshotsAndSaveToDefaultPath)}_0001.png");
                 if (File.Exists(path))
                 {
                     File.Delete(path);
@@ -366,7 +365,8 @@ namespace TestHelper.Monkey
                     TouchAndHoldDelayMillis = 1, // 1ms
                     Screenshots = new ScreenshotOptions()
                     {
-                        FilePathStrategy = CounterBasedStrategy.Create(new Counter()), // dont use Counter.Global
+                        Directory = directory,
+                        FileNameStrategy = new StubScreenshotFileNameStrategy(path),
                     }, // take screenshots and save files
                 };
                 await Monkey.Run(config);
@@ -380,8 +380,9 @@ namespace TestHelper.Monkey
             public async Task Run_withScreenshots_specifyPath_takeScreenshotsAndSaveToSpecifiedPath()
             {
                 var relativeDirectory = Path.Combine("Logs", "TestHelper.Monkey", "SpecifiedPath");
-                var filenamePrefix = "Run_withScreenshots_specifyPath";
-                var path = Path.Combine(relativeDirectory, $"{filenamePrefix}_0001.png");
+                var fileNamePrefix = "Run_withScreenshots_specifyPath";
+                var fileName = $"{fileNamePrefix}_0001.png";
+                var path = Path.Combine(relativeDirectory, fileName);
                 if (File.Exists(path))
                 {
                     File.Delete(path);
@@ -396,7 +397,8 @@ namespace TestHelper.Monkey
                     TouchAndHoldDelayMillis = 1, // 1ms
                     Screenshots = new ScreenshotOptions()
                     {
-                        FilePathStrategy = CounterBasedStrategy.Create(new Counter(), relativeDirectory, filenamePrefix),
+                        Directory = relativeDirectory,
+                        FileNameStrategy = new StubScreenshotFileNameStrategy(fileName),
                         SuperSize = 2,
                     },
                 };
@@ -411,8 +413,9 @@ namespace TestHelper.Monkey
             [LoadScene(TestScene)]
             public async Task Run_withScreenshots_superSize_takeScreenshotsSuperSize()
             {
-                var path = Path.Combine(Application.persistentDataPath, "TestHelper.Monkey", "Screenshots",
-                    $"{nameof(Run_withScreenshots_superSize_takeScreenshotsSuperSize)}_0001.png");
+                var directory = Path.Combine(Application.persistentDataPath, "TestHelper.Monkey", "Screenshots");
+                var fileName = $"{nameof(Run_withScreenshots_superSize_takeScreenshotsSuperSize)}_0001.png";
+                var path = Path.Combine(directory, fileName);
                 if (File.Exists(path))
                 {
                     File.Delete(path);
@@ -427,7 +430,7 @@ namespace TestHelper.Monkey
                     TouchAndHoldDelayMillis = 1, // 1ms
                     Screenshots = new ScreenshotOptions()
                     {
-                        FilePathStrategy = CounterBasedStrategy.Create(new Counter()), // dont use Counter.Global
+                        FileNameStrategy = new StubScreenshotFileNameStrategy(fileName),
                         SuperSize = 2, // 2x size
                     },
                 };
@@ -443,8 +446,9 @@ namespace TestHelper.Monkey
             [LoadScene(TestScene)]
             public async Task Run_withScreenshots_stereo_takeScreenshotsStereo()
             {
-                var path = Path.Combine(Application.persistentDataPath, "TestHelper.Monkey", "Screenshots",
-                    $"{nameof(Run_withScreenshots_stereo_takeScreenshotsStereo)}_0001.png");
+                var directory = Path.Combine(Application.persistentDataPath, "TestHelper.Monkey", "Screenshots");
+                var fileName = $"{nameof(Run_withScreenshots_stereo_takeScreenshotsStereo)}_0001.png";
+                var path = Path.Combine(directory, fileName);
                 if (File.Exists(path))
                 {
                     File.Delete(path);
@@ -459,7 +463,7 @@ namespace TestHelper.Monkey
                     TouchAndHoldDelayMillis = 1, // 1ms
                     Screenshots = new ScreenshotOptions()
                     {
-                        FilePathStrategy = CounterBasedStrategy.Create(new Counter()), // dont use Counter.Global
+                        FileNameStrategy = new StubScreenshotFileNameStrategy(fileName),
                         StereoCaptureMode = ScreenCapture.StereoScreenCaptureMode.BothEyes,
                     },
                 };

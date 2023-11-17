@@ -1,7 +1,7 @@
 // Copyright (c) 2023 Koji Hasegawa.
 // This software is released under the MIT License.
 
-using System;
+using System.IO;
 using TestHelper.Monkey.ScreenshotFilenameStrategies;
 using UnityEngine;
 
@@ -13,9 +13,15 @@ namespace TestHelper.Monkey
     public class ScreenshotOptions
     {
         /// <summary>
+        /// Directory path to save screenshots.
+        /// Default save path is <c>Application.persistentDataPath</c> + "/TestHelper.Monkey/Screenshots/".
+        /// </summary>
+        public string Directory { get; set; } = null;
+        
+        /// <summary>
         /// Strategy for file paths of screenshot images.
         /// </summary>
-        public Func<FilePath> FilePathStrategy { get; set; } = CounterBasedStrategy.Create(Counter.Global);
+        public IScreenshotFileNameStrategy FileNameStrategy { get; set; } = new CounterBasedStrategy(null);
 
         /// <summary>
         /// The factor to increase resolution with.
@@ -34,18 +40,14 @@ namespace TestHelper.Monkey
         public ScreenCapture.StereoScreenCaptureMode StereoCaptureMode { get; set; } =
             ScreenCapture.StereoScreenCaptureMode.LeftEye;
         
-        
-        public readonly struct FilePath
+
+        /// <summary>
+        /// Returns a default directory for screenshot images
+        /// </summary>
+        /// <returns>Default directory for screenshot images</returns>
+        public static string GetDefaultDirectory()
         {
-            public readonly string Directory;
-            public readonly string Filename;
-
-
-            public FilePath(string directory, string filename)
-            {
-                Directory = directory;
-                Filename = filename;
-            }
+            return Path.Combine(Application.persistentDataPath, "TestHelper.Monkey", "Screenshots");
         }
     }
 }

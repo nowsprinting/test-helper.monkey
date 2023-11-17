@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -58,7 +59,8 @@ namespace TestHelper.Monkey
                     {
                         UnityEngine.Assertions.Assert.IsTrue(
                             (Time.time - lastOperationTime) < config.SecondsToErrorForNoInteractiveComponent,
-                            $"Interactive component not found in {config.SecondsToErrorForNoInteractiveComponent} seconds");
+                            $"Interactive component not found in {config.SecondsToErrorForNoInteractiveComponent} seconds"
+                        );
                     }
 
                     await UniTask.Delay(config.DelayMillis, DelayType.DeltaTime, cancellationToken: cancellationToken);
@@ -101,12 +103,14 @@ namespace TestHelper.Monkey
                     s_coroutineRunner = new GameObject().AddComponent<CoroutineRunner>();
                 }
 
-                var path = config.Screenshots.FilePathStrategy();
                 await ScreenshotHelper.TakeScreenshot(
-                        directory: path.Directory,
-                        filename: path.Filename,
+                        directory: string.IsNullOrEmpty(config.Screenshots.Directory)
+                            ? ScreenshotOptions.GetDefaultDirectory()
+                            : config.Screenshots.Directory,
+                        filename: config.Screenshots.FileNameStrategy.GetFileName(),
                         superSize: config.Screenshots.SuperSize,
-                        stereoCaptureMode: config.Screenshots.StereoCaptureMode)
+                        stereoCaptureMode: config.Screenshots.StereoCaptureMode
+                    )
                     .ToUniTask(s_coroutineRunner);
             }
 
@@ -114,8 +118,11 @@ namespace TestHelper.Monkey
             return true;
         }
 
-        internal static InteractiveComponent Lottery(ref List<InteractiveComponent> components, IRandom random,
-            Func<GameObject, Vector2> screenPointStrategy)
+        internal static InteractiveComponent Lottery(
+            ref List<InteractiveComponent> components,
+            IRandom random,
+            Func<GameObject, Vector2> screenPointStrategy
+        )
         {
             if (components == null || components.Count == 0)
             {
@@ -153,8 +160,11 @@ namespace TestHelper.Monkey
             if (component.CanTextInput()) yield return SupportOperation.TextInput;
         }
 
-        internal static async UniTask DoOperation(InteractiveComponent component, MonkeyConfig config,
-            CancellationToken cancellationToken = default)
+        internal static async UniTask DoOperation(
+            InteractiveComponent component,
+            MonkeyConfig config,
+            CancellationToken cancellationToken = default
+        )
         {
             var operations = GetCanOperations(component).ToArray();
             var operation = operations[config.Random.Next(operations.Length)];
@@ -165,8 +175,11 @@ namespace TestHelper.Monkey
                     component.Click(config.ScreenPointStrategy);
                     break;
                 case SupportOperation.TouchAndHold:
-                    await component.TouchAndHold(config.ScreenPointStrategy, config.TouchAndHoldDelayMillis,
-                        cancellationToken);
+                    await component.TouchAndHold(
+                        config.ScreenPointStrategy,
+                        config.TouchAndHoldDelayMillis,
+                        cancellationToken
+                    );
                     break;
                 case SupportOperation.TextInput:
                     component.TextInput(config.RandomStringParametersStrategy, config.RandomString);
