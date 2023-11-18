@@ -12,7 +12,7 @@ on:
 
 jobs:
   check-bump-version:
-    if: startsWith(github.repository, 'nowsprinting/')
+    if: github.repository_owner == 'nowsprinting' # Skip on forked repo
     runs-on: ubuntu-latest
     permissions:
       contents: read

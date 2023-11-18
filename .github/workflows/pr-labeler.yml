@@ -9,6 +9,7 @@ on:
 
 jobs:
   pr-labeler:
+    if: github.event.pull_request.head.repo.fork == false # Skip on public fork
     runs-on: ubuntu-latest
     permissions:
       contents: read
