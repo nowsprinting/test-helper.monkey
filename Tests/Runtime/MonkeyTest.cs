@@ -1,5 +1,7 @@
 ﻿// Copyright (c) 2023 Koji Hasegawa.
 // This software is released under the MIT License.
+//
+// fork test
 
 using System;
 using System.Collections.Generic;
