@@ -12,6 +12,7 @@ on:
 
 jobs:
   check-bump-version:
+    if: startsWith(github.repository, 'nowsprinting/')
     runs-on: ubuntu-latest
     permissions:
       contents: read

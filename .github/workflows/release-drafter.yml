@@ -15,6 +15,7 @@ concurrency:
 
 jobs:
   release-drafter:
+    if: startsWith(github.repository, 'nowsprinting/')
     runs-on: ubuntu-latest
     permissions:
       contents: write
