@@ -24,7 +24,7 @@ concurrency:
 
 jobs:
   test:
-    if: github.event.pull_request.head.repo.fork == false
+    if: github.event.pull_request.head.repo.fork == false # Skip on public fork, because can not read secrets.
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -116,10 +116,10 @@ jobs:
 
   notify:
     needs: test
+    if: github.event.pull_request.head.repo.fork == false # Skip on public fork, because can not read secrets.
     runs-on: ubuntu-latest
     permissions:
       actions: read
-    if: always()
 
     steps:
       - uses: Gamesight/slack-workflow-status@v1.2.0

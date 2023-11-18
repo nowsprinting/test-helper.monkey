@@ -39,4 +39,4 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        if: failure() && github.repository_owner == 'nowsprinting' # Skip on public fork, because can not read secrets.
+        if: failure() && github.event.pull_request.head.repo.fork == false # Skip on public fork, because can not read secrets.
