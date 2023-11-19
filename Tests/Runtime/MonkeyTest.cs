@@ -404,6 +404,7 @@ namespace TestHelper.Monkey
             }
 
             [Test]
+            [Description("This test fails with stereo rendering settings.")]
             [LoadScene(TestScene)]
             public async Task Run_withScreenshots_superSize_takeScreenshotsSuperSize()
             {
@@ -430,6 +431,8 @@ namespace TestHelper.Monkey
 
                 Assert.That(path, Does.Exist);
                 Assert.That(File.ReadAllBytes(path), Has.Length.GreaterThan(FileSizeThreshold2X));
+                // Note: This test fails with stereo rendering settings.
+                //  See: https://docs.unity3d.com/Manual/SinglePassStereoRendering.html
             }
 
             [Test]
@@ -460,7 +463,7 @@ namespace TestHelper.Monkey
                 Assert.That(path, Does.Exist);
                 // Is it a stereo screenshot? See for yourself! Be a witness!!
                 // Note: Require stereo rendering settings.
-                // See: https://docs.unity3d.com/Manual/SinglePassStereoRendering.html
+                //  See: https://docs.unity3d.com/Manual/SinglePassStereoRendering.html
             }
         }
     }
