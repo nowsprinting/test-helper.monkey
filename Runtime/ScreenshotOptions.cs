@@ -45,7 +45,7 @@ namespace TestHelper.Monkey
         /// Returns a default directory for screenshot images
         /// </summary>
         /// <returns>Default directory for screenshot images</returns>
-        public static string GetDefaultDirectory()
+        private static string GetDefaultDirectory()
         {
             return Path.Combine(Application.persistentDataPath, "TestHelper.Monkey", "Screenshots");
         }
