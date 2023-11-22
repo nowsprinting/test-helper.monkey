@@ -105,7 +105,7 @@ namespace TestHelper.Monkey
 
                 await ScreenshotHelper.TakeScreenshot(
                         directory: config.Screenshots.Directory,
-                        filename: config.Screenshots.FileNameStrategy.GetFileName(),
+                        filename: config.Screenshots.FilenameStrategy.GetFilename(),
                         superSize: config.Screenshots.SuperSize,
                         stereoCaptureMode: config.Screenshots.StereoCaptureMode
                     )

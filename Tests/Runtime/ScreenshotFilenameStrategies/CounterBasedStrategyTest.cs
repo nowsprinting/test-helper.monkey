@@ -11,11 +11,11 @@ namespace TestHelper.Monkey.ScreenshotFilenameStrategies
     public class CounterBasedStrategyTest
     {
         [Test]
-        public void FileNamePrefixSpecified()
+        public void FilenamePrefixSpecified()
         {
             var strategy = new CounterBasedStrategy("prefix");
 
-            var actual = Enumerable.Repeat(0, 5).Select(_ => strategy.GetFileName()).ToList();
+            var actual = Enumerable.Repeat(0, 5).Select(_ => strategy.GetFilename()).ToList();
             var expected = new List<string>
             {
                 "prefix_0001.png",
@@ -29,18 +29,18 @@ namespace TestHelper.Monkey.ScreenshotFilenameStrategies
 
 
         [Test]
-        public void DefaultFileNamePrefix()
+        public void DefaultFilenamePrefix()
         {
             var strategy = new CounterBasedStrategy(null);
 
-            var actual = Enumerable.Repeat(0, 5).Select(_ => strategy.GetFileName()).ToList();
+            var actual = Enumerable.Repeat(0, 5).Select(_ => strategy.GetFilename()).ToList();
             var expected = new List<string>
             {
-                $"{nameof(DefaultFileNamePrefix)}_0001.png",
-                $"{nameof(DefaultFileNamePrefix)}_0002.png",
-                $"{nameof(DefaultFileNamePrefix)}_0003.png",
-                $"{nameof(DefaultFileNamePrefix)}_0004.png",
-                $"{nameof(DefaultFileNamePrefix)}_0005.png"
+                $"{nameof(DefaultFilenamePrefix)}_0001.png",
+                $"{nameof(DefaultFilenamePrefix)}_0002.png",
+                $"{nameof(DefaultFilenamePrefix)}_0003.png",
+                $"{nameof(DefaultFilenamePrefix)}_0004.png",
+                $"{nameof(DefaultFilenamePrefix)}_0005.png"
             };
             Assert.That(actual, Is.EquivalentTo(expected));
         }

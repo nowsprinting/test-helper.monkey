@@ -366,7 +366,7 @@ namespace TestHelper.Monkey
                     Screenshots = new ScreenshotOptions()
                     {
                         Directory = directory,
-                        FileNameStrategy = new StubScreenshotFileNameStrategy(path),
+                        FilenameStrategy = new StubScreenshotFilenameStrategy(path),
                     }, // take screenshots and save files
                 };
                 await Monkey.Run(config);
@@ -380,9 +380,9 @@ namespace TestHelper.Monkey
             public async Task Run_withScreenshots_specifyPath_takeScreenshotsAndSaveToSpecifiedPath()
             {
                 var relativeDirectory = Path.Combine("Logs", "TestHelper.Monkey", "SpecifiedPath");
-                var fileNamePrefix = "Run_withScreenshots_specifyPath";
-                var fileName = $"{fileNamePrefix}_0001.png";
-                var path = Path.Combine(relativeDirectory, fileName);
+                var filenamePrefix = "Run_withScreenshots_specifyPath";
+                var filename = $"{filenamePrefix}_0001.png";
+                var path = Path.Combine(relativeDirectory, filename);
                 if (File.Exists(path))
                 {
                     File.Delete(path);
@@ -398,7 +398,7 @@ namespace TestHelper.Monkey
                     Screenshots = new ScreenshotOptions()
                     {
                         Directory = relativeDirectory,
-                        FileNameStrategy = new StubScreenshotFileNameStrategy(fileName),
+                        FilenameStrategy = new StubScreenshotFilenameStrategy(filename),
                         SuperSize = 2,
                     },
                 };
@@ -414,8 +414,8 @@ namespace TestHelper.Monkey
             public async Task Run_withScreenshots_superSize_takeScreenshotsSuperSize()
             {
                 var directory = Path.Combine(Application.persistentDataPath, "TestHelper.Monkey", "Screenshots");
-                var fileName = $"{nameof(Run_withScreenshots_superSize_takeScreenshotsSuperSize)}_0001.png";
-                var path = Path.Combine(directory, fileName);
+                var filename = $"{nameof(Run_withScreenshots_superSize_takeScreenshotsSuperSize)}_0001.png";
+                var path = Path.Combine(directory, filename);
                 if (File.Exists(path))
                 {
                     File.Delete(path);
@@ -430,7 +430,7 @@ namespace TestHelper.Monkey
                     TouchAndHoldDelayMillis = 1, // 1ms
                     Screenshots = new ScreenshotOptions()
                     {
-                        FileNameStrategy = new StubScreenshotFileNameStrategy(fileName),
+                        FilenameStrategy = new StubScreenshotFilenameStrategy(filename),
                         SuperSize = 2, // 2x size
                     },
                 };
@@ -447,8 +447,8 @@ namespace TestHelper.Monkey
             public async Task Run_withScreenshots_stereo_takeScreenshotsStereo()
             {
                 var directory = Path.Combine(Application.persistentDataPath, "TestHelper.Monkey", "Screenshots");
-                var fileName = $"{nameof(Run_withScreenshots_stereo_takeScreenshotsStereo)}_0001.png";
-                var path = Path.Combine(directory, fileName);
+                var filename = $"{nameof(Run_withScreenshots_stereo_takeScreenshotsStereo)}_0001.png";
+                var path = Path.Combine(directory, filename);
                 if (File.Exists(path))
                 {
                     File.Delete(path);
@@ -463,7 +463,7 @@ namespace TestHelper.Monkey
                     TouchAndHoldDelayMillis = 1, // 1ms
                     Screenshots = new ScreenshotOptions()
                     {
-                        FileNameStrategy = new StubScreenshotFileNameStrategy(fileName),
+                        FilenameStrategy = new StubScreenshotFilenameStrategy(filename),
                         StereoCaptureMode = ScreenCapture.StereoScreenCaptureMode.BothEyes,
                     },
                 };

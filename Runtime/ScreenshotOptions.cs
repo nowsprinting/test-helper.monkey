@@ -21,7 +21,7 @@ namespace TestHelper.Monkey
         /// <summary>
         /// Strategy for file paths of screenshot images.
         /// </summary>
-        public IScreenshotFileNameStrategy FileNameStrategy { get; set; } = new CounterBasedStrategy(null);
+        public IScreenshotFilenameStrategy FilenameStrategy { get; set; } = new CounterBasedStrategy(null);
 
         /// <summary>
         /// The factor to increase resolution with.

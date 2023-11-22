@@ -3,12 +3,12 @@
 
 namespace TestHelper.Monkey.ScreenshotFilenameStrategies
 {
-    public interface IScreenshotFileNameStrategy
+    public interface IScreenshotFilenameStrategy
     {
         /// <summary>
         /// Get a file path for screenshots
         /// </summary>
         /// <returns>A generated file path</returns>
-        string GetFileName();
+        string GetFilename();
     }
 }
