@@ -363,11 +363,7 @@ namespace TestHelper.Monkey
                     Lifetime = TimeSpan.FromMilliseconds(200), // 200ms
                     DelayMillis = 1, // 1ms
                     TouchAndHoldDelayMillis = 1, // 1ms
-                    Screenshots = new ScreenshotOptions()
-                    {
-                        Directory = directory,
-                        FilenameStrategy = new StubScreenshotFilenameStrategy(path),
-                    }, // take screenshots and save files
+                    Screenshots = new ScreenshotOptions() // take screenshots and save files
                 };
                 await Monkey.Run(config);
 
