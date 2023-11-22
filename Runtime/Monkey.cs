@@ -104,9 +104,7 @@ namespace TestHelper.Monkey
                 }
 
                 await ScreenshotHelper.TakeScreenshot(
-                        directory: string.IsNullOrEmpty(config.Screenshots.Directory)
-                            ? ScreenshotOptions.GetDefaultDirectory()
-                            : config.Screenshots.Directory,
+                        directory: config.Screenshots.Directory,
                         filename: config.Screenshots.FileNameStrategy.GetFileName(),
                         superSize: config.Screenshots.SuperSize,
                         stereoCaptureMode: config.Screenshots.StereoCaptureMode

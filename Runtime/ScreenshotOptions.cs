@@ -16,7 +16,7 @@ namespace TestHelper.Monkey
         /// Directory path to save screenshots.
         /// Default save path is <c>Application.persistentDataPath</c> + "/TestHelper.Monkey/Screenshots/".
         /// </summary>
-        public string Directory { get; set; } = null;
+        public string Directory { get; set; } = GetDefaultDirectory();
         
         /// <summary>
         /// Strategy for file paths of screenshot images.
