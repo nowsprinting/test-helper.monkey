@@ -13,7 +13,7 @@ namespace TestHelper.Monkey.ScreenshotFilenameStrategies
         private int _count;
 
 
-        public CounterBasedStrategy(string filenamePrefix, [CallerMemberName] string callerMemberName = null) : base(filenamePrefix, callerMemberName)
+        public CounterBasedStrategy(string filenamePrefix = null, [CallerMemberName] string callerMemberName = null) : base(filenamePrefix, callerMemberName)
         {
         }
 
