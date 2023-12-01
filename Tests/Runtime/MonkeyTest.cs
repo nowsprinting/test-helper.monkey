@@ -164,6 +164,7 @@ namespace TestHelper.Monkey
 
         [Test]
         [LoadScene(TestScene)]
+        [Description("Shown Gizmos, See for yourself! Be a witness!!")]
         public async Task Run_withGizmos_showGizmosAndReverted()
         {
             Assume.That(GameViewControlHelper.GetGizmos(), Is.False);
@@ -175,7 +176,7 @@ namespace TestHelper.Monkey
                 TouchAndHoldDelayMillis = 1, // 1ms
                 Gizmos = true, // show Gizmos
             };
-            var task = Monkey.Run(config); // Shown Gizmos, See for yourself! Be a witness!!
+            var task = Monkey.Run(config);
             await UniTask.Delay(1000, DelayType.DeltaTime);
 
             Assert.That(task.Status, Is.EqualTo(UniTaskStatus.Succeeded));
@@ -368,7 +369,7 @@ namespace TestHelper.Monkey
                 await Monkey.Run(config);
 
                 Assert.That(path, Does.Exist);
-                Assert.That(File.ReadAllBytes(path), Has.Length.GreaterThan(FileSizeThreshold));
+                Assert.That(new FileInfo(path), Has.Length.GreaterThan(FileSizeThreshold));
             }
 
             [Test]
@@ -400,7 +401,7 @@ namespace TestHelper.Monkey
                 await Monkey.Run(config);
 
                 Assert.That(path, Does.Exist);
-                Assert.That(File.ReadAllBytes(path), Has.Length.GreaterThan(FileSizeThreshold));
+                Assert.That(new FileInfo(path), Has.Length.GreaterThan(FileSizeThreshold));
             }
 
             [Test]
@@ -430,13 +431,14 @@ namespace TestHelper.Monkey
                 await Monkey.Run(config);
 
                 Assert.That(path, Does.Exist);
-                Assert.That(File.ReadAllBytes(path), Has.Length.GreaterThan(FileSizeThreshold2X));
+                Assert.That(new FileInfo(path), Has.Length.GreaterThan(FileSizeThreshold2X));
                 // Note: This test fails with stereo rendering settings.
                 //  See: https://docs.unity3d.com/Manual/SinglePassStereoRendering.html
             }
 
             [Test]
             [LoadScene(TestScene)]
+            [Description("Is it a stereo screenshot? See for yourself! Be a witness!!")]
             public async Task Run_withScreenshots_stereo_takeScreenshotsStereo()
             {
                 var path = Path.Combine(Application.persistentDataPath, "TestHelper.Monkey", "Screenshots",
@@ -461,7 +463,6 @@ namespace TestHelper.Monkey
                 await Monkey.Run(config);
 
                 Assert.That(path, Does.Exist);
-                // Is it a stereo screenshot? See for yourself! Be a witness!!
                 // Note: Require stereo rendering settings.
                 //  See: https://docs.unity3d.com/Manual/SinglePassStereoRendering.html
             }
