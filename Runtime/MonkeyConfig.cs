@@ -37,12 +37,12 @@ namespace TestHelper.Monkey
         /// <summary>
         /// Random number generator
         /// </summary>
-        public IRandom Random { get; set; } = new RandomImpl();
+        public IRandom Random { get; set; } = new RandomWrapper();
 
         /// <summary>
         /// Random string generator
         /// </summary>
-        public IRandomString RandomString { get; set; } = new RandomStringImpl(new RandomImpl());
+        public IRandomString RandomString { get; set; } = new RandomStringImpl(new RandomWrapper());
 
         /// <summary>
         /// Logger

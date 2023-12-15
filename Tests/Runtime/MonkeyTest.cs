@@ -153,13 +153,13 @@ namespace TestHelper.Monkey
             var config = new MonkeyConfig
             {
                 Lifetime = TimeSpan.FromSeconds(1), // 1sec
-                Random = new RandomImpl(0), // pin seed
+                Random = new RandomWrapper(0), // pin seed
                 Logger = spyLogger,
             };
 
             await Monkey.Run(config);
 
-            Assert.That(spyLogger.Messages, Does.Contain("Using Random using System.Random, seed=0"));
+            Assert.That(spyLogger.Messages, Does.Contain("Using RandomWrapper using System.Random, seed=0"));
         }
 
         [Test]
@@ -330,7 +330,7 @@ namespace TestHelper.Monkey
                 Lifetime = TimeSpan.FromSeconds(10), // 10sec
                 DelayMillis = 1, // 1ms
                 TouchAndHoldDelayMillis = 1, // 1ms
-                Random = new RandomImpl(0), // pin seed
+                Random = new RandomWrapper(0), // pin seed
                 Logger = spyLogger,
             };
 
