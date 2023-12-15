@@ -108,7 +108,7 @@ jobs:
         if: ${{ matrix.octocov }}
 
       - name: Upload test results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: TestResults-Unity${{ matrix.unityVersion }}
           path: |
