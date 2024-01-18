@@ -53,7 +53,7 @@ jobs:
         with:
           project-path: UnityProject~
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: ${{ env.CREATED_PROJECT_PATH }}/Library
           key: Library-${{ matrix.unityVersion }}
