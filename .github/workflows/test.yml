@@ -104,7 +104,7 @@ jobs:
         if: ${{ matrix.octocov }}
 
       - name: Run octocov
-        uses: k1LoW/octocov-action@v0
+        uses: k1LoW/octocov-action@v1
         if: ${{ matrix.octocov }}
 
       - name: Upload test results
