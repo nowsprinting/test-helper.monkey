@@ -49,7 +49,7 @@ jobs:
           lfs: false
 
       - name: Crete project for tests
-        uses: nowsprinting/create-unity-project-action@v2
+        uses: nowsprinting/create-unity-project-action@v3
         with:
           project-path: UnityProject~
 
