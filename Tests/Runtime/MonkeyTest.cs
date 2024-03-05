@@ -427,7 +427,6 @@ namespace TestHelper.Monkey
                     TouchAndHoldDelayMillis = 1, // 1ms
                     Screenshots = new ScreenshotOptions()
                     {
-                        FilenameStrategy = new StubScreenshotFilenameStrategy(filename),
                         SuperSize = 2, // 2x size
                     },
                 };
@@ -461,7 +460,6 @@ namespace TestHelper.Monkey
                     TouchAndHoldDelayMillis = 1, // 1ms
                     Screenshots = new ScreenshotOptions()
                     {
-                        FilenameStrategy = new StubScreenshotFilenameStrategy(filename),
                         StereoCaptureMode = ScreenCapture.StereoScreenCaptureMode.BothEyes,
                     },
                 };
