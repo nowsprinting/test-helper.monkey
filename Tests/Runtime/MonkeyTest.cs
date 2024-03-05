@@ -37,7 +37,7 @@ namespace TestHelper.Monkey
                 TouchAndHoldDelayMillis = 1, // 1ms
             };
 
-            var didAct = await Monkey.RunStep(config, 0);
+            var didAct = await Monkey.RunStep(config);
             Assert.That(didAct, Is.EqualTo(true));
         }
 
@@ -56,7 +56,7 @@ namespace TestHelper.Monkey
                 TouchAndHoldDelayMillis = 1, // 1ms
             };
 
-            var didAct = await Monkey.RunStep(config, 0);
+            var didAct = await Monkey.RunStep(config);
             Assert.That(didAct, Is.EqualTo(false));
         }
 
@@ -350,8 +350,8 @@ namespace TestHelper.Monkey
             [LoadScene(TestScene)]
             public async Task Run_withScreenshots_takeScreenshotsAndSaveToDefaultPath()
             {
-                var path = Path.Combine(Application.persistentDataPath, "TestHelper.Monkey", "Screenshots",
-                    $"{nameof(Run_withScreenshots_takeScreenshotsAndSaveToDefaultPath)}_0001.png");
+                var directory = Path.Combine(Application.persistentDataPath, "TestHelper.Monkey", "Screenshots");
+                var path = Path.Combine(directory, $"{nameof(Run_withScreenshots_takeScreenshotsAndSaveToDefaultPath)}_0001.png");
                 if (File.Exists(path))
                 {
                     File.Delete(path);
@@ -364,7 +364,7 @@ namespace TestHelper.Monkey
                     Lifetime = TimeSpan.FromMilliseconds(200), // 200ms
                     DelayMillis = 1, // 1ms
                     TouchAndHoldDelayMillis = 1, // 1ms
-                    Screenshots = new ScreenshotOptions(), // take screenshots and save files
+                    Screenshots = new ScreenshotOptions() // take screenshots and save files
                 };
                 await Monkey.Run(config);
 
@@ -378,7 +378,8 @@ namespace TestHelper.Monkey
             {
                 var relativeDirectory = Path.Combine("Logs", "TestHelper.Monkey", "SpecifiedPath");
                 var filenamePrefix = "Run_withScreenshots_specifyPath";
-                var path = Path.Combine(relativeDirectory, $"{filenamePrefix}_0001.png");
+                var filename = $"{filenamePrefix}_0001.png";
+                var path = Path.Combine(relativeDirectory, filename);
                 if (File.Exists(path))
                 {
                     File.Delete(path);
@@ -393,8 +394,8 @@ namespace TestHelper.Monkey
                     TouchAndHoldDelayMillis = 1, // 1ms
                     Screenshots = new ScreenshotOptions()
                     {
-                        Directory = relativeDirectory, // Relative path from project root when run in Editor
-                        FilenamePrefix = filenamePrefix, // Prefix of filename
+                        Directory = relativeDirectory,
+                        FilenameStrategy = new StubScreenshotFilenameStrategy(filename),
                         SuperSize = 2,
                     },
                 };
@@ -409,8 +410,9 @@ namespace TestHelper.Monkey
             [LoadScene(TestScene)]
             public async Task Run_withScreenshots_superSize_takeScreenshotsSuperSize()
             {
-                var path = Path.Combine(Application.persistentDataPath, "TestHelper.Monkey", "Screenshots",
-                    $"{nameof(Run_withScreenshots_superSize_takeScreenshotsSuperSize)}_0001.png");
+                var directory = Path.Combine(Application.persistentDataPath, "TestHelper.Monkey", "Screenshots");
+                var filename = $"{nameof(Run_withScreenshots_superSize_takeScreenshotsSuperSize)}_0001.png";
+                var path = Path.Combine(directory, filename);
                 if (File.Exists(path))
                 {
                     File.Delete(path);
@@ -425,6 +427,7 @@ namespace TestHelper.Monkey
                     TouchAndHoldDelayMillis = 1, // 1ms
                     Screenshots = new ScreenshotOptions()
                     {
+                        FilenameStrategy = new StubScreenshotFilenameStrategy(filename),
                         SuperSize = 2, // 2x size
                     },
                 };
@@ -441,8 +444,9 @@ namespace TestHelper.Monkey
             [Description("Is it a stereo screenshot? See for yourself! Be a witness!!")]
             public async Task Run_withScreenshots_stereo_takeScreenshotsStereo()
             {
-                var path = Path.Combine(Application.persistentDataPath, "TestHelper.Monkey", "Screenshots",
-                    $"{nameof(Run_withScreenshots_stereo_takeScreenshotsStereo)}_0001.png");
+                var directory = Path.Combine(Application.persistentDataPath, "TestHelper.Monkey", "Screenshots");
+                var filename = $"{nameof(Run_withScreenshots_stereo_takeScreenshotsStereo)}_0001.png";
+                var path = Path.Combine(directory, filename);
                 if (File.Exists(path))
                 {
                     File.Delete(path);
@@ -457,6 +461,7 @@ namespace TestHelper.Monkey
                     TouchAndHoldDelayMillis = 1, // 1ms
                     Screenshots = new ScreenshotOptions()
                     {
+                        FilenameStrategy = new StubScreenshotFilenameStrategy(filename),
                         StereoCaptureMode = ScreenCapture.StereoScreenCaptureMode.BothEyes,
                     },
                 };
