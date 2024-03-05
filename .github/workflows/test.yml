@@ -67,8 +67,8 @@ jobs:
       - name: Install dependencies
         run: |
           npm install -g openupm-cli
-          openupm add -f com.unity.test-framework
-          openupm add -f com.unity.testtools.codecoverage
+          openupm add -f com.unity.test-framework@1.4.3
+          openupm add -f com.unity.testtools.codecoverage@1.2.5
           openupm add -f com.cysharp.unitask
           openupm add -f com.nowsprinting.test-helper
           openupm add -ft "${{ env.package_name }}"@file:../../
