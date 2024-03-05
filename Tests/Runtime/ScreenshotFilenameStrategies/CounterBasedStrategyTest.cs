@@ -24,7 +24,7 @@ namespace TestHelper.Monkey.ScreenshotFilenameStrategies
                 "prefix_0004.png",
                 "prefix_0005.png"
             };
-            Assert.That(actual, Is.EquivalentTo(expected));
+            Assert.That(actual, Is.EqualTo(expected));
         }
 
 
@@ -42,7 +42,7 @@ namespace TestHelper.Monkey.ScreenshotFilenameStrategies
                 $"{nameof(DefaultFilenamePrefix)}_0004.png",
                 $"{nameof(DefaultFilenamePrefix)}_0005.png"
             };
-            Assert.That(actual, Is.EquivalentTo(expected));
+            Assert.That(actual, Is.EqualTo(expected));
         }
     }
 }
