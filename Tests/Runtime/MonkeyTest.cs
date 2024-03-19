@@ -22,7 +22,6 @@ using UnityEngine.EventSystems;
 namespace TestHelper.Monkey
 {
     [TestFixture]
-    [GameViewResolution(GameViewResolution.VGA)]
     public class MonkeyTest
     {
         private const string TestScene = "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/Operators.unity";

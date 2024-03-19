@@ -11,7 +11,6 @@ using UnityEngine.UI;
 namespace TestHelper.Monkey.Operators
 {
     [TestFixture]
-    [GameViewResolution(GameViewResolution.VGA)]
     public class TextInputOperatorTest
     {
         private const string TestScene = "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/Operators.unity";

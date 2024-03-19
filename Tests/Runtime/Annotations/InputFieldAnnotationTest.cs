@@ -12,7 +12,6 @@ using UnityEngine;
 namespace TestHelper.Monkey.Annotations
 {
     [TestFixture]
-    [GameViewResolution(GameViewResolution.VGA)]
     public partial class InputFieldAnnotationTest
     {
         private const string TestScene = "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/InputFields.unity";
