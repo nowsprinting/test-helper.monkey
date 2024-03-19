@@ -98,7 +98,6 @@ Specify the world position where Monkey operates.
 #### InteractiveComponentCollector.FindInteractiveComponents
 
 Returns interactive uGUI components.
-If the argument is true, return only user-really reachable components (using the `IsReallyInteractiveFromUser` method).
 
 Usage:
 
@@ -113,14 +112,36 @@ public class MyIntegrationTest
     [Test]
     public void MyTestMethod()
     {
-        var component = InteractiveComponentCollector.FindInteractiveComponents(true)
+        var components = InteractiveComponentCollector.FindInteractiveComponents();
+    }
+}
+```
+
+#### InteractiveComponentCollector.FindReallyInteractiveComponents
+
+Returns interactive uGUI components.
+Return only user-really reachable components (using the `IsReallyInteractiveFromUser` method).
+
+Usage:
+
+```csharp
+using System.Linq;
+using NUnit.Framework;
+using TestHelper.Monkey;
+
+[TestFixture]
+public class MyIntegrationTest
+{
+    [Test]
+    public void MyTestMethod()
+    {
+        var component = InteractiveComponentCollector.FindReallyInteractiveComponents()
             .First();
 
         Assume.That(component.CanClick(), Is.True);
         component.Click();
     }
 }
-
 ```
 
 #### InteractiveComponent.IsReallyInteractiveFromUser
@@ -140,7 +161,7 @@ public class MyIntegrationTest
     [Test]
     public void MyTestMethod()
     {
-        var component = InteractiveComponentCollector.FindInteractiveComponents(false)
+        var component = InteractiveComponentCollector.FindInteractiveComponents()
             .First();
 
         Assume.That(component.IsReallyInteractiveFromUser(), Is.True);
