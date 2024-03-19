@@ -1,14 +1,14 @@
-// Copyright (c) 2023 Koji Hasegawa.
+// Copyright (c) 2023-2024 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using UnityEngine;
 
-namespace TestHelper.Monkey
+namespace TestHelper.Monkey.Extensions
 {
     /// <summary>
     /// A utility to select Camera
     /// </summary>
-    public static class CameraSelector
+    public static class GameObjectExtensions
     {
         private static Camera s_cachedMainCamera;
         private static int s_cachedFrame;
@@ -17,7 +17,7 @@ namespace TestHelper.Monkey
         /// Returns the first enabled Camera component that is tagged "MainCamera"
         /// </summary>
         /// <returns>The first enabled Camera component that is tagged "MainCamera"</returns>
-        public static Camera GetMainCamera()
+        private static Camera GetMainCamera()
         {
             if (Time.frameCount == s_cachedFrame)
             {
@@ -29,15 +29,14 @@ namespace TestHelper.Monkey
         }
 
         /// <summary>
-        /// Returns an associated camera with <paramref name="gameObject"/>. Or return <c cref="Camera.main" /> if
-        /// there are no camera associated with
+        /// Returns an associated camera with <paramref name="gameObject"/>.
+        /// Or return <c cref="Camera.main" /> if there are no camera associated with.
         /// </summary>
         /// <param name="gameObject"></param>
         /// <returns>
-        /// Camera associated with <paramref name="gameObject"/>, or return <c cref="Camera.main" /> if there are
-        /// no camera associated with
+        /// Camera associated with <paramref name="gameObject"/>, or return <c cref="Camera.main" /> if there are no camera associated with
         /// </returns>
-        public static Camera SelectBy(GameObject gameObject)
+        public static Camera GetAssociatedCamera(this GameObject gameObject)
         {
             var canvas = gameObject.GetComponentInParent<Canvas>();
             if (canvas == null)

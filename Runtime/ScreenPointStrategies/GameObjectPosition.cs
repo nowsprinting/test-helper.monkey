@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2023 Koji Hasegawa.
 // This software is released under the MIT License.
 
+using TestHelper.Monkey.Extensions;
 using UnityEngine;
 
 namespace TestHelper.Monkey.ScreenPointStrategies
@@ -25,6 +26,6 @@ namespace TestHelper.Monkey.ScreenPointStrategies
         /// <param name="pos">The world position where monkey operators operate on</param>
         /// <returns>The screen point of the <paramref name="pos"/></returns>
         public static Vector2 GetScreenPointByWorldPosition(GameObject gameObject, Vector3 pos) =>
-            RectTransformUtility.WorldToScreenPoint(CameraSelector.SelectBy(gameObject), pos);
+            RectTransformUtility.WorldToScreenPoint(gameObject.GetAssociatedCamera(), pos);
     }
 }
