@@ -159,7 +159,7 @@ You can choose from two typical installation methods.
 3. Open the Package Manager window (**Window > Package Manager**) and select **My Registries** in registries drop-down list (figure 2.)
 4. Click **Install** button on the `com.nowsprinting.test-helper.monkey` package
 
-> **Note**  
+> [!NOTE]  
 > Do not forget to add `com.cysharp` into scopes. These are used within this package.
 
 **Figure 1.** Package Manager tab in Project Settings window.
@@ -212,7 +212,7 @@ Add this repository as a submodule to the Packages/ directory in your project.
 git submodule add https://github.com/nowsprinting/test-helper.monkey.git Packages/com.nowsprinting.test-helper.monkey
 ```
 
-> **Warning**  
+> [!WARNING]  
 > Required install packages for running tests (when adding to the `testables` in package.json), as follows:
 > - [Unity Test Framework](https://docs.unity3d.com/Packages/com.unity.test-framework@latest) package v1.3.4 or later
 
