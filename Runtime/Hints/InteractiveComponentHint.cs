@@ -7,7 +7,7 @@ using TestHelper.Monkey.Extensions;
 using TestHelper.Monkey.ScreenPointStrategies;
 using UnityEngine;
 
-namespace TestHelper.Monkey
+namespace TestHelper.Monkey.Hints
 {
     /// <summary>
     /// Component to make operation positions visible
