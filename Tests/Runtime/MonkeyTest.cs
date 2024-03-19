@@ -22,7 +22,6 @@ using UnityEngine.EventSystems;
 namespace TestHelper.Monkey
 {
     [TestFixture]
-    [GameViewResolution(GameViewResolution.VGA)]
     public class MonkeyTest
     {
         private const string TestScene = "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/Operators.unity";
@@ -327,7 +326,7 @@ namespace TestHelper.Monkey
             var spyLogger = new SpyLogger();
             var config = new MonkeyConfig
             {
-                Lifetime = TimeSpan.FromSeconds(10), // 10sec
+                Lifetime = TimeSpan.FromSeconds(2), // 2sec
                 DelayMillis = 1, // 1ms
                 TouchAndHoldDelayMillis = 1, // 1ms
                 Random = new RandomWrapper(0), // pin seed

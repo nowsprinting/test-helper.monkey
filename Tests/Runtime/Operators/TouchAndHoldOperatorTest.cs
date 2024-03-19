@@ -12,7 +12,6 @@ using UnityEngine.TestTools;
 namespace TestHelper.Monkey.Operators
 {
     [TestFixture]
-    [GameViewResolution(GameViewResolution.VGA)]
     public class TouchAndHoldOperatorTest
     {
         private const string TestScene = "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/Operators.unity";

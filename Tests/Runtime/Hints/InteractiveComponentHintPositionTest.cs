@@ -12,7 +12,6 @@ using UnityEngine.TestTools.Utils;
 namespace TestHelper.Monkey.Hints
 {
     [TestFixture]
-    [GameViewResolution(GameViewResolution.VGA)]
     public class InteractiveComponentHintPositionTest
     {
         private const string TestScene = "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/Hints.unity";
