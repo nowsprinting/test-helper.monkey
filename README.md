@@ -56,6 +56,13 @@ Configurations in `MonkeyConfig`:
 - **Gizmos**: Show Gizmos on `GameView` during running monkey test if true
 - **Screenshots**: Take screenshots during running the monkey test if set a `ScreenshotOptions` instance.
 
+Configurations in `ScreenshotOptions`:
+
+- **Directory**: Directory path to save screenshots. Default save path is `Application.persistentDataPath` + "/TestHelper.Monkey/Screenshots/".
+- **FilenameStrategy**: Strategy for file paths of screenshot images. Default is test case name and four digit sequential number.
+- **SuperSize**: The factor to increase resolution with. Default is 1.
+- **StereoCaptureMode**: The eye texture to capture when stereo rendering is enabled. Default is `LeftEye`.
+
 
 ### Annotations for Monkey's behavior
 
@@ -91,7 +98,6 @@ Specify the world position where Monkey operates.
 #### InteractiveComponentCollector.FindInteractiveComponents
 
 Returns interactive uGUI components.
-If the argument is true, return only user-really reachable components (using the `IsReallyInteractiveFromUser` method).
 
 Usage:
 
@@ -106,14 +112,36 @@ public class MyIntegrationTest
     [Test]
     public void MyTestMethod()
     {
-        var component = InteractiveComponentCollector.FindInteractiveComponents(true)
+        var components = InteractiveComponentCollector.FindInteractiveComponents();
+    }
+}
+```
+
+#### InteractiveComponentCollector.FindReallyInteractiveComponents
+
+Returns interactive uGUI components.
+Return only user-really reachable components (using the `IsReallyInteractiveFromUser` method).
+
+Usage:
+
+```csharp
+using System.Linq;
+using NUnit.Framework;
+using TestHelper.Monkey;
+
+[TestFixture]
+public class MyIntegrationTest
+{
+    [Test]
+    public void MyTestMethod()
+    {
+        var component = InteractiveComponentCollector.FindReallyInteractiveComponents()
             .First();
 
         Assume.That(component.CanClick(), Is.True);
         component.Click();
     }
 }
-
 ```
 
 #### InteractiveComponent.IsReallyInteractiveFromUser
@@ -133,7 +161,7 @@ public class MyIntegrationTest
     [Test]
     public void MyTestMethod()
     {
-        var component = InteractiveComponentCollector.FindInteractiveComponents(false)
+        var component = InteractiveComponentCollector.FindInteractiveComponents()
             .First();
 
         Assume.That(component.IsReallyInteractiveFromUser(), Is.True);
@@ -159,7 +187,7 @@ You can choose from two typical installation methods.
 3. Open the Package Manager window (**Window > Package Manager**) and select **My Registries** in registries drop-down list (figure 2.)
 4. Click **Install** button on the `com.nowsprinting.test-helper.monkey` package
 
-> **Note**  
+> [!NOTE]  
 > Do not forget to add `com.cysharp` into scopes. These are used within this package.
 
 **Figure 1.** Package Manager tab in Project Settings window.
@@ -212,7 +240,7 @@ Add this repository as a submodule to the Packages/ directory in your project.
 git submodule add https://github.com/nowsprinting/test-helper.monkey.git Packages/com.nowsprinting.test-helper.monkey
 ```
 
-> **Warning**  
+> [!WARNING]  
 > Required install packages for running tests (when adding to the `testables` in package.json), as follows:
 > - [Unity Test Framework](https://docs.unity3d.com/Packages/com.unity.test-framework@latest) package v1.3.4 or later
 
