@@ -56,6 +56,13 @@ Configurations in `MonkeyConfig`:
 - **Gizmos**: Show Gizmos on `GameView` during running monkey test if true
 - **Screenshots**: Take screenshots during running the monkey test if set a `ScreenshotOptions` instance.
 
+Configurations in `ScreenshotOptions`:
+
+- **Directory**: Directory path to save screenshots. Default save path is `Application.persistentDataPath` + "/TestHelper.Monkey/Screenshots/".
+- **FilenameStrategy**: Strategy for file paths of screenshot images. Default is test case name and four digit sequential number.
+- **SuperSize**: The factor to increase resolution with. Default is 1.
+- **StereoCaptureMode**: The eye texture to capture when stereo rendering is enabled. Default is `LeftEye`.
+
 
 ### Annotations for Monkey's behavior
 
