@@ -4,6 +4,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using TestHelper.Monkey.ScreenshotFilenameStrategies;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -53,7 +54,9 @@ namespace TestHelper.Monkey.Demo
                     SecondsToErrorForNoInteractiveComponent = secondsToErrorForNoInteractiveComponent,
                     TouchAndHoldDelayMillis = touchAndHoldDelayMillis,
                     Gizmos = gizmos,
-                    Screenshots = screenshots ? new ScreenshotOptions() : null
+                    Screenshots = screenshots
+                        ? new ScreenshotOptions() { FilenameStrategy = new CounterBasedStrategy("Demo") }
+                        : null
                 };
                 _cts = new CancellationTokenSource();
                 _running = true;
