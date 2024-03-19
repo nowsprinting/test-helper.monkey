@@ -1,0 +1,17 @@
+{
+    "name": "TestHelper.Monkey.Demo",
+    "rootNamespace": "",
+    "references": [
+        "GUID:354990723dc8d4984a301da2c689dda4",
+        "GUID:f51ebe6a0ceec4240a699833d6309b23"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
