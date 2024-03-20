@@ -57,6 +57,7 @@ namespace TestHelper.Monkey
         /// <param name="eventData">Specify if avoid GC memory allocation</param>
         /// <param name="results">Specify if avoid GC memory allocation</param>
         /// <returns>true: this object can control by user</returns>
+        [Obsolete("Use GameObjectExtensions.IsReachable() instead")]
         public bool IsReallyInteractiveFromUser(Func<GameObject, Vector2> screenPointStrategy, PointerEventData eventData = null, List<RaycastResult> results = null)
         {
             if (!IsInteractable())
