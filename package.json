@@ -21,6 +21,7 @@
     "Runtime*",
     "Editor",
     "Editor*",
+    "Samples~",
     "Tests",
     "Tests*",
     "LICENSE.md*",
