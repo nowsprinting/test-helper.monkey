@@ -20,7 +20,7 @@ namespace TestHelper.Monkey.Operators
         [LoadScene(TestScene)]
         public void Click(string targetName, string expectedMessage)
         {
-            var target = InteractiveComponentCollector.FindInteractiveComponents()
+            var target = InteractiveComponentCollector.FindInteractableComponents()
                 .First(x => x.gameObject.name == targetName);
 
             Assert.That(target.CanClick(), Is.True);
@@ -33,7 +33,7 @@ namespace TestHelper.Monkey.Operators
         [LoadScene(TestScene)]
         public void Tap(string targetName, string expectedMessage) // Same as Click
         {
-            var target = InteractiveComponentCollector.FindInteractiveComponents()
+            var target = InteractiveComponentCollector.FindInteractableComponents()
                 .First(x => x.gameObject.name == targetName);
 
             Assert.That(target.CanTap(), Is.True);
@@ -46,7 +46,7 @@ namespace TestHelper.Monkey.Operators
         [LoadScene(TestScene)]
         public void CanNotClick(string targetName)
         {
-            var target = InteractiveComponentCollector.FindInteractiveComponents()
+            var target = InteractiveComponentCollector.FindInteractableComponents()
                 .First(x => x.gameObject.name == targetName);
 
             Assert.That(target.CanClick(), Is.False);

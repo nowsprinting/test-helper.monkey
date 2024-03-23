@@ -6,18 +6,18 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using TestHelper.Monkey.Extensions;
 using TestHelper.Monkey.Operators;
 using TestHelper.Monkey.Random;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 namespace TestHelper.Monkey
 {
     /// <summary>
     /// Wrapped component that provide interaction for user.
     /// </summary>
-    public class InteractiveComponent
+    public class InteractiveComponent // TODO: Rename to InteractableComponent
     {
         /// <summary>
         /// Inner component (EventTrigger or implements IEventSystemHandler)
@@ -58,46 +58,10 @@ namespace TestHelper.Monkey
         /// <param name="results">Specify if avoid GC memory allocation</param>
         /// <returns>true: this object can control by user</returns>
         [Obsolete("Use GameObjectExtensions.IsReachable() instead")]
-        public bool IsReallyInteractiveFromUser(Func<GameObject, Vector2> screenPointStrategy, PointerEventData eventData = null, List<RaycastResult> results = null)
+        public bool IsReallyInteractiveFromUser(Func<GameObject, Vector2> screenPointStrategy,
+            PointerEventData eventData = null, List<RaycastResult> results = null)
         {
-            if (!IsInteractable())
-            {
-                return false;
-            }
-
-            eventData = eventData ?? new PointerEventData(EventSystem.current);
-            eventData.position = screenPointStrategy(gameObject);
-
-            results = results ?? new List<RaycastResult>();
-            results.Clear();
-
-            if (EventSystem.current == null)
-            {
-                return false;
-            }
-            EventSystem.current.RaycastAll(eventData, results);
-            return results.Count > 0 && IsSameOrChildObject(results[0].gameObject.transform);
-        }
-
-        private bool IsInteractable()
-        {
-            var selectable = this.component as Selectable;
-            return selectable == null || selectable.interactable;
-        }
-
-        private bool IsSameOrChildObject(Transform hitObjectTransform)
-        {
-            while (hitObjectTransform != null)
-            {
-                if (hitObjectTransform == this.transform)
-                {
-                    return true;
-                }
-
-                hitObjectTransform = hitObjectTransform.transform.parent;
-            }
-
-            return false;
+            return gameObject.IsReachable(screenPointStrategy, eventData, results);
         }
 
         /// <summary>
@@ -110,7 +74,8 @@ namespace TestHelper.Monkey
         /// Click inner component
         /// </summary>
         /// <param name="screenPointStrategy">Function returns the screen position where monkey operators operate on for the specified gameObject</param>
-        public void Click(Func<GameObject, Vector2> screenPointStrategy) => ClickOperator.Click(component, screenPointStrategy);
+        public void Click(Func<GameObject, Vector2> screenPointStrategy) =>
+            ClickOperator.Click(component, screenPointStrategy);
 
         /// <summary>
         /// Check inner component can receive tap (click) event
@@ -122,7 +87,8 @@ namespace TestHelper.Monkey
         /// Tap (click) inner component
         /// </summary>
         /// <param name="screenPointStrategy">Function returns the screen position where monkey operators operate on for the specified gameObject</param>
-        public void Tap(Func<GameObject, Vector2> screenPointStrategy) => ClickOperator.Click(component, screenPointStrategy);
+        public void Tap(Func<GameObject, Vector2> screenPointStrategy) =>
+            ClickOperator.Click(component, screenPointStrategy);
 
         /// <summary>
         /// Check inner component can receive touch-and-hold event
@@ -136,7 +102,8 @@ namespace TestHelper.Monkey
         /// <param name="screenPointStrategy">Function returns the screen position where monkey operators operate on for the specified gameObject</param>
         /// <param name="delayMillis">Delay time between down to up</param>
         /// <param name="cancellationToken">Task cancellation token</param>
-        public async UniTask TouchAndHold(Func<GameObject, Vector2> screenPointStrategy, int delayMillis = 1000, CancellationToken cancellationToken = default)
+        public async UniTask TouchAndHold(Func<GameObject, Vector2> screenPointStrategy, int delayMillis = 1000,
+            CancellationToken cancellationToken = default)
             => await TouchAndHoldOperator.TouchAndHold(component, screenPointStrategy, delayMillis, cancellationToken);
 
         /// <summary>
@@ -150,7 +117,8 @@ namespace TestHelper.Monkey
         /// </summary>
         /// <param name="randomStringParams">Random string generation parameters</param>
         /// <param name="randomString">Random string generator</param>
-        public void TextInput(Func<GameObject, RandomStringParameters> randomStringParams, IRandomString randomString) =>
+        public void TextInput(Func<GameObject, RandomStringParameters> randomStringParams,
+            IRandomString randomString) =>
             TextInputOperator.Input(component, randomStringParams, randomString);
 
         // TODO: drag, swipe, flick, etc...

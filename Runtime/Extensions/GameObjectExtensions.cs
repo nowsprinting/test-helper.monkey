@@ -117,25 +117,7 @@ namespace TestHelper.Monkey.Extensions
         /// <returns>True if this GameObject is interactable</returns>
         public static bool IsInteractable(this GameObject gameObject)
         {
-            // UI element
-            var selectables = gameObject.GetComponents<Selectable>();
-            if (selectables.Any())
-            {
-                if (selectables.Any(x => x.interactable))
-                {
-                    return true;
-                }
-
-                return false;
-            }
-
-            // 2D/3D object
-            if (gameObject.GetComponents<EventTrigger>().Any() || gameObject.GetComponents<IEventSystemHandler>().Any())
-            {
-                return true;
-            }
-
-            return false;
+            return gameObject.GetComponents<MonoBehaviour>().Any(x => x.IsInteractable());
         }
     }
 }

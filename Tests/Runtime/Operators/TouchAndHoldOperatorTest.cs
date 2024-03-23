@@ -22,7 +22,7 @@ namespace TestHelper.Monkey.Operators
         [LoadScene(TestScene)]
         public async Task TouchAndHold(string targetName, string expectedMessage1, string expectedMessage2)
         {
-            var target = InteractiveComponentCollector.FindInteractiveComponents()
+            var target = InteractiveComponentCollector.FindInteractableComponents()
                 .First(x => x.gameObject.name == targetName);
 
             Assert.That(target.CanTouchAndHold(), Is.True);
@@ -36,7 +36,7 @@ namespace TestHelper.Monkey.Operators
         [LoadScene(TestScene)]
         public void CanNotTouchAndHold(string targetName)
         {
-            var target = InteractiveComponentCollector.FindInteractiveComponents()
+            var target = InteractiveComponentCollector.FindInteractableComponents()
                 .First(x => x.gameObject.name == targetName);
 
             Assert.That(target.CanTouchAndHold(), Is.False);

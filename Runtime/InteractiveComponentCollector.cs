@@ -3,7 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using TestHelper.Monkey.Extensions;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using Object = UnityEngine.Object;
@@ -13,7 +13,7 @@ namespace TestHelper.Monkey
     /// <summary>
     /// Collect <c>InteractiveComponent</c>s in the scene.
     /// </summary>
-    public static class InteractiveComponentCollector
+    public static class InteractiveComponentCollector // TODO: Rename to InteractableComponentFinder
     {
         /// <summary>
         /// Find components attached EventTrigger or implements IEventSystemHandler in scene.
@@ -22,18 +22,22 @@ namespace TestHelper.Monkey
         /// Note: If you only need UI elements, using UnityEngine.UI.Selectable.allSelectablesArray is faster.
         /// </summary>
         /// <returns>Interactive components</returns>
-        public static IEnumerable<InteractiveComponent> FindInteractiveComponents()
+        public static IEnumerable<InteractiveComponent> FindInteractableComponents()
         {
             foreach (var component in FindMonoBehaviours())
             {
-                if (component.GetType() == typeof(EventTrigger) ||
-                    component.GetType().GetInterfaces().Contains(typeof(IEventSystemHandler)))
+                if (component.IsInteractable())
                 {
                     yield return new InteractiveComponent(component);
                 }
             }
         }
 
+        [Obsolete("Use FindInteractableComponents() instead")]
+        public static IEnumerable<InteractiveComponent> FindInteractiveComponents()
+        {
+            return FindInteractableComponents();
+        }
 
         /// <summary>
         /// Find components attached EventTrigger or implements IEventSystemHandler in scene.
@@ -47,27 +51,27 @@ namespace TestHelper.Monkey
         /// </remarks>
         /// <param name="screenPointStrategy">Function returns the screen position where monkey operators operate on for the specified gameObject</param>
         /// <returns>Really interactive components</returns>
-        public static IEnumerable<InteractiveComponent> FindReallyInteractiveComponents(
-            Func<GameObject, Vector2> screenPointStrategy
-        )
+        public static IEnumerable<InteractiveComponent> FindReachableInteractableComponents(
+            Func<GameObject, Vector2> screenPointStrategy)
         {
             var data = new PointerEventData(EventSystem.current);
             var results = new List<RaycastResult>();
 
-            foreach (var component in FindMonoBehaviours())
+            foreach (var interactiveComponent in FindInteractableComponents())
             {
-                if (component.GetType() == typeof(EventTrigger) ||
-                    component.GetType().GetInterfaces().Contains(typeof(IEventSystemHandler)))
+                if (interactiveComponent.gameObject.IsReachable(screenPointStrategy, data, results))
                 {
-                    var interactiveComponent = new InteractiveComponent(component);
-                    if (interactiveComponent.IsReallyInteractiveFromUser(screenPointStrategy, data, results))
-                    {
-                        yield return interactiveComponent;
-                    }
+                    yield return interactiveComponent;
                 }
             }
         }
 
+        [Obsolete("Use FindReachableInteractableComponents() instead")]
+        public static IEnumerable<InteractiveComponent> FindReallyInteractiveComponents(
+            Func<GameObject, Vector2> screenPointStrategy)
+        {
+            return FindReachableInteractableComponents(screenPointStrategy);
+        }
 
         private static IEnumerable<MonoBehaviour> FindMonoBehaviours()
         {

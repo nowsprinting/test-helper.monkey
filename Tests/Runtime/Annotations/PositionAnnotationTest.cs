@@ -26,7 +26,7 @@ namespace TestHelper.Monkey.Annotations
         )
         {
             var target = InteractiveComponentCollector
-                .FindInteractiveComponents()
+                .FindInteractableComponents()
                 .First(x => x.gameObject.name == name);
 
             // Without no position annotations, IsReallyInteractiveFromUser() is always false because
