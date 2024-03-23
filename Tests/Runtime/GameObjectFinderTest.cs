@@ -2,10 +2,17 @@
 // This software is released under the MIT License.
 
 using System;
+using System.IO;
 using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.TestTools;
+#if UNITY_EDITOR
+using UnityEditor.SceneManagement;
+#endif
 
 namespace TestHelper.Monkey
 {
@@ -17,6 +24,9 @@ namespace TestHelper.Monkey
         [TestFixture(RenderMode.WorldSpace)]
         public class UI
         {
+            private const string TestScenePath =
+                "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/GameObjectFinderUI.unity";
+
             private readonly GameObjectFinder _sut = new GameObjectFinder(0.1d);
             private readonly RenderMode _canvasRenderMode;
 
@@ -48,7 +58,7 @@ namespace TestHelper.Monkey
             [TestCase("Interactable", false, false)]
             [TestCase("Interactable", true, false)]
             [TestCase("Interactable", false, true)]
-            [LoadScene("Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/GameObjectFinderUI.unity")]
+            [LoadScene(TestScenePath)]
             public async Task FindByNameAsync_Found(string target, bool reachable, bool interactable)
             {
                 var actual = await _sut.FindByNameAsync(target, reachable, interactable);
@@ -57,7 +67,7 @@ namespace TestHelper.Monkey
 
             [TestCase("NotActiveSelf")]
             [TestCase("NotActiveInHierarchy")]
-            [LoadScene("Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/GameObjectFinderUI.unity")]
+            [LoadScene(TestScenePath)]
             public async Task FindByNameAsync_NotFound(string target)
             {
                 try
@@ -73,7 +83,7 @@ namespace TestHelper.Monkey
 
             [TestCase("OutOfSight")]
             [TestCase("BehindTheWall")]
-            [LoadScene("Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/GameObjectFinderUI.unity")]
+            [LoadScene(TestScenePath)]
             public async Task FindByNameAsync_NotReachable(string target)
             {
                 try
@@ -92,7 +102,7 @@ namespace TestHelper.Monkey
             [TestCase("ActiveText")]
             [TestCase("Dialog")]
             [TestCase("NotInteractable")]
-            [LoadScene("Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/GameObjectFinderUI.unity")]
+            [LoadScene(TestScenePath)]
             public async Task FindByNameAsync_NotInteractable(string target)
             {
                 try
@@ -111,7 +121,7 @@ namespace TestHelper.Monkey
             [TestCase("/Canvas/*/Child/Grandchild/Interactable")]
             [TestCase("/Canvas/Parent/**/Interactable")]
             [TestCase("**/Interactable")]
-            [LoadScene("Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/GameObjectFinderUI.unity")]
+            [LoadScene(TestScenePath)]
             public async Task FindByPathAsync_Found(string path)
             {
                 var actual = await _sut.FindByPathAsync(path, reachable: false, interactable: false);
@@ -121,7 +131,7 @@ namespace TestHelper.Monkey
             [TestCase("/Parent/Child/Grandchild/Interactable")]
             [TestCase("/Canvas/Parent/Child/Interactable")]
             [TestCase("Interactable")]
-            [LoadScene("Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/GameObjectFinderUI.unity")]
+            [LoadScene(TestScenePath)]
             public async Task FindByPathAsync_NotMatchPath(string path)
             {
                 try
@@ -137,10 +147,74 @@ namespace TestHelper.Monkey
             }
         }
 
-        // TODO: RenderMode.WorldSpaceで手前に2D/3Dオブジェクトがあるケース
+        [TestFixture("GameObjectFinder2D.unity")]
+        [TestFixture("GameObjectFinder3D.unity")]
+        [UnityPlatform(RuntimePlatform.OSXEditor, RuntimePlatform.WindowsEditor, RuntimePlatform.LinuxEditor)]
+        public class TwoAndThreeD
+        {
+            private readonly GameObjectFinder _sut = new GameObjectFinder(0.1d);
+            private readonly string _testScenePath;
 
-        // TODO: 2Dオブジェクトのケース
+            public TwoAndThreeD(string testScenePath)
+            {
+                _testScenePath = Path.Join("Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes", testScenePath);
+            }
 
-        // TODO: 3Dオブジェクトのケース
+            [SetUp]
+            public async Task SetUp()
+            {
+#if UNITY_EDITOR
+                await EditorSceneManager.LoadSceneAsyncInPlayMode(_testScenePath,
+                    new LoadSceneParameters(LoadSceneMode.Single));
+#endif
+            }
+
+            [TestCase("OutOfSight", false, false)]
+            [TestCase("BehindTheWall", false, false)]
+            [TestCase("NotInteractable", false, false)]
+            [TestCase("NotInteractable", true, false)]
+            [TestCase("EventHandler", false, false)]
+            [TestCase("EventHandler", true, false)]
+            [TestCase("EventHandler", false, true)]
+            [TestCase("EventTrigger", false, false)]
+            [TestCase("EventTrigger", true, false)]
+            [TestCase("EventTrigger", false, true)]
+            public async Task FindByNameAsync_Found(string target, bool reachable, bool interactable)
+            {
+                var actual = await _sut.FindByNameAsync(target, reachable, interactable);
+                Assert.That(actual.name, Is.EqualTo(target));
+            }
+
+            [TestCase("OutOfSight")]
+            [TestCase("BehindTheWall")]
+            public async Task FindByNameAsync_NotReachable(string target)
+            {
+                try
+                {
+                    await _sut.FindByNameAsync(target, reachable: true, interactable: false);
+                    Assert.Fail("Expected TimeoutException but was not thrown");
+                }
+                catch (TimeoutException e)
+                {
+                    Assert.That(e.Message, Is.EqualTo($"GameObject `{target}` is found, but not reachable."));
+                }
+            }
+
+            [TestCase("OutOfSight")]
+            [TestCase("BehindTheWall")]
+            [TestCase("NotInteractable")]
+            public async Task FindByNameAsync_NotInteractable(string target)
+            {
+                try
+                {
+                    await _sut.FindByNameAsync(target, reachable: false, interactable: true);
+                    Assert.Fail("Expected TimeoutException but was not thrown");
+                }
+                catch (TimeoutException e)
+                {
+                    Assert.That(e.Message, Is.EqualTo($"GameObject `{target}` is found, but not interactable."));
+                }
+            }
+        }
     }
 }
