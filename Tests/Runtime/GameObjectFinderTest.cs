@@ -147,17 +147,18 @@ namespace TestHelper.Monkey
             }
         }
 
-        [TestFixture("GameObjectFinder2D.unity")]
-        [TestFixture("GameObjectFinder3D.unity")]
+        [TestFixture("2D")]
+        [TestFixture("3D")]
         [UnityPlatform(RuntimePlatform.OSXEditor, RuntimePlatform.WindowsEditor, RuntimePlatform.LinuxEditor)]
-        public class TwoAndThreeD
+        public class Object
         {
             private readonly GameObjectFinder _sut = new GameObjectFinder(0.1d);
             private readonly string _testScenePath;
 
-            public TwoAndThreeD(string testScenePath)
+            public Object(string dimension)
             {
-                _testScenePath = Path.Combine("Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes", testScenePath);
+                _testScenePath =
+                    $"Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/GameObjectFinder{dimension}.unity";
             }
 
             [SetUp]
