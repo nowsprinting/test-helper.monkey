@@ -105,9 +105,10 @@ namespace TestHelper.Monkey
         }
 
         /// <summary>
-        /// Find GameObject by name (wait until they appear).
+        /// Find GameObject by path (wait until they appear).
         /// </summary>
-        /// <param name="path">Find GameObject hierarchy path</param>
+        /// <seealso href="https://en.wikipedia.org/wiki/Glob_(programming)"/>
+        /// <param name="path">Find GameObject hierarchy path separated by `/`. Can specify grob pattern</param>
         /// <param name="reachable">Find only reachable object</param>
         /// <param name="interactable">Find only interactable object</param>
         /// <param name="token">CancellationToken</param>

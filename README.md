@@ -95,14 +95,19 @@ Specify the world position where Monkey operates.
 
 ### Find and operate interactive uGUI elements API
 
-#### InteractiveComponentCollector.FindInteractiveComponents
+#### GameObjectFinder.FindByNameAsync
 
-Returns interactive uGUI components.
+Find GameObject by name (wait until they appear).
+
+Arguments:
+
+- **name**: Find GameObject name
+- **reachable**: Find only reachable object
+- **interactable**: Find only interactable object
 
 Usage:
 
 ```csharp
-using System.Linq;
 using NUnit.Framework;
 using TestHelper.Monkey;
 
@@ -112,20 +117,25 @@ public class MyIntegrationTest
     [Test]
     public void MyTestMethod()
     {
-        var components = InteractiveComponentCollector.FindInteractiveComponents();
+        var finder = new GameObjectFinder(5d); // 5 seconds timeout
+        var dialog = await finder.FindByNameAsync("ConfirmDialog", reachable: true, interactable: false);
     }
 }
 ```
 
-#### InteractiveComponentCollector.FindReallyInteractiveComponents
+#### GameObjectFinder.FindByPathAsync
 
-Returns interactive uGUI components.
-Return only user-really reachable components (using the `IsReallyInteractiveFromUser` method).
+Find GameObject by path (wait until they appear).
+
+Arguments:
+
+- **path**: Find GameObject hierarchy path separated by `/`. Can specify grob pattern
+- **reachable**: Find only reachable object
+- **interactable**: Find only interactable object
 
 Usage:
 
 ```csharp
-using System.Linq;
 using NUnit.Framework;
 using TestHelper.Monkey;
 
@@ -135,18 +145,37 @@ public class MyIntegrationTest
     [Test]
     public void MyTestMethod()
     {
-        var component = InteractiveComponentCollector.FindReallyInteractiveComponents()
-            .First();
-
-        Assume.That(component.CanClick(), Is.True);
-        component.Click();
+        var finder = new GameObjectFinder(5d); // 5 seconds timeout
+        var button = await finder.FindByPathAsync("/**/Confirm/**/Cancel", reachable: true, interactable: true);
     }
 }
 ```
 
-#### InteractiveComponent.IsReallyInteractiveFromUser
+#### InteractiveComponentCollector.FindInteractableComponents
 
-Returns true if the component is really reachable from the user.
+Returns interactable uGUI components.
+
+Usage:
+
+```csharp
+using NUnit.Framework;
+using TestHelper.Monkey;
+
+[TestFixture]
+public class MyIntegrationTest
+{
+    [Test]
+    public void MyTestMethod()
+    {
+        var components = InteractiveComponentCollector.FindInteractableComponents();
+    }
+}
+```
+
+#### InteractiveComponentCollector.FindReachableInteractableComponents
+
+Returns interactable uGUI components.
+Return only user-really reachable components (using the `IsReachable` method).
 
 Usage:
 
@@ -161,10 +190,9 @@ public class MyIntegrationTest
     [Test]
     public void MyTestMethod()
     {
-        var component = InteractiveComponentCollector.FindInteractiveComponents()
+        var component = InteractiveComponentCollector.FindReachableInteractableComponents()
             .First();
 
-        Assume.That(component.IsReallyInteractiveFromUser(), Is.True);
         Assume.That(component.CanClick(), Is.True);
         component.Click();
     }
