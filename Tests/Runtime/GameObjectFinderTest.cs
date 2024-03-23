@@ -157,7 +157,7 @@ namespace TestHelper.Monkey
 
             public TwoAndThreeD(string testScenePath)
             {
-                _testScenePath = Path.Join("Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes", testScenePath);
+                _testScenePath = Path.Combine("Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes", testScenePath);
             }
 
             [SetUp]
