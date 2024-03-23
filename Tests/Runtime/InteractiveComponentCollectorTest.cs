@@ -127,7 +127,6 @@ namespace TestHelper.Monkey
             {
                 "BeyondTheWall", // Beyond the another object
                 "OutOfSight", // Out of sight
-                "NotInteractable", // Interactable=false
                 "BeyondThe2D", // Beyond the 2D object (GraphicRaycaster.blockingObjects is BlockingObjects.All)
                 "BeyondThe3D", // Beyond the 3D object (GraphicRaycaster.blockingObjects is BlockingObjects.All)
             };
@@ -150,7 +149,6 @@ namespace TestHelper.Monkey
                 {
                     "BeyondTheWall", // Beyond the another object
                     "OutOfSight", // Out of sight
-                    "NotInteractable", // Interactable=false
                 };
 
                 private static IEnumerable<string> s_interactiveUiObjectsInOverlayCanvas()

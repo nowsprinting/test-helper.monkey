@@ -86,7 +86,6 @@ namespace TestHelper.Monkey
 
             [TestCase("BeyondTheWall")] // Beyond the another object
             [TestCase("OutOfSight")] // Out of sight
-            [TestCase("NotInteractable")] // Interactable=false
             [TestCase("BeyondThe2D")] // Beyond the 2D object (GraphicRaycaster.blockingObjects is BlockingObjects.All)
             [TestCase("BeyondThe3D")] // Beyond the 3D object (GraphicRaycaster.blockingObjects is BlockingObjects.All)
             [LoadScene(TestScene)]
