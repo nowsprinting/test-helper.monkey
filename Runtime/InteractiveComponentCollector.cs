@@ -11,9 +11,9 @@ using Object = UnityEngine.Object;
 namespace TestHelper.Monkey
 {
     /// <summary>
-    /// Collect <c>InteractiveComponent</c>s in the scene.
+    /// Find <c>InteractableComponent</c>s in the scene.
     /// </summary>
-    public static class InteractiveComponentCollector // TODO: Rename to InteractableComponentFinder
+    public static class InteractiveComponentCollector // TODO: Rename to InteractableComponentsFinder
     {
         /// <summary>
         /// Find components attached EventTrigger or implements IEventSystemHandler in scene.
@@ -40,15 +40,11 @@ namespace TestHelper.Monkey
         }
 
         /// <summary>
-        /// Find components attached EventTrigger or implements IEventSystemHandler in scene.
+        /// Find components attached EventTrigger or implements IEventSystemHandler in scene, and reachable from user (pass hit test using raycaster).
         /// Includes UI elements that inherit from the Selectable class, such as Button.
-        ///
+        /// 
         /// Note: If you only need UI elements, using UnityEngine.UI.Selectable.allSelectablesArray is faster.
         /// </summary>
-        /// <remarks>
-        /// This method does not give correct results about UI elements when run on batchmode.
-        /// Because GraphicRaycaster does not work in batchmode.
-        /// </remarks>
         /// <param name="screenPointStrategy">Function returns the screen position where monkey operators operate on for the specified gameObject</param>
         /// <returns>Really interactive components</returns>
         public static IEnumerable<InteractiveComponent> FindReachableInteractableComponents(

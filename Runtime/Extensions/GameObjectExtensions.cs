@@ -63,10 +63,6 @@ namespace TestHelper.Monkey.Extensions
         /// Make sure the <c>GameObject</c> is reachable from user.
         /// Hit test using raycaster
         /// </summary>
-        /// <remarks>
-        /// This method does not give correct results about UI elements when run on batchmode.
-        /// Because GraphicRaycaster does not work in batchmode.
-        /// </remarks>
         /// <param name="gameObject"></param>
         /// <param name="screenPointStrategy">Function returns the screen position where raycast for the specified GameObject</param>
         /// <param name="eventData">Specify if avoid GC memory allocation</param>

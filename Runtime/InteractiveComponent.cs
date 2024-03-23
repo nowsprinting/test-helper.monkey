@@ -49,10 +49,6 @@ namespace TestHelper.Monkey
         /// <summary>
         /// Hit test using raycaster
         /// </summary>
-        /// <remarks>
-        /// This method does not give correct results about UI elements when run on batchmode.
-        /// Because GraphicRaycaster does not work in batchmode.
-        /// </remarks>
         /// <param name="screenPointStrategy">Function returns the screen position where monkey operators operate on for the specified gameObject</param>
         /// <param name="eventData">Specify if avoid GC memory allocation</param>
         /// <param name="results">Specify if avoid GC memory allocation</param>
