@@ -16,115 +16,108 @@ namespace TestHelper.Monkey
     /// </summary>
     public class GameObjectFinder
     {
-        /// <summary>
-        /// Find <c>GameObject</c> type.
-        /// </summary>
-        public GameObjectType FindGameObjectType { get; set; } = GameObjectType.Active;
+        private readonly double _timeoutSeconds;
+        private readonly Func<GameObject, Vector2> _screenPointStrategy;
 
         /// <summary>
-        /// The function returns the screen position where raycast for the found <c>GameObject</c>.
-        /// Need for if <c>FindGameObjectType</c> is <c>Reachable</c>.
+        /// Constructor.
         /// </summary>
-        public Func<GameObject, Vector2> ScreenPointStrategy { get; set; }
-
-        /// <summary>
-        /// Seconds to wait until <c>GameObject</c> appear.
-        /// </summary>
-        public double SecondsToWait { get; set; } = DefaultSecondsToWait;
-
-        private const double DefaultSecondsToWait = 1.0d;
-
-        /// <summary>
-        /// Create standard finder for GameObject that reachable from user.
-        /// </summary>
-        /// <returns></returns>
-        public static GameObjectFinder CreateReachableGameObjectFinder(
-            double secondsToWait = DefaultSecondsToWait)
+        /// <param name="timeoutSeconds">Seconds to wait until <c>GameObject</c> appear.</param>
+        /// <param name="screenPointStrategy">The function returns the screen position where raycast for the found <c>GameObject</c>.
+        /// Default is <c>DefaultScreenPointStrategy.GetScreenPoint</c>.</param>
+        public GameObjectFinder(double timeoutSeconds = 1.0d, Func<GameObject, Vector2> screenPointStrategy = null)
         {
-            return new GameObjectFinder
-            {
-                FindGameObjectType = GameObjectType.Reachable,
-                ScreenPointStrategy = DefaultScreenPointStrategy.GetScreenPoint,
-                SecondsToWait = secondsToWait,
-            };
+            _timeoutSeconds = timeoutSeconds;
+            _screenPointStrategy = screenPointStrategy ?? DefaultScreenPointStrategy.GetScreenPoint;
         }
 
-        /// <summary>
-        /// Create standard finder for interactive GameObject.
-        /// </summary>
-        /// <returns></returns>
-        public static GameObjectFinder CreateInteractiveGameObjectFinder(double secondsToWait = DefaultSecondsToWait)
+        private enum Reason
         {
-            return new GameObjectFinder
-            {
-                FindGameObjectType = GameObjectType.Interactive, //
-                SecondsToWait = secondsToWait,
-            };
+            NotFound,
+            NotReachable,
+            NotInteractable,
+            None
         }
 
-        private GameObject FindByName(string name)
+        private (GameObject, Reason) FindByName(string name, bool reachable, bool interactable)
         {
             var foundObject = GameObject.Find(name);
+            // Note: Cases where there are multiple GameObjects with the same name are not considered.
+
             if (foundObject == null)
             {
-                return null;
+                return (null, Reason.NotFound);
             }
 
-            if (FindGameObjectType == GameObjectType.Reachable)
+            if (reachable && !foundObject.IsReachable(_screenPointStrategy))
             {
-                if (!foundObject.IsReachable(ScreenPointStrategy))
-                {
-                    return null;
-                }
+                return (null, Reason.NotReachable);
             }
 
-            if (FindGameObjectType == GameObjectType.Interactive)
+            if (interactable && !foundObject.IsInteractable())
             {
-                if (!foundObject.IsInteractable())
-                {
-                    return null;
-                }
+                return (null, Reason.NotInteractable);
             }
 
-            return foundObject;
+            return (foundObject, Reason.None);
         }
 
         /// <summary>
         /// Find GameObject by name (wait until they appear).
         /// </summary>
         /// <param name="name">Find GameObject name</param>
+        /// <param name="reachable">Find only reachable object</param>
+        /// <param name="interactable">Find only interactable object</param>
         /// <param name="token">CancellationToken</param>
         /// <returns>Found GameObject</returns>
-        /// <exception cref="TimeoutException"></exception>
-        public async UniTask<GameObject> FindByNameAsync(string name, CancellationToken token = default)
+        /// <exception cref="TimeoutException">Throws if GameObject is not found</exception>
+        public async UniTask<GameObject> FindByNameAsync(string name, bool reachable = true, bool interactable = false,
+            CancellationToken token = default)
         {
-            var delaySeconds = 0.02d;
-            GameObject foundObject;
-            while ((foundObject = FindByName(name)) == null)
+            var delaySeconds = 0.01d;
+            var reason = Reason.None;
+
+            while (delaySeconds < _timeoutSeconds)
             {
-                if (delaySeconds > SecondsToWait)
+                GameObject foundObject;
+                (foundObject, reason) = FindByName(name, reachable, interactable);
+                if (foundObject != null)
                 {
-                    throw new TimeoutException($"GameObject `{name}` not found.");
+                    return foundObject;
                 }
 
-                await UniTask.Delay(TimeSpan.FromSeconds(delaySeconds *= 2), cancellationToken: token);
+                delaySeconds = Math.Min(delaySeconds * 2, _timeoutSeconds);
+                await UniTask.Delay(TimeSpan.FromSeconds(delaySeconds), cancellationToken: token);
             }
 
-            return foundObject;
+            switch (reason)
+            {
+                case Reason.NotFound:
+                    throw new TimeoutException($"GameObject `{name}` is not found.");
+                case Reason.NotReachable:
+                    throw new TimeoutException($"GameObject `{name}` is found, but not reachable.");
+                case Reason.NotInteractable:
+                    throw new TimeoutException($"GameObject `{name}` is found, but not interactable.");
+                case Reason.None:
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         /// <summary>
         /// Find GameObject by name (wait until they appear).
         /// </summary>
         /// <param name="path">Find GameObject hierarchy path</param>
+        /// <param name="reachable">Find only reachable object</param>
+        /// <param name="interactable">Find only interactable object</param>
         /// <param name="token">CancellationToken</param>
         /// <returns>Found GameObject</returns>
-        /// <exception cref="TimeoutException"></exception>
-        public async UniTask<GameObject> FindByPathAsync(string path, CancellationToken token = default)
+        /// <exception cref="TimeoutException">Throws if GameObject is not found</exception>
+        public async UniTask<GameObject> FindByPathAsync(string path, bool reachable = true, bool interactable = false,
+            CancellationToken token = default)
         {
             var name = path.Split('/').Last();
-            var foundObject = await FindByNameAsync(name, token);
-
+            var foundObject = await FindByNameAsync(name, reachable, interactable, token);
             if (foundObject.transform.MatchPath(path))
             {
                 return foundObject;

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TestHelper.Monkey.ScreenPointStrategies;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -76,6 +77,8 @@ namespace TestHelper.Monkey.Extensions
             PointerEventData eventData = null,
             List<RaycastResult> results = null)
         {
+            Assert.IsNotNull(EventSystem.current);
+
             screenPointStrategy = screenPointStrategy ?? DefaultScreenPointStrategy.GetScreenPoint;
 
             eventData = eventData ?? new PointerEventData(EventSystem.current);
@@ -83,11 +86,6 @@ namespace TestHelper.Monkey.Extensions
 
             results = results ?? new List<RaycastResult>();
             results.Clear();
-
-            if (EventSystem.current == null)
-            {
-                return false;
-            }
 
             EventSystem.current.RaycastAll(eventData, results);
             return results.Count > 0 && IsSameOrChildObject(gameObject, results[0].gameObject.transform);
@@ -120,9 +118,15 @@ namespace TestHelper.Monkey.Extensions
         public static bool IsInteractable(this GameObject gameObject)
         {
             // UI element
-            if (gameObject.GetComponents<Selectable>().Any(x => x.interactable))
+            var selectables = gameObject.GetComponents<Selectable>();
+            if (selectables.Any())
             {
-                return true;
+                if (selectables.Any(x => x.interactable))
+                {
+                    return true;
+                }
+
+                return false;
             }
 
             // 2D/3D object
