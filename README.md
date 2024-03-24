@@ -129,7 +129,7 @@ Find GameObject by path (wait until they appear).
 
 Arguments:
 
-- **path**: Find GameObject hierarchy path separated by `/`. Can specify grob pattern
+- **path**: Find GameObject hierarchy path separated by `/`. Can specify glob pattern
 - **reachable**: Find only reachable object
 - **interactable**: Find only interactable object
 
