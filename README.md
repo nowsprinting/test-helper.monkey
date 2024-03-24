@@ -58,7 +58,7 @@ Configurations in `MonkeyConfig`:
 
 Configurations in `ScreenshotOptions`:
 
-- **Directory**: Directory path to save screenshots. Default save path is `Application.persistentDataPath` + "/TestHelper.Monkey/Screenshots/".
+- **Directory**: Directory to save screenshots. If omitted, the directory specified by command line argument "-testHelperScreenshotDirectory" is used. If the command line argument is also omitted, `Application.persistentDataPath` + "/TestHelper/Screenshots/" is used.
 - **FilenameStrategy**: Strategy for file paths of screenshot images. Default is test case name and four digit sequential number.
 - **SuperSize**: The factor to increase resolution with. Default is 1.
 - **StereoCaptureMode**: The eye texture to capture when stereo rendering is enabled. Default is `LeftEye`.

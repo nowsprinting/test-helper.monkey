@@ -1,8 +1,8 @@
-// Copyright (c) 2023 Koji Hasegawa.
+// Copyright (c) 2023-2024 Koji Hasegawa.
 // This software is released under the MIT License.
 
-using System.IO;
 using TestHelper.Monkey.ScreenshotFilenameStrategies;
+using TestHelper.RuntimeInternals;
 using UnityEngine;
 
 namespace TestHelper.Monkey
@@ -13,11 +13,12 @@ namespace TestHelper.Monkey
     public class ScreenshotOptions
     {
         /// <summary>
-        /// Directory path to save screenshots.
-        /// Default save path is <c>Application.persistentDataPath</c> + "/TestHelper.Monkey/Screenshots/".
+        /// Directory to save screenshots.
+        /// If omitted, the directory specified by command line argument "-testHelperScreenshotDirectory" is used.
+        /// If the command line argument is also omitted, <c>Application.persistentDataPath</c> + "/TestHelper/Screenshots/" is used.
         /// </summary>
-        public string Directory { get; set; } = GetDefaultDirectory();
-        
+        public string Directory { get; set; } = CommandLineArgs.GetScreenshotDirectory();
+
         /// <summary>
         /// Strategy for file paths of screenshot images.
         /// </summary>
@@ -39,15 +40,5 @@ namespace TestHelper.Monkey
         /// </remarks>
         public ScreenCapture.StereoScreenCaptureMode StereoCaptureMode { get; set; } =
             ScreenCapture.StereoScreenCaptureMode.LeftEye;
-        
-
-        /// <summary>
-        /// Returns a default directory for screenshot images
-        /// </summary>
-        /// <returns>Default directory for screenshot images</returns>
-        private static string GetDefaultDirectory()
-        {
-            return Path.Combine(Application.persistentDataPath, "TestHelper.Monkey", "Screenshots");
-        }
     }
 }

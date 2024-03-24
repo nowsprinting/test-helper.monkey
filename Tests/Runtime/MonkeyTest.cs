@@ -344,13 +344,14 @@ namespace TestHelper.Monkey
         {
             private const int FileSizeThreshold = 5441; // VGA size solid color file size
             private const int FileSizeThreshold2X = 100 * 1024; // Normal size is 80 to 90KB
+            private readonly string _defaultOutputDirectory = CommandLineArgs.GetScreenshotDirectory();
 
             [Test]
             [LoadScene(TestScene)]
             public async Task Run_withScreenshots_takeScreenshotsAndSaveToDefaultPath()
             {
-                var directory = Path.Combine(Application.persistentDataPath, "TestHelper.Monkey", "Screenshots");
-                var path = Path.Combine(directory, $"{nameof(Run_withScreenshots_takeScreenshotsAndSaveToDefaultPath)}_0001.png");
+                var filename = $"{nameof(Run_withScreenshots_takeScreenshotsAndSaveToDefaultPath)}_0001.png";
+                var path = Path.Combine(_defaultOutputDirectory, filename);
                 if (File.Exists(path))
                 {
                     File.Delete(path);
@@ -409,9 +410,8 @@ namespace TestHelper.Monkey
             [LoadScene(TestScene)]
             public async Task Run_withScreenshots_superSize_takeScreenshotsSuperSize()
             {
-                var directory = Path.Combine(Application.persistentDataPath, "TestHelper.Monkey", "Screenshots");
                 var filename = $"{nameof(Run_withScreenshots_superSize_takeScreenshotsSuperSize)}_0001.png";
-                var path = Path.Combine(directory, filename);
+                var path = Path.Combine(_defaultOutputDirectory, filename);
                 if (File.Exists(path))
                 {
                     File.Delete(path);
@@ -442,9 +442,8 @@ namespace TestHelper.Monkey
             [Description("Is it a stereo screenshot? See for yourself! Be a witness!!")]
             public async Task Run_withScreenshots_stereo_takeScreenshotsStereo()
             {
-                var directory = Path.Combine(Application.persistentDataPath, "TestHelper.Monkey", "Screenshots");
                 var filename = $"{nameof(Run_withScreenshots_stereo_takeScreenshotsStereo)}_0001.png";
-                var path = Path.Combine(directory, filename);
+                var path = Path.Combine(_defaultOutputDirectory, filename);
                 if (File.Exists(path))
                 {
                     File.Delete(path);
