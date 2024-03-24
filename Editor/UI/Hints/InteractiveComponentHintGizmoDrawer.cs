@@ -2,6 +2,7 @@
 // This software is released under the MIT License.
 
 using TestHelper.Monkey;
+using TestHelper.Monkey.Hints;
 using UnityEditor;
 using UnityEngine;
 

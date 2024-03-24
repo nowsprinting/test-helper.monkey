@@ -9,12 +9,30 @@ using TestHelper.Monkey.ScreenPointStrategies;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.TestTools;
+using UnityEngine.UI;
 
 namespace TestHelper.Monkey
 {
     [TestFixture]
     public class InteractiveComponentTest
     {
+        [Test]
+        public void CreateInteractableComponent_CreateInstance()
+        {
+            var button = new GameObject("InteractableButton").AddComponent<Button>();
+            var actual = InteractiveComponent.CreateInteractableComponent(button.gameObject);
+            Assert.That(actual, Is.Not.Null);
+        }
+
+        [Test]
+        public void CreateInteractableComponent_NotInteractable_ReturnNull()
+        {
+            var button = new GameObject("NotInteractableButton").AddComponent<Button>();
+            button.interactable = false;
+            var actual = InteractiveComponent.CreateInteractableComponent(button.gameObject);
+            Assert.That(actual, Is.Null);
+        }
+
         /// <summary>
         /// InteractiveComponent test cases using 3D objects
         /// </summary>
@@ -43,7 +61,7 @@ namespace TestHelper.Monkey
             [LoadScene(TestScene)]
             public void IsReallyInteractiveFromUser_reachableObjects_returnTrue(string targetName)
             {
-                var target = InteractiveComponentCollector.FindInteractiveComponents()
+                var target = InteractiveComponentCollector.FindInteractableComponents()
                     .First(x => x.gameObject.name == targetName);
 
                 Assert.That(target.IsReallyInteractiveFromUser(DefaultScreenPointStrategy.GetScreenPoint), Is.True);
@@ -54,7 +72,7 @@ namespace TestHelper.Monkey
             [LoadScene(TestScene)]
             public void IsReallyInteractiveFromUser_unreachableObjects_returnFalse(string targetName)
             {
-                var target = InteractiveComponentCollector.FindInteractiveComponents()
+                var target = InteractiveComponentCollector.FindInteractableComponents()
                     .First(x => x.gameObject.name == targetName);
 
                 Assert.That(target.IsReallyInteractiveFromUser(DefaultScreenPointStrategy.GetScreenPoint), Is.False);
@@ -78,7 +96,7 @@ namespace TestHelper.Monkey
             {
                 await Task.Yield(); // wait for GraphicRaycaster initialization
 
-                var target = InteractiveComponentCollector.FindInteractiveComponents()
+                var target = InteractiveComponentCollector.FindInteractableComponents()
                     .First(x => x.gameObject.name == targetName);
 
                 Assert.That(target.IsReallyInteractiveFromUser(DefaultScreenPointStrategy.GetScreenPoint), Is.True);
@@ -86,7 +104,6 @@ namespace TestHelper.Monkey
 
             [TestCase("BeyondTheWall")] // Beyond the another object
             [TestCase("OutOfSight")] // Out of sight
-            [TestCase("NotInteractable")] // Interactable=false
             [TestCase("BeyondThe2D")] // Beyond the 2D object (GraphicRaycaster.blockingObjects is BlockingObjects.All)
             [TestCase("BeyondThe3D")] // Beyond the 3D object (GraphicRaycaster.blockingObjects is BlockingObjects.All)
             [LoadScene(TestScene)]
@@ -94,7 +111,7 @@ namespace TestHelper.Monkey
             {
                 await Task.Yield(); // wait for GraphicRaycaster initialization
 
-                var target = InteractiveComponentCollector.FindInteractiveComponents()
+                var target = InteractiveComponentCollector.FindInteractableComponents()
                     .First(x => x.gameObject.name == targetName);
 
                 Assert.That(target.IsReallyInteractiveFromUser(DefaultScreenPointStrategy.GetScreenPoint), Is.False);
@@ -104,7 +121,7 @@ namespace TestHelper.Monkey
             [LoadScene(TestScene)]
             public void Tap_Tapped(string targetName, string expectedMessage)
             {
-                var target = InteractiveComponentCollector.FindInteractiveComponents()
+                var target = InteractiveComponentCollector.FindInteractableComponents()
                     .First(x => x.gameObject.name == targetName);
 
                 Assert.That(target.CanTap(), Is.True);

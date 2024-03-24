@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using TestHelper.Monkey.Annotations;
+using TestHelper.Monkey.ScreenPointStrategies;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -32,7 +33,7 @@ namespace TestHelper.Monkey.Operators
 
         internal static async UniTask TouchAndHold(
             MonoBehaviour component,
-            Func<GameObject, Vector2> screenPointStrategy,
+            Func<GameObject, Vector2> screenPointStrategy = null,
             int delayMillis = 1000,
             CancellationToken cancellationToken = default
         )
@@ -42,6 +43,7 @@ namespace TestHelper.Monkey.Operators
                 return;
             }
 
+            screenPointStrategy = screenPointStrategy ?? DefaultScreenPointStrategy.GetScreenPoint;
             var eventData = new PointerEventData(EventSystem.current)
             {
                 position = screenPointStrategy(component.gameObject)

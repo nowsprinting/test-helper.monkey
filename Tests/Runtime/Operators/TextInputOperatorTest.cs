@@ -20,7 +20,7 @@ namespace TestHelper.Monkey.Operators
         [LoadScene(TestScene)]
         public void InputText(string targetName)
         {
-            var target = InteractiveComponentCollector.FindInteractiveComponents()
+            var target = InteractiveComponentCollector.FindInteractableComponents()
                 .First(x => x.gameObject.name == targetName);
 
             Assert.That(target.CanTextInput(), Is.True);
@@ -42,7 +42,7 @@ namespace TestHelper.Monkey.Operators
         [LoadScene(TestScene)]
         public void CanNotInputText(string targetName)
         {
-            var target = InteractiveComponentCollector.FindInteractiveComponents()
+            var target = InteractiveComponentCollector.FindInteractableComponents()
                 .First(x => x.gameObject.name == targetName);
 
             Assert.That(target.CanTextInput(), Is.False);

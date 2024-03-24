@@ -44,7 +44,7 @@ namespace TestHelper.Monkey
         [LoadScene(TestScene)]
         public async Task RunStep_noInteractiveComponent_abort()
         {
-            foreach (var component in InteractiveComponentCollector.FindInteractiveComponents())
+            foreach (var component in InteractiveComponentCollector.FindInteractableComponents())
             {
                 component.gameObject.SetActive(false);
             }
@@ -99,7 +99,7 @@ namespace TestHelper.Monkey
         [LoadScene(TestScene)]
         public async Task Run_noInteractiveComponent_abort()
         {
-            foreach (var component in InteractiveComponentCollector.FindInteractiveComponents())
+            foreach (var component in InteractiveComponentCollector.FindInteractableComponents())
             {
                 component.gameObject.SetActive(false);
             }
@@ -125,7 +125,7 @@ namespace TestHelper.Monkey
         [LoadScene(TestScene)]
         public async Task Run_noInteractiveComponentAndSecondsToErrorForNoInteractiveComponentIsZero_finish()
         {
-            foreach (var component in InteractiveComponentCollector.FindInteractiveComponents())
+            foreach (var component in InteractiveComponentCollector.FindInteractableComponents())
             {
                 component.gameObject.SetActive(false);
             }
@@ -187,7 +187,7 @@ namespace TestHelper.Monkey
         public void Lottery_hitInteractiveComponent_returnComponent()
         {
             var components = InteractiveComponentCollector
-                .FindReallyInteractiveComponents(DefaultScreenPointStrategy.GetScreenPoint).ToList();
+                .FindReachableInteractableComponents(DefaultScreenPointStrategy.GetScreenPoint).ToList();
             for (var i = 0; i < components.Count; i++)
             {
                 var random = new StubRandom(i);
@@ -273,7 +273,7 @@ namespace TestHelper.Monkey
         [LoadScene(TestScene)]
         public async Task DoOperation_invokeOperationByLottery(string target, int index, string operation)
         {
-            var component = InteractiveComponentCollector.FindInteractiveComponents()
+            var component = InteractiveComponentCollector.FindInteractableComponents()
                 .First(x => x.gameObject.name == target);
             var spyLogger = new SpyLogger();
             var config = new MonkeyConfig
@@ -296,7 +296,7 @@ namespace TestHelper.Monkey
             const int Index = 0;
             const string Operation = "TouchAndHold";
 
-            var component = InteractiveComponentCollector.FindInteractiveComponents()
+            var component = InteractiveComponentCollector.FindInteractableComponents()
                 .First(x => x.gameObject.name == Target);
             var spyLogger = new SpyLogger();
             var config = new MonkeyConfig

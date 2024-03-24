@@ -3,10 +3,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using TestHelper.Monkey.Extensions;
 using TestHelper.Random;
 using TestHelper.RuntimeInternals;
 using UnityEngine;
@@ -88,7 +88,7 @@ namespace TestHelper.Monkey
         public static async UniTask<bool> RunStep(MonkeyConfig config, CancellationToken cancellationToken = default)
         {
             var components = InteractiveComponentCollector
-                .FindInteractiveComponents()
+                .FindInteractableComponents()
                 .ToList();
             var component = Lottery(ref components, config.Random, config.ScreenPointStrategy);
             if (component == null)
@@ -135,7 +135,7 @@ namespace TestHelper.Monkey
                 }
 
                 var next = components[random.Next(components.Count)];
-                if (next.IsReallyInteractiveFromUser(screenPointStrategy) && GetCanOperations(next).Any())
+                if (next.gameObject.IsReachable(screenPointStrategy) && GetCanOperations(next).Any())
                 {
                     return next;
                 }

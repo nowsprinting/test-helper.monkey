@@ -1,6 +1,7 @@
 // Copyright (c) 2023 Koji Hasegawa.
 // This software is released under the MIT License.
 
+using TestHelper.Monkey.Hints;
 using UnityEditor;
 using UnityEngine;
 

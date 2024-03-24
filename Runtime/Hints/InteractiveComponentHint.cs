@@ -3,10 +3,11 @@
 
 using System.Collections.Generic;
 using System.Text;
+using TestHelper.Monkey.Extensions;
 using TestHelper.Monkey.ScreenPointStrategies;
 using UnityEngine;
 
-namespace TestHelper.Monkey
+namespace TestHelper.Monkey.Hints
 {
     /// <summary>
     /// Component to make operation positions visible
@@ -97,7 +98,7 @@ namespace TestHelper.Monkey
         {
             Clear();
 
-            foreach (var component in InteractiveComponentCollector.FindInteractiveComponents())
+            foreach (var component in InteractiveComponentCollector.FindInteractableComponents())
             {
                 var dst = component.IsReallyInteractiveFromUser(GetScreenPoint)
                     ? _tmpReallyInteractives
@@ -106,12 +107,12 @@ namespace TestHelper.Monkey
                 var screenPoint = GetScreenPoint(component.gameObject);
                 var originalPos = component.transform.position;
                 var modifiedPos = InteractiveComponentHintPosition.GetWorldPoint(
-                    CameraSelector.SelectBy(component.gameObject),
+                    component.gameObject.GetAssociatedCamera(),
                     screenPoint,
                     originalPos
                 );
 
-                var cameraNorm = CameraSelector.SelectBy(component.gameObject)?.transform.forward * -1 ?? Vector3.back;
+                var cameraNorm = component.gameObject.GetAssociatedCamera()?.transform.forward * -1 ?? Vector3.back;
 
                 if (!dst.TryGetValue((modifiedPos, cameraNorm), out var gameObjects))
                 {
