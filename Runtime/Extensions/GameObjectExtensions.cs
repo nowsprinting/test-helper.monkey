@@ -8,7 +8,6 @@ using TestHelper.Monkey.ScreenPointStrategies;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 namespace TestHelper.Monkey.Extensions
 {

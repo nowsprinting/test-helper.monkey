@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using TestHelper.Monkey.Annotations;
+using TestHelper.Monkey.ScreenPointStrategies;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -26,13 +27,14 @@ namespace TestHelper.Monkey.Operators
             return component.GetType().GetInterfaces().Contains(typeof(IPointerClickHandler));
         }
 
-        internal static void Click(MonoBehaviour component, Func<GameObject, Vector2> screenPointStrategy)
+        internal static void Click(MonoBehaviour component, Func<GameObject, Vector2> screenPointStrategy = null)
         {
             if (!(component is IPointerClickHandler handler))
             {
                 return;
             }
 
+            screenPointStrategy = screenPointStrategy ?? DefaultScreenPointStrategy.GetScreenPoint;
             var eventData = new PointerEventData(EventSystem.current)
             {
                 position = screenPointStrategy(component.gameObject)

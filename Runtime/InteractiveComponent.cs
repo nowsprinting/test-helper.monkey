@@ -26,15 +26,6 @@ namespace TestHelper.Monkey
         public readonly MonoBehaviour component;
 
         /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="component"></param>
-        public InteractiveComponent(MonoBehaviour component)
-        {
-            this.component = component;
-        }
-
-        /// <summary>
         /// Transform via inner component
         /// </summary>
         [SuppressMessage("ReSharper", "InconsistentNaming")]
@@ -45,6 +36,33 @@ namespace TestHelper.Monkey
         /// </summary>
         [SuppressMessage("ReSharper", "InconsistentNaming")]
         public GameObject gameObject => component.gameObject;
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="component"></param>
+        public InteractiveComponent(MonoBehaviour component)
+        {
+            this.component = component;
+        }
+
+        /// <summary>
+        /// Create <c>InteractableComponent</c> instance from GameObject.
+        /// </summary>
+        /// <param name="gameObject"></param>
+        /// <returns>Returns new InteractableComponent instance from GameObject. If GameObject is not interactable so, return null.</returns>
+        public static InteractiveComponent CreateInteractableComponent(GameObject gameObject)
+        {
+            foreach (var component in gameObject.GetComponents<MonoBehaviour>())
+            {
+                if (component.IsInteractable())
+                {
+                    return new InteractiveComponent(component);
+                }
+            }
+
+            return null;
+        }
 
         /// <summary>
         /// Hit test using raycaster
@@ -70,7 +88,7 @@ namespace TestHelper.Monkey
         /// Click inner component
         /// </summary>
         /// <param name="screenPointStrategy">Function returns the screen position where monkey operators operate on for the specified gameObject</param>
-        public void Click(Func<GameObject, Vector2> screenPointStrategy) =>
+        public void Click(Func<GameObject, Vector2> screenPointStrategy = null) =>
             ClickOperator.Click(component, screenPointStrategy);
 
         /// <summary>
@@ -83,7 +101,7 @@ namespace TestHelper.Monkey
         /// Tap (click) inner component
         /// </summary>
         /// <param name="screenPointStrategy">Function returns the screen position where monkey operators operate on for the specified gameObject</param>
-        public void Tap(Func<GameObject, Vector2> screenPointStrategy) =>
+        public void Tap(Func<GameObject, Vector2> screenPointStrategy = null) =>
             ClickOperator.Click(component, screenPointStrategy);
 
         /// <summary>
@@ -98,7 +116,7 @@ namespace TestHelper.Monkey
         /// <param name="screenPointStrategy">Function returns the screen position where monkey operators operate on for the specified gameObject</param>
         /// <param name="delayMillis">Delay time between down to up</param>
         /// <param name="cancellationToken">Task cancellation token</param>
-        public async UniTask TouchAndHold(Func<GameObject, Vector2> screenPointStrategy, int delayMillis = 1000,
+        public async UniTask TouchAndHold(Func<GameObject, Vector2> screenPointStrategy = null, int delayMillis = 1000,
             CancellationToken cancellationToken = default)
             => await TouchAndHoldOperator.TouchAndHold(component, screenPointStrategy, delayMillis, cancellationToken);
 

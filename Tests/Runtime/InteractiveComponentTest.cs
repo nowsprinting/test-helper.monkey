@@ -9,12 +9,30 @@ using TestHelper.Monkey.ScreenPointStrategies;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.TestTools;
+using UnityEngine.UI;
 
 namespace TestHelper.Monkey
 {
     [TestFixture]
     public class InteractiveComponentTest
     {
+        [Test]
+        public void CreateInteractableComponent_CreateInstance()
+        {
+            var button = new GameObject("InteractableButton").AddComponent<Button>();
+            var actual = InteractiveComponent.CreateInteractableComponent(button.gameObject);
+            Assert.That(actual, Is.Not.Null);
+        }
+
+        [Test]
+        public void CreateInteractableComponent_NotInteractable_ReturnNull()
+        {
+            var button = new GameObject("NotInteractableButton").AddComponent<Button>();
+            button.interactable = false;
+            var actual = InteractiveComponent.CreateInteractableComponent(button.gameObject);
+            Assert.That(actual, Is.Null);
+        }
+
         /// <summary>
         /// InteractiveComponent test cases using 3D objects
         /// </summary>

@@ -151,6 +151,31 @@ public class MyIntegrationTest
 }
 ```
 
+#### InteractiveComponent.CreateInteractableComponent
+
+Returns new InteractableComponent instance from GameObject. If GameObject is not interactable so, return null.
+
+Usage:
+
+```csharp
+using NUnit.Framework;
+using TestHelper.Monkey;
+
+[TestFixture]
+public class MyIntegrationTest
+{
+    [Test]
+    public void MyTestMethod()
+    {
+        var finder = new GameObjectFinder();
+        var button = await finder.FindByNameAsync("Button", interactable: true);
+
+        var interactableComponent = InteractiveComponent.CreateInteractableComponent(button);
+        interactableComponent.Click();
+    }
+}
+```
+
 #### InteractiveComponentCollector.FindInteractableComponents
 
 Returns interactable uGUI components.
