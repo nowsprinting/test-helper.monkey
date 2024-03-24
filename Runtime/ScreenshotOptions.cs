@@ -2,7 +2,6 @@
 // This software is released under the MIT License.
 
 using TestHelper.Monkey.ScreenshotFilenameStrategies;
-using TestHelper.RuntimeInternals;
 using UnityEngine;
 
 namespace TestHelper.Monkey
@@ -17,7 +16,7 @@ namespace TestHelper.Monkey
         /// If omitted, the directory specified by command line argument "-testHelperScreenshotDirectory" is used.
         /// If the command line argument is also omitted, <c>Application.persistentDataPath</c> + "/TestHelper/Screenshots/" is used.
         /// </summary>
-        public string Directory { get; set; } = CommandLineArgs.GetScreenshotDirectory();
+        public string Directory { get; set; }
 
         /// <summary>
         /// Strategy for file paths of screenshot images.
