@@ -33,30 +33,30 @@ namespace TestHelper.Monkey.Extensions
         /// Judges whether a hierarchy path matches a glob pattern.
         /// </summary>
         /// <param name="transform">target</param>
-        /// <param name="grob">Hierarchy path can specify grob pattern</param>
+        /// <param name="glob">Hierarchy path can specify glob pattern</param>
         /// <returns>True if match</returns>
         /// <seealso href="https://en.wikipedia.org/wiki/Glob_(programming)"/>
-        public static bool MatchPath(this Transform transform, string grob)
+        public static bool MatchPath(this Transform transform, string glob)
         {
-            if (!ValidateGrobPattern(grob))
+            if (!ValidateGlobPattern(glob))
             {
-                throw new ArgumentException($"Wildcards cannot be used in the most right section of path: {grob}");
+                throw new ArgumentException($"Wildcards cannot be used in the most right section of path: {glob}");
             }
 
-            var regex = ConvertRegexFromGrob(grob);
+            var regex = ConvertRegexFromGlob(glob);
             return regex.IsMatch(transform.GetPath());
         }
 
-        private static bool ValidateGrobPattern(string grob)
+        private static bool ValidateGlobPattern(string glob)
         {
-            var right = grob.Split('/').Last();
+            var right = glob.Split('/').Last();
             return right.IndexOfAny(new[] { '*', '?' }) < 0;
         }
 
-        private static Regex ConvertRegexFromGrob(string grob)
+        private static Regex ConvertRegexFromGlob(string glob)
         {
             var regex = new StringBuilder();
-            foreach (var c in grob)
+            foreach (var c in glob)
             {
                 switch (c)
                 {

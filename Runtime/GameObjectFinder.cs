@@ -12,7 +12,7 @@ using UnityEngine;
 namespace TestHelper.Monkey
 {
     /// <summary>
-    /// Find <c>GameObject</c> by name or path (grob). Wait until they appear.
+    /// Find <c>GameObject</c> by name or path (glob). Wait until they appear.
     /// </summary>
     public class GameObjectFinder
     {
@@ -108,7 +108,7 @@ namespace TestHelper.Monkey
         /// Find GameObject by path (wait until they appear).
         /// </summary>
         /// <seealso href="https://en.wikipedia.org/wiki/Glob_(programming)"/>
-        /// <param name="path">Find GameObject hierarchy path separated by `/`. Can specify grob pattern</param>
+        /// <param name="path">Find GameObject hierarchy path separated by `/`. Can specify glob pattern</param>
         /// <param name="reachable">Find only reachable object</param>
         /// <param name="interactable">Find only interactable object</param>
         /// <param name="token">CancellationToken</param>

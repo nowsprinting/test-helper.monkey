@@ -43,10 +43,10 @@ namespace TestHelper.Monkey.Extensions
         [TestCase("/*/*/Grandchild")]
         [TestCase("/**/Grandchild")]
         [TestCase("**/Grandchild")]
-        public void MatchPath_Match(string grob)
+        public void MatchPath_Match(string glob)
         {
             var grandchild = CreateThreeGenerationObjects();
-            var actual = grandchild.transform.MatchPath(grob);
+            var actual = grandchild.transform.MatchPath(glob);
             Assert.That(actual, Is.True);
         }
 
@@ -54,10 +54,10 @@ namespace TestHelper.Monkey.Extensions
         [TestCase("/Parent/**/Child/Grandchild")]
         [TestCase("*/Grandchild")]
         [TestCase("**/Granddaughter")]
-        public void MatchPath_NotMatch(string grob)
+        public void MatchPath_NotMatch(string glob)
         {
             var grandchild = CreateThreeGenerationObjects();
-            var actual = grandchild.transform.MatchPath(grob);
+            var actual = grandchild.transform.MatchPath(glob);
             Assert.That(actual, Is.False);
         }
 
@@ -65,10 +65,10 @@ namespace TestHelper.Monkey.Extensions
         [TestCase("**/Gran?child")]
         [TestCase("*")]
         [TestCase("**")]
-        public void MatchPath_InvalidGrobPattern_ThrowsArgumentException(string grob)
+        public void MatchPath_InvalidGlobPattern_ThrowsArgumentException(string glob)
         {
             var grandchild = CreateThreeGenerationObjects();
-            Assert.That(() => grandchild.transform.MatchPath(grob),
+            Assert.That(() => grandchild.transform.MatchPath(glob),
                 Throws.TypeOf<ArgumentException>()
                     .And.Message.StartsWith("Wildcards cannot be used in the most right section of path"));
         }
