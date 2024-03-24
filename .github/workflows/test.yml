@@ -90,7 +90,7 @@ jobs:
           unityVersion: ${{ matrix.unityVersion }}  # Default is `auto`
           checkName: test result (${{ matrix.unityVersion }})
           projectPath: ${{ env.CREATED_PROJECT_PATH }}
-          customParameters: -testCategory "!IgnoreCI" -testHelperScreenshotDirectory ${{ env.CREATED_PROJECT_PATH }}/Logs/Screenshots
+          customParameters: -testCategory "!IgnoreCI" -testHelperScreenshotDirectory /github/workspace/artifacts/Screenshots
           coverageOptions: generateAdditionalMetrics;generateTestReferences;generateHtmlReport;generateAdditionalReports;dontClear;assemblyFilters:${{ env.assembly_filters }}
           # see: https://docs.unity3d.com/Packages/com.unity.testtools.codecoverage@1.2/manual/CoverageBatchmode.html
         env:
@@ -114,7 +114,6 @@ jobs:
           path: |
             ${{ steps.test.outputs.artifactsPath }}
             ${{ steps.test.outputs.coveragePath }}
-            ${{ env.CREATED_PROJECT_PATH }}/Logs/Screenshots
         if: always()
 
   notify:
