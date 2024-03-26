@@ -4,7 +4,6 @@
 using System.Linq;
 using NUnit.Framework;
 using TestHelper.Attributes;
-using TestHelper.Monkey.ScreenPointStrategies;
 
 namespace TestHelper.Monkey.Annotations
 {
@@ -25,14 +24,14 @@ namespace TestHelper.Monkey.Annotations
             string name
         )
         {
-            var target = InteractiveComponentCollector
+            var target = new InteractiveComponentCollector()
                 .FindInteractableComponents()
                 .First(x => x.gameObject.name == name);
 
             // Without no position annotations, IsReallyInteractiveFromUser() is always false because
             // gameObject.transform.position is not in the mesh. So IsReallyInteractiveFromUser() is true means
             // the position annotation work well
-            Assert.That(target.IsReallyInteractiveFromUser(DefaultScreenPointStrategy.GetScreenPoint), Is.True);
+            Assert.That(target.IsReachable(), Is.True);
         }
     }
 }

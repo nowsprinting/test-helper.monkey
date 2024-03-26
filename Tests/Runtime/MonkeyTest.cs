@@ -12,7 +12,6 @@ using Cysharp.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
 using TestHelper.Monkey.Annotations;
-using TestHelper.Monkey.ScreenPointStrategies;
 using TestHelper.Monkey.TestDoubles;
 using TestHelper.Random;
 using TestHelper.RuntimeInternals;
@@ -36,7 +35,7 @@ namespace TestHelper.Monkey
                 TouchAndHoldDelayMillis = 1, // 1ms
             };
 
-            var didAct = await Monkey.RunStep(config);
+            var didAct = await Monkey.RunStep(config, new InteractiveComponentCollector());
             Assert.That(didAct, Is.EqualTo(true));
         }
 
@@ -44,7 +43,8 @@ namespace TestHelper.Monkey
         [LoadScene(TestScene)]
         public async Task RunStep_noInteractiveComponent_abort()
         {
-            foreach (var component in InteractiveComponentCollector.FindInteractableComponents())
+            var interactiveComponentCollector = new InteractiveComponentCollector();
+            foreach (var component in interactiveComponentCollector.FindInteractableComponents())
             {
                 component.gameObject.SetActive(false);
             }
@@ -55,7 +55,7 @@ namespace TestHelper.Monkey
                 TouchAndHoldDelayMillis = 1, // 1ms
             };
 
-            var didAct = await Monkey.RunStep(config);
+            var didAct = await Monkey.RunStep(config, interactiveComponentCollector);
             Assert.That(didAct, Is.EqualTo(false));
         }
 
@@ -99,7 +99,8 @@ namespace TestHelper.Monkey
         [LoadScene(TestScene)]
         public async Task Run_noInteractiveComponent_abort()
         {
-            foreach (var component in InteractiveComponentCollector.FindInteractableComponents())
+            var interactiveComponentCollector = new InteractiveComponentCollector();
+            foreach (var component in interactiveComponentCollector.FindInteractableComponents())
             {
                 component.gameObject.SetActive(false);
             }
@@ -125,7 +126,8 @@ namespace TestHelper.Monkey
         [LoadScene(TestScene)]
         public async Task Run_noInteractiveComponentAndSecondsToErrorForNoInteractiveComponentIsZero_finish()
         {
-            foreach (var component in InteractiveComponentCollector.FindInteractableComponents())
+            var interactiveComponentCollector = new InteractiveComponentCollector();
+            foreach (var component in interactiveComponentCollector.FindInteractableComponents())
             {
                 component.gameObject.SetActive(false);
             }
@@ -186,13 +188,13 @@ namespace TestHelper.Monkey
         [LoadScene(TestScene)]
         public void Lottery_hitInteractiveComponent_returnComponent()
         {
-            var components = InteractiveComponentCollector
-                .FindReachableInteractableComponents(DefaultScreenPointStrategy.GetScreenPoint).ToList();
+            var interactiveComponentCollector = new InteractiveComponentCollector();
+            var components = interactiveComponentCollector.FindReachableInteractableComponents().ToList();
             for (var i = 0; i < components.Count; i++)
             {
                 var random = new StubRandom(i);
                 var expected = components[i];
-                var actual = Monkey.Lottery(ref components, random, DefaultScreenPointStrategy.GetScreenPoint);
+                var actual = Monkey.Lottery(ref components, random);
 
                 Assert.That(actual.gameObject.name, Is.EqualTo(expected.gameObject.name));
             }
@@ -217,7 +219,7 @@ namespace TestHelper.Monkey
 
             var random = new StubRandom(0, 1);
             var expected = components[2];
-            var actual = Monkey.Lottery(ref components, random, DefaultScreenPointStrategy.GetScreenPoint);
+            var actual = Monkey.Lottery(ref components, random);
 
             Assert.That(actual.gameObject.name, Is.EqualTo(expected.gameObject.name));
             Assert.That(components, Has.Count.EqualTo(3)); // Removed not interactive objects.
@@ -235,7 +237,7 @@ namespace TestHelper.Monkey
             components[0].gameObject.SetActive(false);
 
             var random = new StubRandom(0);
-            var actual = Monkey.Lottery(ref components, random, DefaultScreenPointStrategy.GetScreenPoint);
+            var actual = Monkey.Lottery(ref components, random);
 
             Assert.That(actual, Is.Null);
             Assert.That(components, Has.Count.EqualTo(0)); // Removed not interactive objects.
@@ -253,7 +255,7 @@ namespace TestHelper.Monkey
             components[0].gameObject.AddComponent<IgnoreAnnotation>();
 
             var random = new StubRandom(0);
-            var actual = Monkey.Lottery(ref components, random, DefaultScreenPointStrategy.GetScreenPoint);
+            var actual = Monkey.Lottery(ref components, random);
 
             Assert.That(actual, Is.Null);
             Assert.That(components, Has.Count.EqualTo(0)); // Removed not interactive objects.
@@ -273,7 +275,7 @@ namespace TestHelper.Monkey
         [LoadScene(TestScene)]
         public async Task DoOperation_invokeOperationByLottery(string target, int index, string operation)
         {
-            var component = InteractiveComponentCollector.FindInteractableComponents()
+            var component = new InteractiveComponentCollector().FindInteractableComponents()
                 .First(x => x.gameObject.name == target);
             var spyLogger = new SpyLogger();
             var config = new MonkeyConfig
@@ -296,7 +298,7 @@ namespace TestHelper.Monkey
             const int Index = 0;
             const string Operation = "TouchAndHold";
 
-            var component = InteractiveComponentCollector.FindInteractableComponents()
+            var component = new InteractiveComponentCollector().FindInteractableComponents()
                 .First(x => x.gameObject.name == Target);
             var spyLogger = new SpyLogger();
             var config = new MonkeyConfig

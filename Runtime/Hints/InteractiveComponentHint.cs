@@ -15,7 +15,7 @@ namespace TestHelper.Monkey.Hints
     public class InteractiveComponentHint : MonoBehaviour
     {
         private static readonly Color s_orange = new Color(0xef, 0x81, 0x0f);
-        
+
         /// <summary>
         /// Color for interactive components that users can operate
         /// </summary>
@@ -98,9 +98,10 @@ namespace TestHelper.Monkey.Hints
         {
             Clear();
 
-            foreach (var component in InteractiveComponentCollector.FindInteractableComponents())
+            var interactiveComponentCollector = new InteractiveComponentCollector(getScreenPoint: GetScreenPoint);
+            foreach (var component in interactiveComponentCollector.FindInteractableComponents())
             {
-                var dst = component.IsReallyInteractiveFromUser(GetScreenPoint)
+                var dst = component.IsReachable()
                     ? _tmpReallyInteractives
                     : _tmpNotReallyInteractives;
 

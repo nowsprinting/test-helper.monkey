@@ -4,7 +4,6 @@
 using System.Linq;
 using NUnit.Framework;
 using TestHelper.Attributes;
-using TestHelper.Monkey.ScreenPointStrategies;
 using UnityEngine;
 using UnityEngine.TestTools;
 
@@ -20,11 +19,11 @@ namespace TestHelper.Monkey.Operators
         [LoadScene(TestScene)]
         public void Click(string targetName, string expectedMessage)
         {
-            var target = InteractiveComponentCollector.FindInteractableComponents()
+            var target = new InteractiveComponentCollector().FindInteractableComponents()
                 .First(x => x.gameObject.name == targetName);
 
             Assert.That(target.CanClick(), Is.True);
-            target.Click(DefaultScreenPointStrategy.GetScreenPoint);
+            target.Click();
             LogAssert.Expect(LogType.Log, $"{targetName}.{expectedMessage}");
         }
 
@@ -33,11 +32,11 @@ namespace TestHelper.Monkey.Operators
         [LoadScene(TestScene)]
         public void Tap(string targetName, string expectedMessage) // Same as Click
         {
-            var target = InteractiveComponentCollector.FindInteractableComponents()
+            var target = new InteractiveComponentCollector().FindInteractableComponents()
                 .First(x => x.gameObject.name == targetName);
 
             Assert.That(target.CanTap(), Is.True);
-            target.Tap(DefaultScreenPointStrategy.GetScreenPoint);
+            target.Tap();
             LogAssert.Expect(LogType.Log, $"{targetName}.{expectedMessage}");
         }
 
@@ -46,7 +45,7 @@ namespace TestHelper.Monkey.Operators
         [LoadScene(TestScene)]
         public void CanNotClick(string targetName)
         {
-            var target = InteractiveComponentCollector.FindInteractableComponents()
+            var target = new InteractiveComponentCollector().FindInteractableComponents()
                 .First(x => x.gameObject.name == targetName);
 
             Assert.That(target.CanClick(), Is.False);

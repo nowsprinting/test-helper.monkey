@@ -73,7 +73,7 @@ namespace TestHelper.Monkey
 
             if (reachable)
             {
-                _eventData.position = _getScreenPoint(foundObject);
+                _eventData.position = _getScreenPoint.Invoke(foundObject);
                 if (!_isReachable.Invoke(foundObject, _eventData, _results))
                 {
                     return (null, Reason.NotReachable);
