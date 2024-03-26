@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
-using TestHelper.Monkey.ScreenPointStrategies;
 using UnityEngine;
 using UnityEngine.TestTools;
 
@@ -26,7 +25,7 @@ namespace TestHelper.Monkey.Operators
                 .First(x => x.gameObject.name == targetName);
 
             Assert.That(target.CanTouchAndHold(), Is.True);
-            await target.TouchAndHold(DefaultScreenPointStrategy.GetScreenPoint);
+            await target.TouchAndHold();
             LogAssert.Expect(LogType.Log, $"{targetName}.{expectedMessage1}");
             LogAssert.Expect(LogType.Log, $"{targetName}.{expectedMessage2}");
         }

@@ -175,11 +175,10 @@ namespace TestHelper.Monkey
             switch (operation)
             {
                 case SupportOperation.Click:
-                    component.Click(config.ScreenPointStrategy);
+                    component.Click();
                     break;
                 case SupportOperation.TouchAndHold:
                     await component.TouchAndHold(
-                        config.ScreenPointStrategy,
                         config.TouchAndHoldDelayMillis,
                         cancellationToken
                     );

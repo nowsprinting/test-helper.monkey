@@ -4,7 +4,6 @@
 using System.Linq;
 using NUnit.Framework;
 using TestHelper.Attributes;
-using TestHelper.Monkey.ScreenPointStrategies;
 using UnityEngine;
 using UnityEngine.TestTools;
 
@@ -24,7 +23,7 @@ namespace TestHelper.Monkey.Operators
                 .First(x => x.gameObject.name == targetName);
 
             Assert.That(target.CanClick(), Is.True);
-            target.Click(DefaultScreenPointStrategy.GetScreenPoint);
+            target.Click();
             LogAssert.Expect(LogType.Log, $"{targetName}.{expectedMessage}");
         }
 
@@ -37,7 +36,7 @@ namespace TestHelper.Monkey.Operators
                 .First(x => x.gameObject.name == targetName);
 
             Assert.That(target.CanTap(), Is.True);
-            target.Tap(DefaultScreenPointStrategy.GetScreenPoint);
+            target.Tap();
             LogAssert.Expect(LogType.Log, $"{targetName}.{expectedMessage}");
         }
 

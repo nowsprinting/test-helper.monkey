@@ -128,9 +128,7 @@ namespace TestHelper.Monkey
         /// <summary>
         /// Click inner component
         /// </summary>
-        /// <param name="screenPointStrategy">Function returns the screen position where monkey operators operate on for the specified gameObject</param>
-        public void Click(Func<GameObject, Vector2> screenPointStrategy = null) =>
-            ClickOperator.Click(component, screenPointStrategy);
+        public void Click() => ClickOperator.Click(component, _getScreenPoint);
 
         /// <summary>
         /// Check inner component can receive tap (click) event
@@ -141,9 +139,7 @@ namespace TestHelper.Monkey
         /// <summary>
         /// Tap (click) inner component
         /// </summary>
-        /// <param name="screenPointStrategy">Function returns the screen position where monkey operators operate on for the specified gameObject</param>
-        public void Tap(Func<GameObject, Vector2> screenPointStrategy = null) =>
-            ClickOperator.Click(component, screenPointStrategy);
+        public void Tap() => ClickOperator.Click(component, _getScreenPoint);
 
         /// <summary>
         /// Check inner component can receive touch-and-hold event
@@ -157,9 +153,8 @@ namespace TestHelper.Monkey
         /// <param name="screenPointStrategy">Function returns the screen position where monkey operators operate on for the specified gameObject</param>
         /// <param name="delayMillis">Delay time between down to up</param>
         /// <param name="cancellationToken">Task cancellation token</param>
-        public async UniTask TouchAndHold(Func<GameObject, Vector2> screenPointStrategy = null, int delayMillis = 1000,
-            CancellationToken cancellationToken = default)
-            => await TouchAndHoldOperator.TouchAndHold(component, screenPointStrategy, delayMillis, cancellationToken);
+        public async UniTask TouchAndHold(int delayMillis = 1000, CancellationToken cancellationToken = default)
+            => await TouchAndHoldOperator.TouchAndHold(component, _getScreenPoint, delayMillis, cancellationToken);
 
         /// <summary>
         /// Check inner component can input text

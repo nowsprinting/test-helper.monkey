@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
-using TestHelper.Monkey.ScreenPointStrategies;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.TestTools;
@@ -125,7 +124,7 @@ namespace TestHelper.Monkey
                     .First(x => x.gameObject.name == targetName);
 
                 Assert.That(target.CanTap(), Is.True);
-                target.Tap(DefaultScreenPointStrategy.GetScreenPoint);
+                target.Tap();
 
                 LogAssert.Expect(LogType.Log, $"{targetName}.{expectedMessage}");
             }
