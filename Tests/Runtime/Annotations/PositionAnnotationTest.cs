@@ -24,7 +24,7 @@ namespace TestHelper.Monkey.Annotations
             string name
         )
         {
-            var target = InteractiveComponentCollector
+            var target = new InteractiveComponentCollector()
                 .FindInteractableComponents()
                 .First(x => x.gameObject.name == name);
 

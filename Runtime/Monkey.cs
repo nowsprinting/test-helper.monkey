@@ -6,12 +6,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using TestHelper.Monkey.DefaultStrategies;
 using TestHelper.Random;
 using TestHelper.RuntimeInternals;
 using UnityEngine;
 using UnityEngine.Assertions;
-using UnityEngine.EventSystems;
 
 namespace TestHelper.Monkey
 {
@@ -46,13 +44,18 @@ namespace TestHelper.Monkey
                 GameViewControlHelper.SetGizmos(true);
             }
 
+            var interactiveComponentCollector = new InteractiveComponentCollector(
+                getScreenPoint: config.ScreenPointStrategy
+            );
+            // TODO: Set other strategies
+
             config.Logger.Log($"Using {config.Random}");
 
             try
             {
                 while (Time.time < endTime)
                 {
-                    var didAct = await RunStep(config, cancellationToken);
+                    var didAct = await RunStep(config, interactiveComponentCollector, cancellationToken);
                     if (didAct)
                     {
                         lastOperationTime = Time.time;
@@ -85,14 +88,16 @@ namespace TestHelper.Monkey
         /// Run a step of monkey testing.
         /// </summary>
         /// <param name="config">Run configuration for monkey testing</param>
+        /// <param name="interactiveComponentCollector"></param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns></returns>
-        public static async UniTask<bool> RunStep(MonkeyConfig config, CancellationToken cancellationToken = default)
+        public static async UniTask<bool> RunStep(MonkeyConfig config,
+            InteractiveComponentCollector interactiveComponentCollector, CancellationToken cancellationToken = default)
         {
-            var components = InteractiveComponentCollector
+            var components = interactiveComponentCollector
                 .FindInteractableComponents()
                 .ToList();
-            var component = Lottery(ref components, config.Random, config.ScreenPointStrategy);
+            var component = Lottery(ref components, config.Random);
             if (component == null)
             {
                 return false;
@@ -120,19 +125,12 @@ namespace TestHelper.Monkey
 
         internal static InteractiveComponent Lottery(
             ref List<InteractiveComponent> components,
-            IRandom random,
-            Func<GameObject, Vector2> screenPointStrategy
-        )
+            IRandom random)
         {
             if (components == null || components.Count == 0)
             {
                 return null;
             }
-
-            Func<GameObject, PointerEventData, List<RaycastResult>, bool> isReachable =
-                DefaultReachableStrategy.IsReachable;
-            var eventData = new PointerEventData(EventSystem.current);
-            var results = new List<RaycastResult>();
 
             while (true)
             {
@@ -142,8 +140,7 @@ namespace TestHelper.Monkey
                 }
 
                 var next = components[random.Next(components.Count)];
-                eventData.position = screenPointStrategy(next.gameObject);
-                if (isReachable(next.gameObject, eventData, results) && GetCanOperations(next).Any())
+                if (next.IsReachable() && GetCanOperations(next).Any())
                 {
                     return next;
                 }

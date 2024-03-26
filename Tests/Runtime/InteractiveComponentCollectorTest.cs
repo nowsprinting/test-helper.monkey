@@ -6,7 +6,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
-using TestHelper.Monkey.ScreenPointStrategies;
 
 namespace TestHelper.Monkey
 {
@@ -44,7 +43,7 @@ namespace TestHelper.Monkey
             [LoadScene(TestScene)]
             public void FindInteractiveObjects_findAllInteractiveObjects()
             {
-                var actual = InteractiveComponentCollector.FindInteractableComponents()
+                var actual = new InteractiveComponentCollector().FindInteractableComponents()
                     .Select(x => x.gameObject.name)
                     .ToArray();
                 Assert.That(actual, Is.EquivalentTo(s_interactiveObjects()));
@@ -54,8 +53,7 @@ namespace TestHelper.Monkey
             [LoadScene(TestScene)]
             public void FindInteractiveObjects_reallyInteractiveOnly_findReachableObjects()
             {
-                var actual = InteractiveComponentCollector
-                    .FindReachableInteractableComponents(DefaultScreenPointStrategy.GetScreenPoint)
+                var actual = new InteractiveComponentCollector().FindReachableInteractableComponents()
                     .Select(x => x.gameObject.name)
                     .ToArray();
                 Assert.That(actual, Is.EquivalentTo(s_reachableObjects));
@@ -93,7 +91,7 @@ namespace TestHelper.Monkey
             [LoadScene(TestScene)]
             public void FindInteractiveObjects_findAllInteractiveObjects()
             {
-                var actual = InteractiveComponentCollector.FindInteractableComponents()
+                var actual = new InteractiveComponentCollector().FindInteractableComponents()
                     .Select(x => x.gameObject.name)
                     .ToArray();
                 Assert.That(actual, Is.EquivalentTo(s_interactiveObjects()));
@@ -105,8 +103,7 @@ namespace TestHelper.Monkey
             {
                 await Task.Yield(); // wait for GraphicRaycaster initialization
 
-                var actual = InteractiveComponentCollector
-                    .FindReachableInteractableComponents(DefaultScreenPointStrategy.GetScreenPoint)
+                var actual = new InteractiveComponentCollector().FindReachableInteractableComponents()
                     .Select(x => x.gameObject.name)
                     .ToArray();
                 Assert.That(actual, Is.EquivalentTo(s_reachableObjects));
@@ -160,7 +157,7 @@ namespace TestHelper.Monkey
                 [LoadScene(TestScene)]
                 public void FindInteractiveObjects_findAllInteractiveObjects()
                 {
-                    var actual = InteractiveComponentCollector.FindInteractableComponents()
+                    var actual = new InteractiveComponentCollector().FindInteractableComponents()
                         .Select(x => x.gameObject.name)
                         .ToArray();
                     Assert.That(actual, Is.EquivalentTo(s_interactiveUiObjectsInOverlayCanvas()));
@@ -172,8 +169,7 @@ namespace TestHelper.Monkey
                 {
                     await Task.Yield(); // wait for GraphicRaycaster initialization
 
-                    var actual = InteractiveComponentCollector
-                        .FindReachableInteractableComponents(DefaultScreenPointStrategy.GetScreenPoint)
+                    var actual = new InteractiveComponentCollector().FindReachableInteractableComponents()
                         .Select(x => x.gameObject.name)
                         .ToArray();
                     Assert.That(actual, Is.EquivalentTo(s_reachableUiObjects));
@@ -193,7 +189,7 @@ namespace TestHelper.Monkey
                 [LoadScene(TestScene)]
                 public void FindInteractiveObjects_findAllInteractiveObjects()
                 {
-                    var actual = InteractiveComponentCollector.FindInteractableComponents()
+                    var actual = new InteractiveComponentCollector().FindInteractableComponents()
                         .Select(x => x.gameObject.name)
                         .ToArray();
                     Assert.That(actual, Is.EquivalentTo(s_interactiveUiObjects()));
@@ -205,8 +201,7 @@ namespace TestHelper.Monkey
                 {
                     await Task.Yield(); // wait for GraphicRaycaster initialization
 
-                    var actual = InteractiveComponentCollector
-                        .FindReachableInteractableComponents(DefaultScreenPointStrategy.GetScreenPoint)
+                    var actual = new InteractiveComponentCollector().FindReachableInteractableComponents()
                         .Select(x => x.gameObject.name)
                         .ToArray();
                     Assert.That(actual, Is.EquivalentTo(s_reachableUiObjects));
@@ -226,7 +221,7 @@ namespace TestHelper.Monkey
                 [LoadScene(TestScene)]
                 public void FindInteractiveObjects_findAllInteractiveObjects()
                 {
-                    var actual = InteractiveComponentCollector.FindInteractableComponents()
+                    var actual = new InteractiveComponentCollector().FindInteractableComponents()
                         .Select(x => x.gameObject.name)
                         .ToArray();
                     Assert.That(actual, Is.EquivalentTo(s_interactiveUiObjects()));
@@ -238,8 +233,7 @@ namespace TestHelper.Monkey
                 {
                     await Task.Yield(); // wait for GraphicRaycaster initialization
 
-                    var actual = InteractiveComponentCollector
-                        .FindReachableInteractableComponents(DefaultScreenPointStrategy.GetScreenPoint)
+                    var actual = new InteractiveComponentCollector().FindReachableInteractableComponents()
                         .Select(x => x.gameObject.name)
                         .ToArray();
                     Assert.That(actual, Is.EquivalentTo(s_reachableUiObjects));

@@ -1,9 +1,10 @@
-﻿// Copyright (c) 2023 Koji Hasegawa.
+﻿// Copyright (c) 2023-2024 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System;
 using System.Collections.Generic;
 using TestHelper.Monkey.DefaultStrategies;
+using TestHelper.Monkey.ScreenPointStrategies;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using Object = UnityEngine.Object;
@@ -14,28 +15,49 @@ namespace TestHelper.Monkey
     /// Find <c>InteractableComponent</c>s in the scene.
     /// </summary>
     // TODO: Rename to InteractableComponentsFinder
-    public static class InteractiveComponentCollector
+    public class InteractiveComponentCollector
     {
+        private readonly Func<GameObject, Vector2> _getScreenPoint;
+        private readonly Func<Component, bool> _isComponentInteractable;
+        private readonly Func<GameObject, PointerEventData, List<RaycastResult>, bool> _isReachable;
+        private readonly PointerEventData _eventData = new PointerEventData(EventSystem.current);
+        private readonly List<RaycastResult> _results = new List<RaycastResult>();
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="getScreenPoint">The function returns the screen position where raycast for the found <c>GameObject</c>.
+        /// Default is <c>DefaultScreenPointStrategy.GetScreenPoint</c>.</param>
+        /// <param name="isComponentInteractable">The function returns the <c>Component</c> is interactable or not.
+        /// Default is <c>DefaultComponentInteractableStrategy.IsInteractable</c>.</param>
+        /// <param name="isReachable">The function returns the <c>GameObject</c> is reachable from user or not.
+        /// Default is <c>DefaultReachableStrategy.IsReachable</c>.</param>
+        public InteractiveComponentCollector(
+            Func<GameObject, Vector2> getScreenPoint = null,
+            Func<Component, bool> isComponentInteractable = null,
+            Func<GameObject, PointerEventData, List<RaycastResult>, bool> isReachable = null)
+        {
+            _getScreenPoint = getScreenPoint ?? DefaultScreenPointStrategy.GetScreenPoint;
+            _isComponentInteractable = isComponentInteractable ?? DefaultComponentInteractableStrategy.IsInteractable;
+            _isReachable = isReachable ?? DefaultReachableStrategy.IsReachable;
+        }
+
         /// <summary>
         /// Find components attached EventTrigger or implements IEventSystemHandler in scene.
         /// Includes UI elements that inherit from the Selectable class, such as Button.
         ///
         /// Note: If you only need UI elements, using UnityEngine.UI.Selectable.allSelectablesArray is faster.
         /// </summary>
-        /// <param name="isInteractable">The function returns the <c>Component</c> is interactable or not.
-        /// Default is <c>DefaultComponentInteractableStrategy.IsInteractable</c>.</param>
         /// <returns>Interactive components</returns>
-        // TODO: Change to instance method
-        public static IEnumerable<InteractiveComponent> FindInteractableComponents(
-            Func<Component, bool> isInteractable = null)
+        public IEnumerable<InteractiveComponent> FindInteractableComponents()
         {
-            isInteractable = isInteractable ?? DefaultComponentInteractableStrategy.IsInteractable;
-
             foreach (var component in FindMonoBehaviours())
             {
-                if (isInteractable(component))
+                if (_isComponentInteractable.Invoke(component))
                 {
-                    yield return new InteractiveComponent(component);
+                    yield return new InteractiveComponent(component,
+                        _getScreenPoint,
+                        _isReachable);
                 }
             }
         }
@@ -43,7 +65,8 @@ namespace TestHelper.Monkey
         [Obsolete("Use FindInteractableComponents() instead")]
         public static IEnumerable<InteractiveComponent> FindInteractiveComponents()
         {
-            return FindInteractableComponents();
+            var instance = new InteractiveComponentCollector();
+            return instance.FindInteractableComponents();
         }
 
         /// <summary>
@@ -52,23 +75,13 @@ namespace TestHelper.Monkey
         /// 
         /// Note: If you only need UI elements, using UnityEngine.UI.Selectable.allSelectablesArray is faster.
         /// </summary>
-        /// <param name="screenPointStrategy">Function returns the screen position where monkey operators operate on for the specified gameObject</param>
         /// <returns>Really interactive components</returns>
-        /// <param name="isReachable">The function returns the <c>GameObject</c> is reachable from user or not.
-        /// Default is <c>DefaultReachableStrategy.IsReachable</c>.</param>
-        // TODO: Change to instance method
-        public static IEnumerable<InteractiveComponent> FindReachableInteractableComponents(
-            Func<GameObject, Vector2> screenPointStrategy,
-            Func<GameObject, PointerEventData, List<RaycastResult>, bool> isReachable = null)
+        public IEnumerable<InteractiveComponent> FindReachableInteractableComponents()
         {
-            isReachable = isReachable ?? DefaultReachableStrategy.IsReachable;
-            var data = new PointerEventData(EventSystem.current);
-            var results = new List<RaycastResult>();
-
             foreach (var interactiveComponent in FindInteractableComponents())
             {
-                data.position = screenPointStrategy(interactiveComponent.gameObject);
-                if (isReachable(interactiveComponent.gameObject, data, results))
+                _eventData.position = _getScreenPoint.Invoke(interactiveComponent.gameObject);
+                if (_isReachable.Invoke(interactiveComponent.gameObject, _eventData, _results))
                 {
                     yield return interactiveComponent;
                 }
@@ -79,7 +92,8 @@ namespace TestHelper.Monkey
         public static IEnumerable<InteractiveComponent> FindReallyInteractiveComponents(
             Func<GameObject, Vector2> screenPointStrategy)
         {
-            return FindReachableInteractableComponents(screenPointStrategy);
+            var instance = new InteractiveComponentCollector(getScreenPoint: screenPointStrategy);
+            return instance.FindReachableInteractableComponents();
         }
 
         private static IEnumerable<MonoBehaviour> FindMonoBehaviours()

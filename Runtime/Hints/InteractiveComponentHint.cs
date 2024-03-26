@@ -98,7 +98,8 @@ namespace TestHelper.Monkey.Hints
         {
             Clear();
 
-            foreach (var component in InteractiveComponentCollector.FindInteractableComponents())
+            var interactiveComponentCollector = new InteractiveComponentCollector(getScreenPoint: GetScreenPoint);
+            foreach (var component in interactiveComponentCollector.FindInteractableComponents())
             {
                 var dst = component.IsReachable()
                     ? _tmpReallyInteractives
