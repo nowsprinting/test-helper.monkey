@@ -64,7 +64,7 @@ namespace TestHelper.Monkey
                 var target = InteractiveComponentCollector.FindInteractableComponents()
                     .First(x => x.gameObject.name == targetName);
 
-                Assert.That(target.IsReallyInteractiveFromUser(DefaultScreenPointStrategy.GetScreenPoint), Is.True);
+                Assert.That(target.IsReachable(), Is.True);
             }
 
             [TestCase("BeyondTheWall")] // Beyond the another object
@@ -75,7 +75,7 @@ namespace TestHelper.Monkey
                 var target = InteractiveComponentCollector.FindInteractableComponents()
                     .First(x => x.gameObject.name == targetName);
 
-                Assert.That(target.IsReallyInteractiveFromUser(DefaultScreenPointStrategy.GetScreenPoint), Is.False);
+                Assert.That(target.IsReachable(), Is.False);
             }
         }
 
@@ -99,7 +99,7 @@ namespace TestHelper.Monkey
                 var target = InteractiveComponentCollector.FindInteractableComponents()
                     .First(x => x.gameObject.name == targetName);
 
-                Assert.That(target.IsReallyInteractiveFromUser(DefaultScreenPointStrategy.GetScreenPoint), Is.True);
+                Assert.That(target.IsReachable(), Is.True);
             }
 
             [TestCase("BeyondTheWall")] // Beyond the another object
@@ -114,7 +114,7 @@ namespace TestHelper.Monkey
                 var target = InteractiveComponentCollector.FindInteractableComponents()
                     .First(x => x.gameObject.name == targetName);
 
-                Assert.That(target.IsReallyInteractiveFromUser(DefaultScreenPointStrategy.GetScreenPoint), Is.False);
+                Assert.That(target.IsReachable(), Is.False);
             }
 
             [TestCase("Button", "ReceiveOnClick")]
