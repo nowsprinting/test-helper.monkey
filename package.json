@@ -1,7 +1,7 @@
 {
   "name": "com.nowsprinting.test-helper.monkey",
   "description": "Reference implementation that performs object-based Unity UI (uGUI) monkey tests and API for custom implementation.",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "author": "Koji Hasegawa <hasegawa@hubsys.co.jp> (https://github.com/nowsprinting)",
   "category": "Unity Test Framework",
   "changelogUrl": "https://github.com/nowsprinting/test-helper.monkey/releases",
