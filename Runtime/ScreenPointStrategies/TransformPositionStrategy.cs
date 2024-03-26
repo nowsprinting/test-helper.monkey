@@ -5,6 +5,7 @@ using TestHelper.Monkey.Extensions;
 using UnityEngine;
 
 namespace TestHelper.Monkey.ScreenPointStrategies
+// TODO: Move to TestHelper.Monkey.DefaultStrategies namespace
 {
     /// <summary>
     /// Screen point strategy that dont care any annotations
