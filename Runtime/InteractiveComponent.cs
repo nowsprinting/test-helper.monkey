@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using TestHelper.Monkey.DefaultStrategies;
 using TestHelper.Monkey.Extensions;
 using TestHelper.Monkey.Operators;
 using TestHelper.Monkey.Random;
@@ -17,7 +18,8 @@ namespace TestHelper.Monkey
     /// <summary>
     /// Wrapped component that provide interaction for user.
     /// </summary>
-    public class InteractiveComponent // TODO: Rename to InteractableComponent
+    // TODO: Rename to InteractableComponent
+    public class InteractiveComponent
     {
         /// <summary>
         /// Inner component (EventTrigger or implements IEventSystemHandler)
@@ -50,12 +52,17 @@ namespace TestHelper.Monkey
         /// Create <c>InteractableComponent</c> instance from GameObject.
         /// </summary>
         /// <param name="gameObject"></param>
+        /// <param name="isInteractable">The function returns the <c>Component</c> is interactable or not.
+        /// Default is <c>DefaultComponentInteractableStrategy.IsInteractable</c>.</param>
         /// <returns>Returns new InteractableComponent instance from GameObject. If GameObject is not interactable so, return null.</returns>
-        public static InteractiveComponent CreateInteractableComponent(GameObject gameObject)
+        public static InteractiveComponent CreateInteractableComponent(GameObject gameObject,
+            Func<Component, bool> isInteractable = null)
         {
+            isInteractable = isInteractable ?? DefaultComponentInteractableStrategy.IsInteractable;
+
             foreach (var component in gameObject.GetComponents<MonoBehaviour>())
             {
-                if (component.IsInteractable())
+                if (isInteractable(component))
                 {
                     return new InteractiveComponent(component);
                 }

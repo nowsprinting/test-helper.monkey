@@ -2,12 +2,15 @@
 // This software is released under the MIT License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using TestHelper.Monkey.DefaultStrategies;
 using TestHelper.Monkey.Extensions;
 using TestHelper.Monkey.ScreenPointStrategies;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace TestHelper.Monkey
 {
@@ -17,18 +20,37 @@ namespace TestHelper.Monkey
     public class GameObjectFinder
     {
         private readonly double _timeoutSeconds;
-        private readonly Func<GameObject, Vector2> _screenPointStrategy;
+        private readonly Func<GameObject, Vector2> _getScreenPoint;
+        private readonly Func<Component, bool> _isComponentInteractable;
+        private readonly Func<GameObject, Func<Component, bool>, bool> _isGameObjectInteractable;
+        private readonly Func<GameObject, PointerEventData, List<RaycastResult>, bool> _isReachable;
+        private readonly PointerEventData _eventData = new PointerEventData(EventSystem.current);
+        private readonly List<RaycastResult> _results = new List<RaycastResult>();
 
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="timeoutSeconds">Seconds to wait until <c>GameObject</c> appear.</param>
-        /// <param name="screenPointStrategy">The function returns the screen position where raycast for the found <c>GameObject</c>.
+        /// <param name="getScreenPoint">The function returns the screen position where raycast for the found <c>GameObject</c>.
         /// Default is <c>DefaultScreenPointStrategy.GetScreenPoint</c>.</param>
-        public GameObjectFinder(double timeoutSeconds = 1.0d, Func<GameObject, Vector2> screenPointStrategy = null)
+        /// <param name="isComponentInteractable">The function returns the <c>Component</c> is interactable or not.
+        /// Default is <c>DefaultComponentInteractableStrategy.IsInteractable</c>.</param>
+        /// <param name="isGameObjectInteractable">The function returns the <c>GameObject</c> is interactable or not.
+        /// Default is <c>DefaultGameObjectInteractableStrategy.IsInteractable</c>.</param>
+        /// <param name="isReachable">The function returns the <c>GameObject</c> is reachable from user or not.
+        /// Default is <c>DefaultReachableStrategy.IsReachable</c>.</param>
+        public GameObjectFinder(double timeoutSeconds = 1.0d,
+            Func<GameObject, Vector2> getScreenPoint = null,
+            Func<Component, bool> isComponentInteractable = null,
+            Func<GameObject, Func<Component, bool>, bool> isGameObjectInteractable = null,
+            Func<GameObject, PointerEventData, List<RaycastResult>, bool> isReachable = null)
         {
             _timeoutSeconds = timeoutSeconds;
-            _screenPointStrategy = screenPointStrategy ?? DefaultScreenPointStrategy.GetScreenPoint;
+            _getScreenPoint = getScreenPoint ?? DefaultScreenPointStrategy.GetScreenPoint;
+            _isComponentInteractable = isComponentInteractable ?? DefaultComponentInteractableStrategy.IsInteractable;
+            _isGameObjectInteractable =
+                isGameObjectInteractable ?? DefaultGameObjectInteractableStrategy.IsInteractable;
+            _isReachable = isReachable ?? DefaultReachableStrategy.IsReachable;
         }
 
         private enum Reason
@@ -49,14 +71,21 @@ namespace TestHelper.Monkey
                 return (null, Reason.NotFound);
             }
 
-            if (reachable && !foundObject.IsReachable(_screenPointStrategy))
+            if (reachable)
             {
-                return (null, Reason.NotReachable);
+                _eventData.position = _getScreenPoint(foundObject);
+                if (!_isReachable.Invoke(foundObject, _eventData, _results))
+                {
+                    return (null, Reason.NotReachable);
+                }
             }
 
-            if (interactable && !foundObject.IsInteractable())
+            if (interactable)
             {
-                return (null, Reason.NotInteractable);
+                if (!_isGameObjectInteractable.Invoke(foundObject, _isComponentInteractable))
+                {
+                    return (null, Reason.NotInteractable);
+                }
             }
 
             return (foundObject, Reason.None);

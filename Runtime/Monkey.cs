@@ -6,10 +6,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using TestHelper.Monkey.Extensions;
+using TestHelper.Monkey.DefaultStrategies;
 using TestHelper.Random;
 using TestHelper.RuntimeInternals;
 using UnityEngine;
+using UnityEngine.Assertions;
+using UnityEngine.EventSystems;
 
 namespace TestHelper.Monkey
 {
@@ -57,7 +59,7 @@ namespace TestHelper.Monkey
                     }
                     else if (config.SecondsToErrorForNoInteractiveComponent > 0)
                     {
-                        UnityEngine.Assertions.Assert.IsTrue(
+                        Assert.IsTrue(
                             (Time.time - lastOperationTime) < config.SecondsToErrorForNoInteractiveComponent,
                             $"Interactive component not found in {config.SecondsToErrorForNoInteractiveComponent} seconds"
                         );
@@ -127,6 +129,11 @@ namespace TestHelper.Monkey
                 return null;
             }
 
+            Func<GameObject, PointerEventData, List<RaycastResult>, bool> isReachable =
+                DefaultReachableStrategy.IsReachable;
+            var eventData = new PointerEventData(EventSystem.current);
+            var results = new List<RaycastResult>();
+
             while (true)
             {
                 if (components.Count == 0)
@@ -135,7 +142,8 @@ namespace TestHelper.Monkey
                 }
 
                 var next = components[random.Next(components.Count)];
-                if (next.gameObject.IsReachable(screenPointStrategy) && GetCanOperations(next).Any())
+                eventData.position = screenPointStrategy(next.gameObject);
+                if (isReachable(next.gameObject, eventData, results) && GetCanOperations(next).Any())
                 {
                     return next;
                 }
