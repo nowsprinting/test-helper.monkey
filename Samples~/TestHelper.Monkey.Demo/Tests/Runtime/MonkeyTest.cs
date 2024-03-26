@@ -13,7 +13,7 @@ namespace TestHelper.Monkey.Demo
     public class MonkeyTest
     {
         [Test]
-        [LoadScene("Assets/Samples/Monkey Test Helper/0.8.0/Demo/Scenes/Demo.unity")]
+        [LoadScene("Assets/Samples/Monkey Test Helper/0.8.1/Demo/Scenes/Demo.unity")]
         public async Task Run()
         {
             var config = new MonkeyConfig
