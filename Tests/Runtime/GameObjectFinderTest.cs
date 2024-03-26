@@ -2,7 +2,9 @@
 // This software is released under the MIT License.
 
 using System;
+using System.IO;
 using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
 using UnityEngine;
