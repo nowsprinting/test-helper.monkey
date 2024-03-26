@@ -1,15 +1,17 @@
 // Copyright (c) 2023-2024 Koji Hasegawa.
 // This software is released under the MIT License.
 
-using System;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-namespace TestHelper.Monkey.Extensions
+namespace TestHelper.Monkey.DefaultStrategies
 {
-    public static class ComponentExtensions
+    /// <summary>
+    /// Default strategy to examine whether Component is interactable.
+    /// </summary>
+    public static class DefaultComponentInteractableStrategy
     {
         /// <summary>
         /// Make sure the <c>Component</c> is interactable.
@@ -20,8 +22,7 @@ namespace TestHelper.Monkey.Extensions
         /// </summary>
         /// <param name="component"></param>
         /// <returns>True if this Component is interactable</returns>
-        [Obsolete("Use DefaultComponentInteractableStrategy instead.")]
-        public static bool IsInteractable(this Component component)
+        public static bool IsInteractable(Component component)
         {
             // UI element
             var selectable = component as Selectable;

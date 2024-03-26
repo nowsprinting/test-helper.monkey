@@ -67,6 +67,7 @@ namespace TestHelper.Monkey.Extensions
         /// <param name="eventData">Specify if avoid GC memory allocation</param>
         /// <param name="results">Specify if avoid GC memory allocation</param>
         /// <returns>True if this GameObject is reachable from user</returns>
+        [Obsolete("Use DefaultReachableStrategy instead.")]
         public static bool IsReachable(this GameObject gameObject,
             Func<GameObject, Vector2> screenPointStrategy = null,
             PointerEventData eventData = null,
@@ -110,6 +111,7 @@ namespace TestHelper.Monkey.Extensions
         /// </summary>
         /// <param name="gameObject"></param>
         /// <returns>True if this GameObject is interactable</returns>
+        [Obsolete("Use DefaultGameObjectInteractableStrategy instead.")]
         public static bool IsInteractable(this GameObject gameObject)
         {
             return gameObject.GetComponents<MonoBehaviour>().Any(x => x.IsInteractable());
