@@ -6,7 +6,7 @@ using TestHelper.Monkey.Hints;
 using UnityEditor;
 using UnityEngine;
 
-namespace Editor.UI
+namespace TestHelper.Monkey.Editor.UI.Hints
 {
     /// <summary>
     /// Gizmo Drawer for <c cref="InteractiveComponentHint" />

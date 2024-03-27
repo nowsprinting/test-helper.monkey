@@ -6,7 +6,7 @@ using TestHelper.Monkey.Hints;
 using UnityEditor;
 using UnityEngine;
 
-namespace Editor.ContextMenu
+namespace TestHelper.Monkey.Editor.ContextMenu
 {
     /// <summary>
     /// Attaches interactive component hints
