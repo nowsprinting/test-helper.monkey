@@ -5,7 +5,7 @@ using TestHelper.Monkey.Hints;
 using UnityEditor;
 using UnityEngine;
 
-namespace TestHelper.Monkey.Editor.Hints
+namespace TestHelper.Monkey.Editor.UI.Hints
 {
     /// <summary>
     /// Custom editor for <c cref="InteractiveComponentHint" />
