@@ -2,10 +2,13 @@
 // This software is released under the MIT License.
 
 using System;
+using System.Collections.Generic;
+using TestHelper.Monkey.DefaultStrategies;
 using TestHelper.Monkey.Random;
 using TestHelper.Monkey.ScreenPointStrategies;
 using TestHelper.Random;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace TestHelper.Monkey
 {
@@ -53,6 +56,18 @@ namespace TestHelper.Monkey
         /// Function returns the screen position where monkey operators operate on for the specified gameObject
         /// </summary>
         public Func<GameObject, Vector2> ScreenPointStrategy { get; set; } = DefaultScreenPointStrategy.GetScreenPoint;
+
+        /// <summary>
+        /// Function returns the <c>GameObject</c> is reachable from user or not.
+        /// </summary>
+        public Func<GameObject, Func<GameObject, Vector2>, PointerEventData, List<RaycastResult>, bool>
+            IsReachable { get; set; } = DefaultReachableStrategy.IsReachable;
+
+        /// <summary>
+        /// Function returns the <c>Component</c> is interactable or not.
+        /// </summary>
+        public Func<Component, bool>
+            IsInteractable { get; set; } = DefaultComponentInteractableStrategy.IsInteractable;
 
         /// <summary>
         /// Function returns the random string generation parameters

@@ -45,9 +45,9 @@ namespace TestHelper.Monkey
             }
 
             var interactiveComponentCollector = new InteractiveComponentCollector(
-                getScreenPoint: config.ScreenPointStrategy
-            );
-            // TODO: Set other strategies
+                getScreenPoint: config.ScreenPointStrategy,
+                isReachable: config.IsReachable,
+                isInteractable: config.IsInteractable);
 
             config.Logger.Log($"Using {config.Random}");
 
