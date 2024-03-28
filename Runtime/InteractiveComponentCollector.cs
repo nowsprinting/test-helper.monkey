@@ -18,7 +18,10 @@ namespace TestHelper.Monkey
     public class InteractiveComponentCollector
     {
         private readonly Func<GameObject, Vector2> _getScreenPoint;
-        private readonly Func<GameObject, PointerEventData, List<RaycastResult>, bool> _isReachable;
+
+        private readonly Func<GameObject, Func<GameObject, Vector2>, PointerEventData, List<RaycastResult>, bool>
+            _isReachable;
+
         private readonly Func<Component, bool> _isInteractable;
         private readonly PointerEventData _eventData = new PointerEventData(EventSystem.current);
         private readonly List<RaycastResult> _results = new List<RaycastResult>();
@@ -34,7 +37,7 @@ namespace TestHelper.Monkey
         /// Default is <c>DefaultComponentInteractableStrategy.IsInteractable</c>.</param>
         public InteractiveComponentCollector(
             Func<GameObject, Vector2> getScreenPoint = null,
-            Func<GameObject, PointerEventData, List<RaycastResult>, bool> isReachable = null,
+            Func<GameObject, Func<GameObject, Vector2>, PointerEventData, List<RaycastResult>, bool> isReachable = null,
             Func<Component, bool> isInteractable = null)
         {
             _getScreenPoint = getScreenPoint ?? DefaultScreenPointStrategy.GetScreenPoint;
@@ -80,8 +83,7 @@ namespace TestHelper.Monkey
         {
             foreach (var interactiveComponent in FindInteractableComponents())
             {
-                _eventData.position = _getScreenPoint.Invoke(interactiveComponent.gameObject);
-                if (_isReachable.Invoke(interactiveComponent.gameObject, _eventData, _results))
+                if (_isReachable.Invoke(interactiveComponent.gameObject, _getScreenPoint, _eventData, _results))
                 {
                     yield return interactiveComponent;
                 }

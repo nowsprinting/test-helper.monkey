@@ -21,8 +21,11 @@ namespace TestHelper.Monkey
     {
         private readonly double _timeoutSeconds;
         private readonly Func<GameObject, Vector2> _getScreenPoint;
+
+        private readonly Func<GameObject, Func<GameObject, Vector2>, PointerEventData, List<RaycastResult>, bool>
+            _isReachable;
+
         private readonly Func<Component, bool> _isComponentInteractable;
-        private readonly Func<GameObject, PointerEventData, List<RaycastResult>, bool> _isReachable;
         private readonly PointerEventData _eventData = new PointerEventData(EventSystem.current);
         private readonly List<RaycastResult> _results = new List<RaycastResult>();
 
@@ -38,7 +41,7 @@ namespace TestHelper.Monkey
         /// Default is <c>DefaultComponentInteractableStrategy.IsInteractable</c>.</param>
         public GameObjectFinder(double timeoutSeconds = 1.0d,
             Func<GameObject, Vector2> getScreenPoint = null,
-            Func<GameObject, PointerEventData, List<RaycastResult>, bool> isReachable = null,
+            Func<GameObject, Func<GameObject, Vector2>, PointerEventData, List<RaycastResult>, bool> isReachable = null,
             Func<Component, bool> isComponentInteractable = null)
         {
             _timeoutSeconds = timeoutSeconds;
@@ -67,8 +70,7 @@ namespace TestHelper.Monkey
 
             if (reachable)
             {
-                _eventData.position = _getScreenPoint.Invoke(foundObject);
-                if (!_isReachable.Invoke(foundObject, _eventData, _results))
+                if (!_isReachable.Invoke(foundObject, _getScreenPoint, _eventData, _results))
                 {
                     return (null, Reason.NotReachable);
                 }
