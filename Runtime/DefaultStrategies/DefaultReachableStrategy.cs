@@ -1,7 +1,9 @@
 // Copyright (c) 2023-2024 Koji Hasegawa.
 // This software is released under the MIT License.
 
+using System;
 using System.Collections.Generic;
+using TestHelper.Monkey.ScreenPointStrategies;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -17,13 +19,22 @@ namespace TestHelper.Monkey.DefaultStrategies
         /// Hit test using raycaster
         /// </summary>
         /// <param name="gameObject"></param>
+        /// <param name="getScreenPoint">The function returns the screen position where raycast for the found <c>GameObject</c>.
+        /// Default is <c>DefaultScreenPointStrategy.GetScreenPoint</c>.</param>
         /// <param name="eventData">Specify if avoid GC memory allocation</param>
         /// <param name="results">Specify if avoid GC memory allocation</param>
         /// <returns>True if this GameObject is reachable from user</returns>
         public static bool IsReachable(GameObject gameObject,
-            PointerEventData eventData,
-            List<RaycastResult> results)
+            Func<GameObject, Vector2> getScreenPoint = null,
+            PointerEventData eventData = null,
+            List<RaycastResult> results = null)
         {
+            getScreenPoint = getScreenPoint ?? DefaultScreenPointStrategy.GetScreenPoint;
+
+            eventData = eventData ?? new PointerEventData(EventSystem.current);
+            eventData.position = getScreenPoint.Invoke(gameObject);
+
+            results = results ?? new List<RaycastResult>();
             results.Clear();
 
             EventSystem.current.RaycastAll(eventData, results);

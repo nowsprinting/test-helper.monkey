@@ -41,7 +41,10 @@ namespace TestHelper.Monkey
         public GameObject gameObject => component.gameObject;
 
         private readonly Func<GameObject, Vector2> _getScreenPoint;
-        private readonly Func<GameObject, PointerEventData, List<RaycastResult>, bool> _isReachable;
+
+        private readonly Func<GameObject, Func<GameObject, Vector2>, PointerEventData, List<RaycastResult>, bool>
+            _isReachable;
+
         private readonly PointerEventData _eventData = new PointerEventData(EventSystem.current);
         private readonly List<RaycastResult> _results = new List<RaycastResult>();
 
@@ -55,7 +58,7 @@ namespace TestHelper.Monkey
         /// Default is <c>DefaultReachableStrategy.IsReachable</c>.</param>
         public InteractiveComponent(MonoBehaviour component,
             Func<GameObject, Vector2> getScreenPoint = null,
-            Func<GameObject, PointerEventData, List<RaycastResult>, bool> isReachable = null)
+            Func<GameObject, Func<GameObject, Vector2>, PointerEventData, List<RaycastResult>, bool> isReachable = null)
         {
             this.component = component;
             _getScreenPoint = getScreenPoint ?? DefaultScreenPointStrategy.GetScreenPoint;
@@ -68,15 +71,15 @@ namespace TestHelper.Monkey
         /// <param name="gameObject"></param>
         /// <param name="getScreenPoint">The function returns the screen position where raycast for the found <c>GameObject</c>.
         /// Default is <c>DefaultScreenPointStrategy.GetScreenPoint</c>.</param>
-        /// <param name="isComponentInteractable">The function returns the <c>Component</c> is interactable or not.
-        /// Default is <c>DefaultComponentInteractableStrategy.IsInteractable</c>.</param>
         /// <param name="isReachable">The function returns the <c>GameObject</c> is reachable from user or not.
         /// Default is <c>DefaultReachableStrategy.IsReachable</c>.</param>
+        /// <param name="isComponentInteractable">The function returns the <c>Component</c> is interactable or not.
+        /// Default is <c>DefaultComponentInteractableStrategy.IsInteractable</c>.</param>
         /// <returns>Returns new InteractableComponent instance from GameObject. If GameObject is not interactable so, return null.</returns>
         public static InteractiveComponent CreateInteractableComponent(GameObject gameObject,
             Func<GameObject, Vector2> getScreenPoint = null,
-            Func<Component, bool> isComponentInteractable = null,
-            Func<GameObject, PointerEventData, List<RaycastResult>, bool> isReachable = null)
+            Func<GameObject, Func<GameObject, Vector2>, PointerEventData, List<RaycastResult>, bool> isReachable = null,
+            Func<Component, bool> isComponentInteractable = null)
         {
             getScreenPoint = getScreenPoint ?? DefaultScreenPointStrategy.GetScreenPoint;
             isComponentInteractable = isComponentInteractable ?? DefaultComponentInteractableStrategy.IsInteractable;
@@ -86,9 +89,7 @@ namespace TestHelper.Monkey
             {
                 if (isComponentInteractable.Invoke(component))
                 {
-                    return new InteractiveComponent(component,
-                        getScreenPoint,
-                        isReachable);
+                    return new InteractiveComponent(component, getScreenPoint, isReachable);
                 }
             }
 
@@ -115,8 +116,7 @@ namespace TestHelper.Monkey
         /// <returns>true: this object can control by user</returns>
         public bool IsReachable()
         {
-            _eventData.position = _getScreenPoint.Invoke(gameObject);
-            return _isReachable.Invoke(gameObject, _eventData, _results);
+            return _isReachable.Invoke(gameObject, _getScreenPoint, _eventData, _results);
         }
 
         /// <summary>
@@ -150,7 +150,6 @@ namespace TestHelper.Monkey
         /// <summary>
         /// Touch-and-hold inner component
         /// </summary>
-        /// <param name="screenPointStrategy">Function returns the screen position where monkey operators operate on for the specified gameObject</param>
         /// <param name="delayMillis">Delay time between down to up</param>
         /// <param name="cancellationToken">Task cancellation token</param>
         public async UniTask TouchAndHold(int delayMillis = 1000, CancellationToken cancellationToken = default)
