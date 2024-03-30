@@ -1,5 +1,5 @@
 {
-    "name": "TestHelper.Monkey.Demo",
+    "name": "TestHelper.Monkey.Samples.UGUIDemo",
     "rootNamespace": "",
     "references": [
         "TestHelper.Monkey",

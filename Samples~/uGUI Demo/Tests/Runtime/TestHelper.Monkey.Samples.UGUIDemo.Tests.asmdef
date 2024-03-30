@@ -1,5 +1,5 @@
 {
-    "name": "TestHelper.Monkey.Demo.Tests",
+    "name": "TestHelper.Monkey.Samples.UGUIDemo.Tests",
     "rootNamespace": "",
     "references": [
         "UnityEngine.TestRunner",

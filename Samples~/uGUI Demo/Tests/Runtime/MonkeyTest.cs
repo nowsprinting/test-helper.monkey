@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
 
-namespace TestHelper.Monkey.Demo
+namespace TestHelper.Monkey.Samples.UGUIDemo
 {
     [TestFixture]
     [GameViewResolution(GameViewResolution.VGA)]
     public class MonkeyTest
     {
         [Test]
-        [LoadScene("Assets/Samples/Monkey Test Helper/0.9.0/Demo/Scenes/Demo.unity")]
+        [LoadScene("Assets/Samples/Monkey Test Helper/0.9.0/uGUI Demo/Scenes/uGUIDemo.unity")]
         public async Task Run()
         {
             var config = new MonkeyConfig

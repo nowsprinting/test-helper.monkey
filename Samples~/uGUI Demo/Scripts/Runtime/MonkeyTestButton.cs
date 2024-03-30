@@ -8,7 +8,7 @@ using TestHelper.Monkey.ScreenshotFilenameStrategies;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace TestHelper.Monkey.Demo
+namespace TestHelper.Monkey.Samples.UGUIDemo
 {
     /// <summary>
     /// Run/ Stop monkey testing.
