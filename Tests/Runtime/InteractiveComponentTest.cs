@@ -19,7 +19,7 @@ namespace TestHelper.Monkey
         public void CreateInteractableComponent_CreateInstance()
         {
             var button = new GameObject("InteractableButton").AddComponent<Button>();
-            var actual = InteractiveComponent.CreateInteractableComponent(button.gameObject);
+            var actual = InteractiveComponent.CreateInteractableComponent(button);
             Assert.That(actual, Is.Not.Null);
         }
 
@@ -28,7 +28,7 @@ namespace TestHelper.Monkey
         {
             var button = new GameObject("NotInteractableButton").AddComponent<Button>();
             button.interactable = false;
-            var actual = InteractiveComponent.CreateInteractableComponent(button.gameObject);
+            var actual = InteractiveComponent.CreateInteractableComponent(button);
             Assert.That(actual, Is.Null);
         }
 

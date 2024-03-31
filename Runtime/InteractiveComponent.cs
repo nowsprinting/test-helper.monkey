@@ -97,6 +97,7 @@ namespace TestHelper.Monkey
         /// <param name="isComponentInteractable">The function returns the <c>Component</c> is interactable or not.
         /// Default is <c>DefaultComponentInteractableStrategy.IsInteractable</c>.</param>
         /// <returns>Returns new InteractableComponent instance from GameObject. If GameObject is not interactable so, return null.</returns>
+        [Obsolete("Obsolete due to non-deterministic behavior when GameObject has multiple interactable components.")]
         public static InteractiveComponent CreateInteractableComponent(GameObject gameObject,
             Func<GameObject, Vector2> getScreenPoint = null,
             Func<GameObject, Func<GameObject, Vector2>, PointerEventData, List<RaycastResult>, bool> isReachable = null,

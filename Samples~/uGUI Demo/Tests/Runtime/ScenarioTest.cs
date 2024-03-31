@@ -4,6 +4,7 @@
 using System.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
+using UnityEngine.UI;
 
 namespace TestHelper.Monkey.Samples.UGUIDemo
 {
@@ -25,17 +26,23 @@ namespace TestHelper.Monkey.Samples.UGUIDemo
 
             // When click Start button, then open Home screen.
             var startButton = await _finder.FindByNameAsync("StartButton", interactable: true);
-            InteractiveComponent.CreateInteractableComponent(startButton).Click();
+            var startComponent = InteractiveComponent.CreateInteractableComponent(startButton.GetComponent<Button>());
+            Assume.That(startComponent.CanClick(), Is.True);
+            startComponent.Click();
             await _finder.FindByNameAsync("Home");
 
             // When click target button, then open target screen.
             var targetButton = await _finder.FindByNameAsync($"{target}Button", interactable: true);
-            InteractiveComponent.CreateInteractableComponent(targetButton).Click();
+            var targetComponent = InteractiveComponent.CreateInteractableComponent(targetButton.GetComponent<Button>());
+            Assume.That(targetComponent.CanClick(), Is.True);
+            targetComponent.Click();
             await _finder.FindByNameAsync(target);
 
             // When click Back button, then return Home screen.
             var backButton = await _finder.FindByPathAsync($"**/{target}/BackButton", interactable: true);
-            InteractiveComponent.CreateInteractableComponent(backButton).Click();
+            var backComponent = InteractiveComponent.CreateInteractableComponent(backButton.GetComponent<Button>());
+            Assume.That(backComponent.CanClick(), Is.True);
+            backComponent.Click();
             await _finder.FindByNameAsync("Home");
         }
     }
