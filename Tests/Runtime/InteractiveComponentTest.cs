@@ -47,7 +47,7 @@ namespace TestHelper.Monkey
             {
                 var gameObject = GameObject.Find("UsingEventTrigger");
                 var component = gameObject.GetComponent<EventTrigger>();
-                var sut = new InteractiveComponent(component);
+                var sut = InteractiveComponent.CreateInteractableComponent(component);
 
                 Assert.That(sut.component, Is.EqualTo(component));
                 Assert.That(sut.gameObject, Is.EqualTo(gameObject));

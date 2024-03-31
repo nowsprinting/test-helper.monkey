@@ -48,21 +48,42 @@ namespace TestHelper.Monkey
         private readonly PointerEventData _eventData = new PointerEventData(EventSystem.current);
         private readonly List<RaycastResult> _results = new List<RaycastResult>();
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <param name="component"></param>
-        /// <param name="getScreenPoint">The function returns the screen position where raycast for the found <c>GameObject</c>.
-        /// Default is <c>DefaultScreenPointStrategy.GetScreenPoint</c>.</param>
-        /// <param name="isReachable">The function returns the <c>GameObject</c> is reachable from user or not.
-        /// Default is <c>DefaultReachableStrategy.IsReachable</c>.</param>
-        public InteractiveComponent(MonoBehaviour component,
+        internal InteractiveComponent(MonoBehaviour component,
             Func<GameObject, Vector2> getScreenPoint = null,
             Func<GameObject, Func<GameObject, Vector2>, PointerEventData, List<RaycastResult>, bool> isReachable = null)
         {
             this.component = component;
             _getScreenPoint = getScreenPoint ?? DefaultScreenPointStrategy.GetScreenPoint;
             _isReachable = isReachable ?? DefaultReachableStrategy.IsReachable;
+        }
+
+        /// <summary>
+        /// Create <c>InteractableComponent</c> instance from MonoBehaviour.
+        /// </summary>
+        /// <param name="component"></param>
+        /// <param name="getScreenPoint">The function returns the screen position where raycast for the found <c>GameObject</c>.
+        /// Default is <c>DefaultScreenPointStrategy.GetScreenPoint</c>.</param>
+        /// <param name="isReachable">The function returns the <c>GameObject</c> is reachable from user or not.
+        /// Default is <c>DefaultReachableStrategy.IsReachable</c>.</param>
+        /// <param name="isComponentInteractable">The function returns the <c>Component</c> is interactable or not.
+        /// Default is <c>DefaultComponentInteractableStrategy.IsInteractable</c>.</param>
+        /// <returns>Returns new InteractableComponent instance from MonoBehaviour. If MonoBehaviour is not interactable so, return null.</returns>
+        public static InteractiveComponent CreateInteractableComponent(MonoBehaviour component,
+            Func<GameObject, Vector2> getScreenPoint = null,
+            Func<GameObject, Func<GameObject, Vector2>, PointerEventData, List<RaycastResult>, bool> isReachable = null,
+            Func<Component, bool> isComponentInteractable = null)
+        {
+            getScreenPoint = getScreenPoint ?? DefaultScreenPointStrategy.GetScreenPoint;
+            isReachable = isReachable ?? DefaultReachableStrategy.IsReachable;
+            isComponentInteractable = isComponentInteractable ?? DefaultComponentInteractableStrategy.IsInteractable;
+
+            if (isComponentInteractable.Invoke(component))
+            {
+                return new InteractiveComponent(component, getScreenPoint, isReachable);
+            }
+
+            Debug.LogWarning($"Component `{component}` is not interactable.");
+            return null;
         }
 
         /// <summary>
@@ -82,8 +103,8 @@ namespace TestHelper.Monkey
             Func<Component, bool> isComponentInteractable = null)
         {
             getScreenPoint = getScreenPoint ?? DefaultScreenPointStrategy.GetScreenPoint;
-            isComponentInteractable = isComponentInteractable ?? DefaultComponentInteractableStrategy.IsInteractable;
             isReachable = isReachable ?? DefaultReachableStrategy.IsReachable;
+            isComponentInteractable = isComponentInteractable ?? DefaultComponentInteractableStrategy.IsInteractable;
 
             foreach (var component in gameObject.GetComponents<MonoBehaviour>())
             {
@@ -93,6 +114,7 @@ namespace TestHelper.Monkey
                 }
             }
 
+            Debug.LogWarning($"GameObject `{gameObject}` has not interactable component.");
             return null;
         }
 
