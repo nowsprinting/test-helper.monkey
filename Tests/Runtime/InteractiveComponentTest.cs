@@ -24,12 +24,12 @@ namespace TestHelper.Monkey
         }
 
         [Test]
-        public void CreateInteractableComponent_NotInteractable_ReturnNull()
+        public void CreateInteractableComponent_NotInteractable_ThrowsException()
         {
             var button = new GameObject("NotInteractableButton").AddComponent<Button>();
             button.interactable = false;
-            var actual = InteractiveComponent.CreateInteractableComponent(button);
-            Assert.That(actual, Is.Null);
+            Assert.That(() => InteractiveComponent.CreateInteractableComponent(button), Throws.ArgumentException
+                .And.Message.Contains("Component is not interactable"));
         }
 
         /// <summary>

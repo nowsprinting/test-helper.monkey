@@ -82,8 +82,7 @@ namespace TestHelper.Monkey
                 return new InteractiveComponent(component, getScreenPoint, isReachable);
             }
 
-            Debug.LogWarning($"Component `{component}` is not interactable.");
-            return null;
+            throw new ArgumentException("Component is not interactable.");
         }
 
         /// <summary>
@@ -115,8 +114,7 @@ namespace TestHelper.Monkey
                 }
             }
 
-            Debug.LogWarning($"GameObject `{gameObject}` has not interactable component.");
-            return null;
+            throw new ArgumentException("GameObject has not interactable component.");
         }
 
         /// <summary>
