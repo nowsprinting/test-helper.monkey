@@ -58,7 +58,7 @@ namespace TestHelper.Monkey
             {
                 if (_isInteractable.Invoke(component))
                 {
-                    yield return new InteractiveComponent(component,
+                    yield return InteractiveComponent.CreateInteractableComponent(component,
                         _getScreenPoint,
                         _isReachable);
                 }
