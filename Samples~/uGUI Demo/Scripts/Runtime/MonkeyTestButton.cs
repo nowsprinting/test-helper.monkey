@@ -3,7 +3,7 @@
 
 using System;
 using System.Threading;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using TestHelper.Monkey.ScreenshotFilenameStrategies;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,36 +14,37 @@ namespace TestHelper.Monkey.Samples.UGUIDemo
     /// Run/ Stop monkey testing.
     /// </summary>
     [RequireComponent(typeof(Button))]
-    public class MonkeyController : MonoBehaviour
+    public class MonkeyTestButton : MonoBehaviour
     {
         public int lifetimeSeconds = 30;
         public int delayMillis = 200;
         public int secondsToErrorForNoInteractiveComponent = 5;
         public int touchAndHoldDelayMillis = 1000;
         public bool gizmos;
-        public bool screenshots;
+        public bool screenshots = true;
 
-        private bool _running;
         private Text _buttonLabel;
+
         private CancellationTokenSource _cts;
+        private bool IsRunning => _cts != null;
 
         private void Start()
         {
             var button = GetComponent<Button>();
-            button.onClick.AddListener(async () =>
+            button.onClick.AddListener(() =>
             {
-                await OnClick();
+                OnClick().Forget();
             });
             _buttonLabel = button.GetComponentInChildren<Text>();
         }
 
-        private async Task OnClick()
+        private async UniTask OnClick()
         {
-            if (_running)
+            if (IsRunning)
             {
                 _cts.Cancel();
                 _cts.Dispose();
-                _running = false;
+                _cts = null;
             }
             else
             {
@@ -55,19 +56,20 @@ namespace TestHelper.Monkey.Samples.UGUIDemo
                     TouchAndHoldDelayMillis = touchAndHoldDelayMillis,
                     Gizmos = gizmos,
                     Screenshots = screenshots
-                        ? new ScreenshotOptions() { FilenameStrategy = new CounterBasedStrategy("Demo") }
+                        ? new ScreenshotOptions() { FilenameStrategy = new CounterBasedStrategy("uGUI Demo") }
                         : null
                 };
+
                 _cts = new CancellationTokenSource();
-                _running = true;
                 await Monkey.Run(config, _cts.Token).SuppressCancellationThrow();
-                _running = false;
+                _cts.Dispose();
+                _cts = null;
             }
         }
 
         private void Update()
         {
-            _buttonLabel.text = _running ? "Stop monkey testing" : "Run monkey testing";
+            _buttonLabel.text = IsRunning ? "Stop monkey testing" : "Run monkey testing";
         }
     }
 }

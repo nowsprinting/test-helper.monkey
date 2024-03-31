@@ -17,10 +17,10 @@
     "Annotations",
     "Annotations*",
     "Documentation~",
-    "Runtime",
-    "Runtime*",
     "Editor",
     "Editor*",
+    "Runtime",
+    "Runtime*",
     "Samples~",
     "Tests",
     "Tests*",
@@ -40,7 +40,7 @@
   "samples": [
     {
       "displayName": "uGUI Demo",
-      "description": "Monkey testing demo for uGUI base app",
+      "description": "Monkey and scenario testing demo for uGUI based app",
       "path": "Samples~/uGUI Demo"
     }
   ],
