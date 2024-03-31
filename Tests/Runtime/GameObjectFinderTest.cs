@@ -2,9 +2,9 @@
 // This software is released under the MIT License.
 
 using System;
-using System.IO;
+using System.IO; // Do not remove, required for Unity 2022 or earlier
 using System.Threading.Tasks;
-using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks; // Do not remove, required for Unity 2022 or earlier
 using NUnit.Framework;
 using TestHelper.Attributes;
 using UnityEngine;
