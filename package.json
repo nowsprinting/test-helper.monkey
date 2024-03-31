@@ -17,10 +17,10 @@
     "Annotations",
     "Annotations*",
     "Documentation~",
-    "Runtime",
-    "Runtime*",
     "Editor",
     "Editor*",
+    "Runtime",
+    "Runtime*",
     "Samples~",
     "Tests",
     "Tests*",
@@ -39,9 +39,9 @@
   "repository": "https://github.com/nowsprinting/test-helper.monkey",
   "samples": [
     {
-      "displayName": "Demo",
-      "description": "Monkey testing demo app",
-      "path": "Samples~/TestHelper.Monkey.Demo"
+      "displayName": "uGUI Demo",
+      "description": "Monkey and scenario testing demo for uGUI based app",
+      "path": "Samples~/uGUI Demo"
     }
   ],
   "unity": "2019.4",
