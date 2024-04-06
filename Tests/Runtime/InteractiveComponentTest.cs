@@ -1,10 +1,12 @@
 ﻿// Copyright (c) 2023-2024 Koji Hasegawa.
 // This software is released under the MIT License.
 
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
+using TestHelper.Monkey.Operators;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -113,6 +115,26 @@ namespace TestHelper.Monkey
                     .First(x => x.gameObject.name == targetName);
 
                 Assert.That(target.IsReachable(), Is.False);
+            }
+
+            [Test]
+            [LoadScene(TestScene)]
+            public void FilterAvailableOperators_Button_GotClickOperator()
+            {
+                var clickOperator = new DefaultClickOperator();
+                var touchAndHoldOperator = new DefaultTouchAndHoldOperator();
+                var textInputOperator = new DefaultTextInputOperator();
+                IEnumerable<IOperator> operators = new IOperator[]
+                {
+                    clickOperator, touchAndHoldOperator, // Match
+                    textInputOperator, // Not match
+                };
+
+                var target = new InteractiveComponentCollector().FindInteractableComponents()
+                    .First(x => x.gameObject.name == "Button");
+                var actual = target.FilterAvailableOperators(operators);
+
+                Assert.That(actual, Is.EquivalentTo(new IOperator[] { clickOperator, touchAndHoldOperator }));
             }
         }
     }

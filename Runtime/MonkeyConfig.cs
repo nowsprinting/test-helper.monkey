@@ -1,10 +1,10 @@
-﻿// Copyright (c) 2023 Koji Hasegawa.
+﻿// Copyright (c) 2023-2024 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System;
 using System.Collections.Generic;
 using TestHelper.Monkey.DefaultStrategies;
-using TestHelper.Monkey.Random;
+using TestHelper.Monkey.Operators;
 using TestHelper.Monkey.ScreenPointStrategies;
 using TestHelper.Random;
 using UnityEngine;
@@ -35,17 +35,13 @@ namespace TestHelper.Monkey
         /// <summary>
         /// Delay time for touch-and-hold
         /// </summary>
+        [Obsolete]
         public int TouchAndHoldDelayMillis { get; set; } = 1000;
 
         /// <summary>
         /// Random number generator
         /// </summary>
         public IRandom Random { get; set; } = new RandomWrapper();
-
-        /// <summary>
-        /// Random string generator
-        /// </summary>
-        public IRandomString RandomString { get; set; } = new RandomStringImpl(new RandomWrapper());
 
         /// <summary>
         /// Logger
@@ -55,6 +51,7 @@ namespace TestHelper.Monkey
         /// <summary>
         /// Function returns the screen position where monkey operators operate on for the specified gameObject
         /// </summary>
+        [Obsolete]
         public Func<GameObject, Vector2> ScreenPointStrategy { get; set; } = DefaultScreenPointStrategy.GetScreenPoint;
 
         /// <summary>
@@ -66,26 +63,26 @@ namespace TestHelper.Monkey
         /// <summary>
         /// Function returns the <c>Component</c> is interactable or not.
         /// </summary>
-        public Func<Component, bool>
-            IsInteractable { get; set; } = DefaultComponentInteractableStrategy.IsInteractable;
-
-        /// <summary>
-        /// Function returns the random string generation parameters
-        /// </summary>
-        public Func<GameObject, RandomStringParameters> RandomStringParametersStrategy { get; set; } =
-            DefaultRandomStringParameterGen;
-
-        private static RandomStringParameters DefaultRandomStringParameterGen(GameObject _) =>
-            RandomStringParameters.Default;
+        public Func<Component, bool> IsInteractable { get; set; } = DefaultComponentInteractableStrategy.IsInteractable;
 
         /// <summary>
         /// Show Gizmos on <c>GameView</c> during running monkey test if true
         /// </summary>
-        public bool Gizmos { get; set; } = false;
+        public bool Gizmos { get; set; }
 
         /// <summary>
         /// Take screenshots during running the monkey test if set a <c>ScreenshotOptions</c> instance.
         /// </summary>
-        public ScreenshotOptions Screenshots { get; set; } = null;
+        public ScreenshotOptions Screenshots { get; set; }
+
+        /// <summary>
+        /// Operators that the monkey performs.
+        /// </summary>
+        public IEnumerable<IOperator> Operators { get; set; } = new IOperator[]
+        {
+            new DefaultClickOperator(), // Specify screen click point strategy as a constructor argument, if necessary
+            new DefaultTouchAndHoldOperator(), // Specify screen click point strategy and hold millis, if necessary
+            new DefaultTextInputOperator(), // Specify random text input strategy, if necessary
+        };
     }
 }

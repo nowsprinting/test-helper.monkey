@@ -194,7 +194,7 @@ namespace TestHelper.Monkey
             {
                 var random = new StubRandom(i);
                 var expected = components[i];
-                var actual = Monkey.Lottery(ref components, random);
+                var actual = Monkey.LotteryOperation(ref components, random);
 
                 Assert.That(actual.gameObject.name, Is.EqualTo(expected.gameObject.name));
             }
@@ -219,7 +219,7 @@ namespace TestHelper.Monkey
 
             var random = new StubRandom(0, 1);
             var expected = components[2];
-            var actual = Monkey.Lottery(ref components, random);
+            var actual = Monkey.LotteryOperation(ref components, random);
 
             Assert.That(actual.gameObject.name, Is.EqualTo(expected.gameObject.name));
             Assert.That(components, Has.Count.EqualTo(3)); // Removed not interactive objects.
@@ -237,7 +237,7 @@ namespace TestHelper.Monkey
             components[0].gameObject.SetActive(false);
 
             var random = new StubRandom(0);
-            var actual = Monkey.Lottery(ref components, random);
+            var actual = Monkey.LotteryOperation(ref components, random);
 
             Assert.That(actual, Is.Null);
             Assert.That(components, Has.Count.EqualTo(0)); // Removed not interactive objects.
@@ -255,7 +255,7 @@ namespace TestHelper.Monkey
             components[0].gameObject.AddComponent<IgnoreAnnotation>();
 
             var random = new StubRandom(0);
-            var actual = Monkey.Lottery(ref components, random);
+            var actual = Monkey.LotteryOperation(ref components, random);
 
             Assert.That(actual, Is.Null);
             Assert.That(components, Has.Count.EqualTo(0)); // Removed not interactive objects.
@@ -285,39 +285,9 @@ namespace TestHelper.Monkey
                 Logger = spyLogger,
             };
 
-            await Monkey.DoOperation(component, config);
+            await Monkey.Operate(component, config);
 
             Assert.That(spyLogger.Messages, Does.Contain($"Do operation {target} {operation}"));
-        }
-
-        [Test]
-        [LoadScene(TestScene)]
-        public async Task DoOperation_cancelDuringTouchAndHold_cancel()
-        {
-            const string Target = "UsingOnPointerDownUpHandler";
-            const int Index = 0;
-            const string Operation = "TouchAndHold";
-
-            var component = new InteractiveComponentCollector().FindInteractableComponents()
-                .First(x => x.gameObject.name == Target);
-            var spyLogger = new SpyLogger();
-            var config = new MonkeyConfig
-            {
-                TouchAndHoldDelayMillis = 1000, // 1sec
-                Random = new StubRandom(Index), // for lottery operation
-                Logger = spyLogger,
-            };
-            using (var cancellationTokenSource = new CancellationTokenSource())
-            {
-                var task = Monkey.DoOperation(component, config, cancellationTokenSource.Token);
-                await UniTask.Delay(100, DelayType.DeltaTime);
-
-                cancellationTokenSource.Cancel();
-                await UniTask.NextFrame();
-
-                Assert.That(task.Status, Is.EqualTo(UniTaskStatus.Canceled));
-                Assert.That(spyLogger.Messages, Does.Contain($"Do operation {Target} {Operation}"));
-            }
         }
 
         [TestCaseSource(nameof(s_componentAndOperations))]

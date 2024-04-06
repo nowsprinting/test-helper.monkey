@@ -34,7 +34,6 @@ namespace TestHelper.Monkey.Annotations
             {
                 Lifetime = TimeSpan.FromMilliseconds(500), // 500ms
                 DelayMillis = 1, // 1ms
-                TouchAndHoldDelayMillis = 1, // 1ms
             };
             await Monkey.Run(config); // as successful if no LogError output
         }
@@ -55,7 +54,6 @@ namespace TestHelper.Monkey.Annotations
             {
                 Lifetime = TimeSpan.FromMilliseconds(500), // 500ms
                 DelayMillis = 1, // 1ms
-                TouchAndHoldDelayMillis = 1, // 1ms
             };
             await Monkey.Run(config); // as successful if no LogError output
         }
@@ -76,7 +74,6 @@ namespace TestHelper.Monkey.Annotations
             {
                 Lifetime = TimeSpan.FromMilliseconds(500), // 500ms
                 DelayMillis = 1, // 1ms
-                TouchAndHoldDelayMillis = 1, // 1ms
             };
             await Monkey.Run(config); // as successful if no LogError output
         }

@@ -4,8 +4,10 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using TestHelper.Monkey.DefaultStrategies;
 using TestHelper.Monkey.Extensions;
+using TestHelper.Monkey.Operators;
 using TestHelper.Monkey.ScreenPointStrategies;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -44,7 +46,7 @@ namespace TestHelper.Monkey
         private readonly PointerEventData _eventData = new PointerEventData(EventSystem.current);
         private readonly List<RaycastResult> _results = new List<RaycastResult>();
 
-        internal InteractiveComponent(MonoBehaviour component,
+        private InteractiveComponent(MonoBehaviour component,
             Func<GameObject, Vector2> getScreenPoint = null,
             Func<GameObject, Func<GameObject, Vector2>, PointerEventData, List<RaycastResult>, bool> isReachable = null)
         {
@@ -134,6 +136,16 @@ namespace TestHelper.Monkey
         public bool IsReachable()
         {
             return _isReachable.Invoke(gameObject, _getScreenPoint, _eventData, _results);
+        }
+
+        /// <summary>
+        /// Returns only available operators myself.
+        /// </summary>
+        /// <param name="operators"></param>
+        /// <returns>Available operators myself</returns>
+        public IEnumerable<IOperator> FilterAvailableOperators(IEnumerable<IOperator> operators)
+        {
+            return operators.Where(iOperator => iOperator.IsMatch(component));
         }
     }
 }

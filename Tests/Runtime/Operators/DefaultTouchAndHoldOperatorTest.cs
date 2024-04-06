@@ -2,9 +2,12 @@
 // This software is released under the MIT License.
 
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
+using TestHelper.Monkey.TestDoubles;
 using UnityEngine;
 using UnityEngine.TestTools;
 
@@ -41,6 +44,22 @@ namespace TestHelper.Monkey.Operators
                 .First(x => x.gameObject.name == targetName);
 
             Assert.That(_sut.IsMatch(target.component), Is.False);
+        }
+
+        [Test]
+        public async Task TouchAndHold_Cancel()
+        {
+            var stub = new GameObject("StubLogErrorWhenOnPointerUp").AddComponent<StubLogErrorWhenOnPointerUp>();
+            var target = InteractiveComponent.CreateInteractableComponent(stub);
+            Assume.That(_sut.IsMatch(target.component), Is.True);
+
+            var cancellationTokenSource = new CancellationTokenSource();
+            _sut.Operate(target.component, cancellationTokenSource.Token).Forget();
+            await UniTask.NextFrame();
+            cancellationTokenSource.Cancel(); // Not output LogError from StubLogErrorWhenOnPointerUp
+            await UniTask.NextFrame();
+
+            LogAssert.Expect(LogType.Log, $"{stub.gameObject.name}.OnPointerDown");
         }
     }
 }
