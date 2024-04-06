@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2023 Koji Hasegawa.
+﻿// Copyright (c) 2023-2024 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System.Linq;
@@ -7,7 +7,6 @@ using NUnit.Framework;
 using TestHelper.Attributes;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.TestTools;
 using UnityEngine.UI;
 
 namespace TestHelper.Monkey
@@ -114,19 +113,6 @@ namespace TestHelper.Monkey
                     .First(x => x.gameObject.name == targetName);
 
                 Assert.That(target.IsReachable(), Is.False);
-            }
-
-            [TestCase("Button", "ReceiveOnClick")]
-            [LoadScene(TestScene)]
-            public void Tap_Tapped(string targetName, string expectedMessage)
-            {
-                var target = new InteractiveComponentCollector().FindInteractableComponents()
-                    .First(x => x.gameObject.name == targetName);
-
-                Assert.That(target.CanTap(), Is.True);
-                target.Tap();
-
-                LogAssert.Expect(LogType.Log, $"{targetName}.{expectedMessage}");
             }
         }
     }

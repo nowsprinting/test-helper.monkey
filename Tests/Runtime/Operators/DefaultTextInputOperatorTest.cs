@@ -1,4 +1,4 @@
-// Copyright (c) 2023 Koji Hasegawa.
+// Copyright (c) 2023-2024 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System.Linq;
@@ -11,10 +11,13 @@ using UnityEngine.UI;
 namespace TestHelper.Monkey.Operators
 {
     [TestFixture]
-    public class TextInputOperatorTest
+    public class DefaultTextInputOperatorTest
     {
         private const string TestScene = "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/Operators.unity";
 
+        private readonly IOperator _sut = new DefaultTextInputOperator(
+            _ => RandomStringParameters.Default,
+            new StubRandomString("RANDOM"));
 
         [TestCase("InputField")]
         [LoadScene(TestScene)]
@@ -23,16 +26,11 @@ namespace TestHelper.Monkey.Operators
             var target = new InteractiveComponentCollector().FindInteractableComponents()
                 .First(x => x.gameObject.name == targetName);
 
-            Assert.That(target.CanTextInput(), Is.True);
-            Assert.That(target.component.TryGetComponent<InputField>(out var inputField));
+            Assume.That(_sut.IsMatch(target.component), Is.True);
+            _sut.Operate(target.component);
 
-            target.TextInput(
-                _ => RandomStringParameters.Default,
-                new StubRandomString("RANDOM")
-            );
-            Assert.That(inputField.text, Is.EqualTo("RANDOM"));
+            Assert.That(((InputField)target.component).text, Is.EqualTo("RANDOM"));
         }
-
 
         [TestCase("UsingPointerClickEventTrigger")]
         [TestCase("UsingOnPointerClickHandler")]
@@ -45,7 +43,7 @@ namespace TestHelper.Monkey.Operators
             var target = new InteractiveComponentCollector().FindInteractableComponents()
                 .First(x => x.gameObject.name == targetName);
 
-            Assert.That(target.CanTextInput(), Is.False);
+            Assert.That(_sut.IsMatch(target.component), Is.False);
         }
     }
 }

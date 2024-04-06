@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2023 Koji Hasegawa.
+﻿// Copyright (c) 2023-2024 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System.Linq;
@@ -10,9 +10,10 @@ using UnityEngine.TestTools;
 namespace TestHelper.Monkey.Operators
 {
     [TestFixture]
-    public class ClickOperatorTest
+    public class DefaultClickOperatorTest
     {
         private const string TestScene = "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/Operators.unity";
+        private readonly IOperator _sut = new DefaultClickOperator();
 
         [TestCase("UsingOnPointerClickHandler", "OnPointerClick")]
         [TestCase("UsingPointerClickEventTrigger", "ReceivePointerClick")]
@@ -22,8 +23,9 @@ namespace TestHelper.Monkey.Operators
             var target = new InteractiveComponentCollector().FindInteractableComponents()
                 .First(x => x.gameObject.name == targetName);
 
-            Assert.That(target.CanClick(), Is.True);
-            target.Click();
+            Assume.That(_sut.IsMatch(target.component), Is.True);
+            _sut.Operate(target.component);
+
             LogAssert.Expect(LogType.Log, $"{targetName}.{expectedMessage}");
         }
 
@@ -35,8 +37,9 @@ namespace TestHelper.Monkey.Operators
             var target = new InteractiveComponentCollector().FindInteractableComponents()
                 .First(x => x.gameObject.name == targetName);
 
-            Assert.That(target.CanTap(), Is.True);
-            target.Tap();
+            Assume.That(_sut.IsMatch(target.component), Is.True);
+            _sut.Operate(target.component);
+
             LogAssert.Expect(LogType.Log, $"{targetName}.{expectedMessage}");
         }
 
@@ -48,7 +51,7 @@ namespace TestHelper.Monkey.Operators
             var target = new InteractiveComponentCollector().FindInteractableComponents()
                 .First(x => x.gameObject.name == targetName);
 
-            Assert.That(target.CanClick(), Is.False);
+            Assert.That(_sut.IsMatch(target.component), Is.False);
         }
     }
 }
