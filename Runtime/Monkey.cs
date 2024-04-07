@@ -98,9 +98,8 @@ namespace TestHelper.Monkey
             InteractiveComponentCollector interactiveComponentCollector,
             CancellationToken cancellationToken = default)
         {
-            var components = interactiveComponentCollector.FindInteractableComponents();
-            var operators = components.SelectMany(x => x.GetOperators(), (x, o) => (x, o));
-            var (selectedComponent, selectedOperator) = LotteryOperation(operators.ToList(), config.Random);
+            var operators = GetOperators(interactiveComponentCollector);
+            var (selectedComponent, selectedOperator) = LotteryOperator(operators.ToList(), config.Random);
             if (selectedComponent == null || selectedOperator == null)
             {
                 return false;
@@ -127,11 +126,18 @@ namespace TestHelper.Monkey
             return true;
         }
 
-        internal static (InteractiveComponent, IOperator) LotteryOperation(
+        internal static IEnumerable<(InteractiveComponent, IOperator)> GetOperators(
+            InteractiveComponentCollector interactiveComponentCollector)
+        {
+            var components = interactiveComponentCollector.FindInteractableComponents();
+            return components.SelectMany(x => x.GetOperators(), (x, o) => (x, o));
+        }
+
+        internal static (InteractiveComponent, IOperator) LotteryOperator(
             List<(InteractiveComponent, IOperator)> operators,
             IRandom random)
         {
-            while (operators != null && operators.Count > 0)
+            while (operators.Count > 0)
             {
                 var (selectedComponent, selectedOperator) = operators[random.Next(operators.Count)];
                 if (selectedComponent.IsReachable())

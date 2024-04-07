@@ -5,18 +5,17 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
-using TestHelper.Monkey.Annotations;
+using TestHelper.Monkey.Operators;
 using TestHelper.Monkey.TestDoubles;
 using TestHelper.Random;
 using TestHelper.RuntimeInternals;
 using UnityEngine;
-using UnityEngine.EventSystems;
+using AssertionException = UnityEngine.Assertions.AssertionException;
 
 namespace TestHelper.Monkey
 {
@@ -25,6 +24,13 @@ namespace TestHelper.Monkey
     {
         private const string TestScene = "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/Operators.unity";
 
+        private readonly IEnumerable<IOperator> _operators = new IOperator[]
+        {
+            new UGUIClickOperator(), // click
+            new UGUIClickAndHoldOperator(1), // click and hold 1ms
+            new UGUITextInputOperator()
+        };
+
         [Test]
         [LoadScene(TestScene)]
         public async Task RunStep_finish()
@@ -32,10 +38,10 @@ namespace TestHelper.Monkey
             var config = new MonkeyConfig
             {
                 DelayMillis = 1, // 1ms
-                TouchAndHoldDelayMillis = 1, // 1ms
             };
 
-            var didAct = await Monkey.RunStep(config, new InteractiveComponentCollector());
+            var interactiveComponentCollector = new InteractiveComponentCollector(operators: _operators);
+            var didAct = await Monkey.RunStep(config, interactiveComponentCollector);
             Assert.That(didAct, Is.EqualTo(true));
         }
 
@@ -43,7 +49,7 @@ namespace TestHelper.Monkey
         [LoadScene(TestScene)]
         public async Task RunStep_noInteractiveComponent_abort()
         {
-            var interactiveComponentCollector = new InteractiveComponentCollector();
+            var interactiveComponentCollector = new InteractiveComponentCollector(operators: _operators);
             foreach (var component in interactiveComponentCollector.FindInteractableComponents())
             {
                 component.gameObject.SetActive(false);
@@ -52,7 +58,6 @@ namespace TestHelper.Monkey
             var config = new MonkeyConfig
             {
                 DelayMillis = 1, // 1ms
-                TouchAndHoldDelayMillis = 1, // 1ms
             };
 
             var didAct = await Monkey.RunStep(config, interactiveComponentCollector);
@@ -67,7 +72,7 @@ namespace TestHelper.Monkey
             {
                 Lifetime = TimeSpan.FromMilliseconds(200), // 200ms
                 DelayMillis = 1, // 1ms
-                TouchAndHoldDelayMillis = 1, // 1ms
+                Operators = _operators,
             };
             var task = Monkey.Run(config);
             await UniTask.Delay(1000, DelayType.DeltaTime);
@@ -116,7 +121,7 @@ namespace TestHelper.Monkey
                 await Monkey.Run(config);
                 Assert.Fail("AssertionException was not thrown");
             }
-            catch (UnityEngine.Assertions.AssertionException e)
+            catch (AssertionException e)
             {
                 Assert.That(e.Message, Does.Contain("Interactive component not found in 1 seconds"));
             }
@@ -136,7 +141,6 @@ namespace TestHelper.Monkey
             {
                 Lifetime = TimeSpan.FromSeconds(2), // 2sec
                 DelayMillis = 1, // 1ms
-                TouchAndHoldDelayMillis = 1, // 1ms
                 SecondsToErrorForNoInteractiveComponent = 0, // not detect error
             };
 
@@ -156,6 +160,7 @@ namespace TestHelper.Monkey
                 Lifetime = TimeSpan.FromSeconds(1), // 1sec
                 Random = new RandomWrapper(0), // pin seed
                 Logger = spyLogger,
+                Operators = _operators,
             };
 
             await Monkey.Run(config);
@@ -174,8 +179,8 @@ namespace TestHelper.Monkey
             {
                 Lifetime = TimeSpan.FromMilliseconds(200), // 200ms
                 DelayMillis = 1, // 1ms
-                TouchAndHoldDelayMillis = 1, // 1ms
                 Gizmos = true, // show Gizmos
+                Operators = _operators,
             };
             var task = Monkey.Run(config);
             await UniTask.Delay(1000, DelayType.DeltaTime);
@@ -186,128 +191,83 @@ namespace TestHelper.Monkey
 
         [Test]
         [LoadScene(TestScene)]
-        public void Lottery_hitInteractiveComponent_returnComponent()
+        public void GetOperators_GotAllInteractableComponentAndOperators()
         {
-            var interactiveComponentCollector = new InteractiveComponentCollector();
-            var components = interactiveComponentCollector.FindReachableInteractableComponents().ToList();
-            for (var i = 0; i < components.Count; i++)
+            var interactiveComponentCollector = new InteractiveComponentCollector(operators: _operators);
+            var operators = Monkey.GetOperators(interactiveComponentCollector);
+            var actual = new List<string>();
+            foreach (var (component, @operator) in operators)
             {
-                var random = new StubRandom(i);
-                var expected = components[i];
-                var actual = Monkey.LotteryOperation(ref components, random);
-
-                Assert.That(actual.gameObject.name, Is.EqualTo(expected.gameObject.name));
+                actual.Add(
+                    $"{component.gameObject.name}|{component.component.GetType().Name}|{@operator.GetType().Name}");
             }
+
+            var expected = new List<string>
+            {
+                "UsingOnPointerClickHandler|SpyOnPointerClickHandler|UGUIClickOperator",
+                "UsingPointerClickEventTrigger|EventTrigger|UGUIClickOperator",
+                "UsingOnPointerDownUpHandler|SpyOnPointerDownUpHandler|UGUIClickAndHoldOperator",
+                "UsingPointerDownUpEventTrigger|EventTrigger|UGUIClickAndHoldOperator",
+                "UsingMultipleEventTriggers|EventTrigger|UGUIClickOperator",
+                "UsingMultipleEventTriggers|EventTrigger|UGUIClickAndHoldOperator",
+                "DestroyItselfIfPointerDown|StubDestroyingItselfWhenPointerDown|UGUIClickAndHoldOperator",
+                "InputField|InputField|UGUIClickOperator",
+                "InputField|InputField|UGUIClickAndHoldOperator",
+                "InputField|InputField|UGUITextInputOperator",
+            };
+
+            Assert.That(actual, Is.EquivalentTo(expected));
         }
 
         [Test]
-        [LoadScene(TestScene)]
-        public void Lottery_hitNotInteractiveComponent_returnNextLotteryComponent()
+        public void LotteryOperator_NothingOperators_ReturnNull()
         {
-            var components = new List<InteractiveComponent>()
-            {
-                InteractiveComponent.CreateInteractableComponent(
-                    GameObject.Find("UsingOnPointerClickHandler").GetComponent<SpyOnPointerClickHandler>()),
-                InteractiveComponent.CreateInteractableComponent(
-                    GameObject.Find("UsingPointerClickEventTrigger").GetComponent<EventTrigger>()),
-                InteractiveComponent.CreateInteractableComponent(
-                    GameObject.Find("UsingOnPointerDownUpHandler").GetComponent<SpyOnPointerDownUpHandler>()),
-                InteractiveComponent.CreateInteractableComponent(
-                    GameObject.Find("UsingPointerDownUpEventTrigger").GetComponent<EventTrigger>()),
-            };
-            components[0].gameObject.SetActive(false);
-
-            var random = new StubRandom(0, 1);
-            var expected = components[2];
-            var actual = Monkey.LotteryOperation(ref components, random);
-
-            Assert.That(actual.gameObject.name, Is.EqualTo(expected.gameObject.name));
-            Assert.That(components, Has.Count.EqualTo(3)); // Removed not interactive objects.
-        }
-
-        [Test]
-        [LoadScene(TestScene)]
-        public void Lottery_noInteractiveComponent_returnNull()
-        {
-            var components = new List<InteractiveComponent>()
-            {
-                InteractiveComponent.CreateInteractableComponent(
-                    GameObject.Find("UsingOnPointerClickHandler").GetComponent<SpyOnPointerClickHandler>()),
-            };
-            components[0].gameObject.SetActive(false);
-
+            var operators = new List<(InteractiveComponent, IOperator)>();
             var random = new StubRandom(0);
-            var actual = Monkey.LotteryOperation(ref components, random);
+            var actual = Monkey.LotteryOperator(operators, random);
 
-            Assert.That(actual, Is.Null);
-            Assert.That(components, Has.Count.EqualTo(0)); // Removed not interactive objects.
+            Assert.That(actual.Item1, Is.Null, "InteractiveComponent is null");
+            Assert.That(actual.Item2, Is.Null, "Operator is null");
         }
 
         [Test]
-        [LoadScene(TestScene)]
-        public void Lottery_withIgnoreAnnotation_returnNull()
+        [LoadScene("Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/PhysicsRaycasterSandbox.unity")]
+        public void LotteryOperator_NotReachableComponentOnly_ReturnNull()
         {
-            var components = new List<InteractiveComponent>()
+            var cube = GameObject.Find("Cube");
+            var clickable = cube.AddComponent<SpyOnPointerClickHandler>();
+            clickable.transform.position = new Vector3(0, 0, -20); // out of sight
+
+            var operators = new List<(InteractiveComponent, IOperator)>()
             {
-                InteractiveComponent.CreateInteractableComponent(
-                    GameObject.Find("UsingMultipleEventTriggers").GetComponent<EventTrigger>()),
+                (InteractiveComponent.CreateInteractableComponent(clickable), new UGUIClickOperator()),
             };
-            components[0].gameObject.AddComponent<IgnoreAnnotation>();
+            var random = new RandomWrapper();
+            var actual = Monkey.LotteryOperator(operators, random);
 
-            var random = new StubRandom(0);
-            var actual = Monkey.LotteryOperation(ref components, random);
-
-            Assert.That(actual, Is.Null);
-            Assert.That(components, Has.Count.EqualTo(0)); // Removed not interactive objects.
+            Assert.That(actual.Item1, Is.Null, "InteractiveComponent is null");
+            Assert.That(actual.Item2, Is.Null, "Operator is null");
         }
 
-        private static object[][] s_componentAndOperations = new[]
+        [Test]
+        [LoadScene("Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/PhysicsRaycasterSandbox.unity")]
+        public void LotteryOperator_BingoReachableComponent_ReturnOperator()
         {
-            new object[] { "UsingOnPointerClickHandler", 0, "Click" },
-            new object[] { "UsingPointerClickEventTrigger", 0, "Click" },
-            new object[] { "UsingOnPointerDownUpHandler", 0, "TouchAndHold" },
-            new object[] { "UsingPointerDownUpEventTrigger", 0, "TouchAndHold" },
-            new object[] { "UsingMultipleEventTriggers", 0, "Click" },
-            new object[] { "UsingMultipleEventTriggers", 1, "TouchAndHold" },
-        };
+            var cube = GameObject.Find("Cube");
+            var clickable = cube.AddComponent<SpyOnPointerClickHandler>();
+            var clickOperator = new UGUIClickOperator();
 
-        [TestCaseSource(nameof(s_componentAndOperations))]
-        [LoadScene(TestScene)]
-        public async Task DoOperation_invokeOperationByLottery(string target, int index, string operation)
-        {
-            var component = new InteractiveComponentCollector().FindInteractableComponents()
-                .First(x => x.gameObject.name == target);
-            var spyLogger = new SpyLogger();
-            var config = new MonkeyConfig
+            var operators = new List<(InteractiveComponent, IOperator)>()
             {
-                TouchAndHoldDelayMillis = 1, // 1ms
-                Random = new StubRandom(index), // for lottery operation
-                Logger = spyLogger,
+                (null, null), // dummy
+                (InteractiveComponent.CreateInteractableComponent(clickable), clickOperator),
+                (null, null), // dummy
             };
+            var random = new StubRandom(new int[] { 1 });
+            var actual = Monkey.LotteryOperator(operators, random);
 
-            await Monkey.Operate(component, config);
-
-            Assert.That(spyLogger.Messages, Does.Contain($"Do operation {target} {operation}"));
-        }
-
-        [TestCaseSource(nameof(s_componentAndOperations))]
-        [Category("IgnoreCI")] // Ignore on CI due to low fps
-        [LoadScene(TestScene)]
-        public async Task Run_lotteryComponentsAndOperations(string target, int _, string operation)
-        {
-            var spyLogger = new SpyLogger();
-            var config = new MonkeyConfig
-            {
-                Lifetime = TimeSpan.FromSeconds(2), // 2sec
-                DelayMillis = 1, // 1ms
-                TouchAndHoldDelayMillis = 1, // 1ms
-                Random = new RandomWrapper(0), // pin seed
-                Logger = spyLogger,
-            };
-
-            await Monkey.Run(config);
-
-            Assert.That(spyLogger.Messages, Does.Contain($"Do operation {target} {operation}"));
+            Assert.That(actual.Item1.component, Is.EqualTo(clickable));
+            Assert.That(actual.Item2, Is.EqualTo(clickOperator));
         }
 
         [TestFixture]
@@ -335,7 +295,6 @@ namespace TestHelper.Monkey
                 {
                     Lifetime = TimeSpan.FromMilliseconds(200), // 200ms
                     DelayMillis = 1, // 1ms
-                    TouchAndHoldDelayMillis = 1, // 1ms
                     Screenshots = new ScreenshotOptions() // take screenshots and save files
                 };
                 await Monkey.Run(config);
@@ -363,7 +322,6 @@ namespace TestHelper.Monkey
                 {
                     Lifetime = TimeSpan.FromMilliseconds(200), // 200ms
                     DelayMillis = 1, // 1ms
-                    TouchAndHoldDelayMillis = 1, // 1ms
                     Screenshots = new ScreenshotOptions()
                     {
                         Directory = relativeDirectory,
@@ -395,7 +353,6 @@ namespace TestHelper.Monkey
                 {
                     Lifetime = TimeSpan.FromMilliseconds(200), // 200ms
                     DelayMillis = 1, // 1ms
-                    TouchAndHoldDelayMillis = 1, // 1ms
                     Screenshots = new ScreenshotOptions()
                     {
                         SuperSize = 2, // 2x size
@@ -427,7 +384,6 @@ namespace TestHelper.Monkey
                 {
                     Lifetime = TimeSpan.FromMilliseconds(200), // 200ms
                     DelayMillis = 1, // 1ms
-                    TouchAndHoldDelayMillis = 1, // 1ms
                     Screenshots = new ScreenshotOptions()
                     {
                         StereoCaptureMode = ScreenCapture.StereoScreenCaptureMode.BothEyes,
