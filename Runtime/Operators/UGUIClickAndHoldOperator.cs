@@ -13,9 +13,10 @@ using UnityEngine.EventSystems;
 namespace TestHelper.Monkey.Operators
 {
     /// <summary>
-    /// Touch and hold operator.
+    /// Click and hold operator for Unity UI (uGUI) components.
+    /// a.k.a. touch and hold, long press.
     /// </summary>
-    public class DefaultTouchAndHoldOperator : IOperator
+    public class UGUIClickAndHoldOperator : IOperator
     {
         private readonly int _holdMillis;
         private readonly Func<GameObject, Vector2> _getScreenPoint;
@@ -26,11 +27,14 @@ namespace TestHelper.Monkey.Operators
         /// </summary>
         /// <param name="holdMillis">Hold time in milliseconds</param>
         /// <param name="getScreenPoint">The function returns the screen click position. Default is <c>DefaultScreenPointStrategy.GetScreenPoint</c>.</param>
-        public DefaultTouchAndHoldOperator(int holdMillis = 1000, Func<GameObject, Vector2> getScreenPoint = null)
+        public UGUIClickAndHoldOperator(int holdMillis = 1000, Func<GameObject, Vector2> getScreenPoint = null)
         {
             this._holdMillis = holdMillis;
             this._getScreenPoint = getScreenPoint ?? DefaultScreenPointStrategy.GetScreenPoint;
         }
+
+        /// <inheritdoc />
+        public OperatorType Type => OperatorType.ClickAndHold;
 
         /// <inheritdoc />
         public bool IsMatch(Component component)
@@ -51,7 +55,7 @@ namespace TestHelper.Monkey.Operators
         }
 
         /// <inheritdoc />
-        public async UniTask Operate(Component component, CancellationToken cancellationToken = default)
+        public async UniTask OperateAsync(Component component, CancellationToken cancellationToken = default)
         {
             if (!(component is IPointerDownHandler downHandler) || !(component is IPointerUpHandler upHandler))
             {

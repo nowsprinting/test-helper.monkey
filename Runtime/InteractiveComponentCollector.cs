@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using TestHelper.Monkey.DefaultStrategies;
+using TestHelper.Monkey.Operators;
 using TestHelper.Monkey.ScreenPointStrategies;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -23,6 +24,7 @@ namespace TestHelper.Monkey
             _isReachable;
 
         private readonly Func<Component, bool> _isInteractable;
+        private readonly IEnumerable<IOperator> _operators;
         private readonly PointerEventData _eventData = new PointerEventData(EventSystem.current);
         private readonly List<RaycastResult> _results = new List<RaycastResult>();
 
@@ -35,14 +37,17 @@ namespace TestHelper.Monkey
         /// Default is <c>DefaultReachableStrategy.IsReachable</c>.</param>
         /// <param name="isInteractable">The function returns the <c>Component</c> is interactable or not.
         /// Default is <c>DefaultComponentInteractableStrategy.IsInteractable</c>.</param>
+        /// <param name="operators">All available operators in autopilot/tests. Usually defined in <c>MonkeyConfig</c></param>
         public InteractiveComponentCollector(
             Func<GameObject, Vector2> getScreenPoint = null,
             Func<GameObject, Func<GameObject, Vector2>, PointerEventData, List<RaycastResult>, bool> isReachable = null,
-            Func<Component, bool> isInteractable = null)
+            Func<Component, bool> isInteractable = null,
+            IEnumerable<IOperator> operators = null)
         {
             _getScreenPoint = getScreenPoint ?? DefaultScreenPointStrategy.GetScreenPoint;
             _isReachable = isReachable ?? DefaultReachableStrategy.IsReachable;
             _isInteractable = isInteractable ?? DefaultComponentInteractableStrategy.IsInteractable;
+            _operators = operators;
         }
 
         /// <summary>
@@ -60,7 +65,9 @@ namespace TestHelper.Monkey
                 {
                     yield return InteractiveComponent.CreateInteractableComponent(component,
                         _getScreenPoint,
-                        _isReachable);
+                        _isReachable,
+                        _isInteractable,
+                        _operators);
                 }
             }
         }

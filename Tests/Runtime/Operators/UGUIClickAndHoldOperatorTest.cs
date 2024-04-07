@@ -14,52 +14,54 @@ using UnityEngine.TestTools;
 namespace TestHelper.Monkey.Operators
 {
     [TestFixture]
-    public class DefaultTouchAndHoldOperatorTest
+    public class UGUIClickAndHoldOperatorTest
     {
         private const string TestScene = "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/Operators.unity";
-        private readonly IOperator _sut = new DefaultTouchAndHoldOperator(holdMillis: 100);
+        private readonly IOperator _sut = new UGUIClickAndHoldOperator(holdMillis: 500);
 
         [TestCase("UsingOnPointerDownUpHandler", "OnPointerDown", "OnPointerUp")]
         [TestCase("UsingPointerDownUpEventTrigger", "ReceivePointerDown", "ReceivePointerUp")]
         [TestCase("DestroyItselfIfPointerDown", "OnPointerDown", "DestroyImmediate")]
         [LoadScene(TestScene)]
-        public async Task TouchAndHold(string targetName, string expectedMessage1, string expectedMessage2)
+        public async Task OperateAsync_InvokeOnPointerDownAndUp(string targetName, string expectedMessage1,
+            string expectedMessage2)
         {
             var target = new InteractiveComponentCollector().FindInteractableComponents()
                 .First(x => x.gameObject.name == targetName);
 
             Assume.That(_sut.IsMatch(target.component), Is.True);
-            await _sut.Operate(target.component);
+            await _sut.OperateAsync(target.component);
 
             LogAssert.Expect(LogType.Log, $"{targetName}.{expectedMessage1}");
             LogAssert.Expect(LogType.Log, $"{targetName}.{expectedMessage2}");
         }
 
-        [TestCase("UsingOnPointerClickHandler")]
-        [TestCase("UsingPointerClickEventTrigger")]
-        [LoadScene(TestScene)]
-        public void CanNotTouchAndHold(string targetName)
-        {
-            var target = new InteractiveComponentCollector().FindInteractableComponents()
-                .First(x => x.gameObject.name == targetName);
-
-            Assert.That(_sut.IsMatch(target.component), Is.False);
-        }
-
         [Test]
-        public async Task TouchAndHold_Cancel()
+        public async Task OperateAsync_Cancel()
         {
             var stub = new GameObject("StubLogErrorWhenOnPointerUp").AddComponent<StubLogErrorWhenOnPointerUp>();
             var target = InteractiveComponent.CreateInteractableComponent(stub);
             Assume.That(_sut.IsMatch(target.component), Is.True);
 
             var cancellationTokenSource = new CancellationTokenSource();
-            _sut.Operate(target.component, cancellationTokenSource.Token).Forget();
+            _sut.OperateAsync(target.component, cancellationTokenSource.Token).Forget();
             await UniTask.NextFrame();
+
             cancellationTokenSource.Cancel(); // Not output LogError from StubLogErrorWhenOnPointerUp
             await UniTask.NextFrame();
 
             LogAssert.Expect(LogType.Log, $"{stub.gameObject.name}.OnPointerDown");
+        }
+
+        [TestCase("UsingOnPointerClickHandler")]
+        [TestCase("UsingPointerClickEventTrigger")]
+        [LoadScene(TestScene)]
+        public void IsMatch_CanNotTouchAndHold_ReturnFalse(string targetName)
+        {
+            var target = new InteractiveComponentCollector().FindInteractableComponents()
+                .First(x => x.gameObject.name == targetName);
+
+            Assert.That(_sut.IsMatch(target.component), Is.False);
         }
     }
 }

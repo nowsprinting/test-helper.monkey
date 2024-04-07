@@ -10,35 +10,21 @@ using UnityEngine.TestTools;
 namespace TestHelper.Monkey.Operators
 {
     [TestFixture]
-    public class DefaultClickOperatorTest
+    public class UGUIClickOperatorTest
     {
         private const string TestScene = "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/Operators.unity";
-        private readonly IOperator _sut = new DefaultClickOperator();
+        private readonly IOperator _sut = new UGUIClickOperator();
 
         [TestCase("UsingOnPointerClickHandler", "OnPointerClick")]
         [TestCase("UsingPointerClickEventTrigger", "ReceivePointerClick")]
         [LoadScene(TestScene)]
-        public void Click(string targetName, string expectedMessage)
+        public void OperateAsync_InvokeOnClick(string targetName, string expectedMessage)
         {
             var target = new InteractiveComponentCollector().FindInteractableComponents()
                 .First(x => x.gameObject.name == targetName);
 
             Assume.That(_sut.IsMatch(target.component), Is.True);
-            _sut.Operate(target.component);
-
-            LogAssert.Expect(LogType.Log, $"{targetName}.{expectedMessage}");
-        }
-
-        [TestCase("UsingOnPointerClickHandler", "OnPointerClick")]
-        [TestCase("UsingPointerClickEventTrigger", "ReceivePointerClick")]
-        [LoadScene(TestScene)]
-        public void Tap(string targetName, string expectedMessage) // Same as Click
-        {
-            var target = new InteractiveComponentCollector().FindInteractableComponents()
-                .First(x => x.gameObject.name == targetName);
-
-            Assume.That(_sut.IsMatch(target.component), Is.True);
-            _sut.Operate(target.component);
+            _sut.OperateAsync(target.component);
 
             LogAssert.Expect(LogType.Log, $"{targetName}.{expectedMessage}");
         }
@@ -46,7 +32,7 @@ namespace TestHelper.Monkey.Operators
         [TestCase("UsingOnPointerDownUpHandler")]
         [TestCase("UsingPointerDownUpEventTrigger")]
         [LoadScene(TestScene)]
-        public void CanNotClick(string targetName)
+        public void IsMatch_CanNotClick_ReturnFalse(string targetName)
         {
             var target = new InteractiveComponentCollector().FindInteractableComponents()
                 .First(x => x.gameObject.name == targetName);

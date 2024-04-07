@@ -48,7 +48,8 @@ namespace TestHelper.Monkey
             var interactiveComponentCollector = new InteractiveComponentCollector(
                 getScreenPoint: config.ScreenPointStrategy,
                 isReachable: config.IsReachable,
-                isInteractable: config.IsInteractable);
+                isInteractable: config.IsInteractable,
+                operators: config.Operators);
 
             config.Logger.Log($"Using {config.Random}");
 
@@ -98,7 +99,7 @@ namespace TestHelper.Monkey
             CancellationToken cancellationToken = default)
         {
             var components = interactiveComponentCollector.FindInteractableComponents();
-            var operators = components.SelectMany(x => x.FilterAvailableOperators(config.Operators), (x, o) => (x, o));
+            var operators = components.SelectMany(x => x.GetOperators(), (x, o) => (x, o));
             var (selectedComponent, selectedOperator) = LotteryOperation(operators.ToList(), config.Random);
             if (selectedComponent == null || selectedOperator == null)
             {
@@ -122,7 +123,7 @@ namespace TestHelper.Monkey
             }
 
             config.Logger.Log($"{selectedOperator} operates to {selectedComponent.gameObject.name}");
-            await selectedOperator.Operate(selectedComponent.component, cancellationToken);
+            await selectedOperator.OperateAsync(selectedComponent.component, cancellationToken);
             return true;
         }
 

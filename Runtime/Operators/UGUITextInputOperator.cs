@@ -15,9 +15,9 @@ using UnityEngine.UI;
 namespace TestHelper.Monkey.Operators
 {
     /// <summary>
-    /// Text input operator for <c>InputField</c>.
+    /// Text input operator for Unity UI (uGUI) <c>InputField</c> component.
     /// </summary>
-    public class DefaultTextInputOperator : IOperator
+    public class UGUITextInputOperator : ITextInputOperator
     {
         private readonly Func<GameObject, RandomStringParameters> _randomStringParams;
         private readonly IRandomString _randomString;
@@ -27,13 +27,16 @@ namespace TestHelper.Monkey.Operators
         /// </summary>
         /// <param name="randomStringParams">Random string generation parameters</param>
         /// <param name="randomString">Random string generator</param>
-        public DefaultTextInputOperator(
+        public UGUITextInputOperator(
             Func<GameObject, RandomStringParameters> randomStringParams = null,
             IRandomString randomString = null)
         {
             _randomStringParams = randomStringParams ?? (_ => RandomStringParameters.Default);
             _randomString = randomString ?? new RandomStringImpl(new RandomWrapper());
         }
+
+        /// <inheritdoc />
+        public OperatorType Type => OperatorType.TextInput;
 
         /// <inheritdoc />
         public bool IsMatch(Component component)
@@ -47,7 +50,7 @@ namespace TestHelper.Monkey.Operators
         }
 
         /// <inheritdoc />
-        public async UniTask Operate(Component component, CancellationToken cancellationToken = default)
+        public async UniTask OperateAsync(Component component, CancellationToken cancellationToken = default)
         {
             if (!(component is InputField inputField))
             {
@@ -70,6 +73,18 @@ namespace TestHelper.Monkey.Operators
             }
 
             inputField.text = _randomString.Next(randomStringParams(component.gameObject));
+        }
+
+        /// <inheritdoc />
+        public async UniTask OperateAsync(Component component, string text,
+            CancellationToken cancellationToken = default)
+        {
+            if (!(component is InputField inputField))
+            {
+                throw new ArgumentException("Component must be InputField class.");
+            }
+
+            inputField.text = text;
         }
     }
 }

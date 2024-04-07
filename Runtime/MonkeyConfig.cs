@@ -80,9 +80,9 @@ namespace TestHelper.Monkey
         /// </summary>
         public IEnumerable<IOperator> Operators { get; set; } = new IOperator[]
         {
-            new DefaultClickOperator(), // Specify screen click point strategy as a constructor argument, if necessary
-            new DefaultTouchAndHoldOperator(), // Specify screen click point strategy and hold millis, if necessary
-            new DefaultTextInputOperator(), // Specify random text input strategy, if necessary
+            new UGUIClickOperator(), // Specify screen click point strategy as a constructor argument, if necessary
+            new UGUIClickAndHoldOperator(), // Specify screen click point strategy and hold millis, if necessary
+            new UGUITextInputOperator(), // Specify random text input strategy, if necessary
         };
     }
 }

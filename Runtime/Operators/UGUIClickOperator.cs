@@ -15,9 +15,9 @@ using UnityEngine.EventSystems;
 namespace TestHelper.Monkey.Operators
 {
     /// <summary>
-    /// Click operator.
+    /// Click (tap) operator for Unity UI (uGUI) components.
     /// </summary>
-    public class DefaultClickOperator : IOperator
+    public class UGUIClickOperator : IOperator
     {
         private readonly Func<GameObject, Vector2> _getScreenPoint;
         private readonly PointerEventData _eventData = new PointerEventData(EventSystem.current);
@@ -26,10 +26,13 @@ namespace TestHelper.Monkey.Operators
         /// Constructor.
         /// </summary>
         /// <param name="getScreenPoint">The function returns the screen click position. Default is <c>DefaultScreenPointStrategy.GetScreenPoint</c>.</param>
-        public DefaultClickOperator(Func<GameObject, Vector2> getScreenPoint = null)
+        public UGUIClickOperator(Func<GameObject, Vector2> getScreenPoint = null)
         {
             this._getScreenPoint = getScreenPoint ?? DefaultScreenPointStrategy.GetScreenPoint;
         }
+
+        /// <inheritdoc />
+        public OperatorType Type => OperatorType.Click;
 
         /// <inheritdoc />
         public bool IsMatch(Component component)
@@ -48,7 +51,7 @@ namespace TestHelper.Monkey.Operators
         }
 
         /// <inheritdoc />
-        public async UniTask Operate(Component component, CancellationToken cancellationToken = default)
+        public async UniTask OperateAsync(Component component, CancellationToken cancellationToken = default)
         {
             if (!(component is IPointerClickHandler handler))
             {

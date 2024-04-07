@@ -11,23 +11,23 @@ using UnityEngine.UI;
 namespace TestHelper.Monkey.Operators
 {
     [TestFixture]
-    public class DefaultTextInputOperatorTest
+    public class UGUITextInputOperatorTest
     {
         private const string TestScene = "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/Operators.unity";
 
-        private readonly IOperator _sut = new DefaultTextInputOperator(
+        private readonly IOperator _sut = new UGUITextInputOperator(
             _ => RandomStringParameters.Default,
             new StubRandomString("RANDOM"));
 
         [TestCase("InputField")]
         [LoadScene(TestScene)]
-        public void InputText(string targetName)
+        public void OperateAsync_InputText(string targetName)
         {
             var target = new InteractiveComponentCollector().FindInteractableComponents()
                 .First(x => x.gameObject.name == targetName);
 
             Assume.That(_sut.IsMatch(target.component), Is.True);
-            _sut.Operate(target.component);
+            _sut.OperateAsync(target.component);
 
             Assert.That(((InputField)target.component).text, Is.EqualTo("RANDOM"));
         }
@@ -38,7 +38,7 @@ namespace TestHelper.Monkey.Operators
         [TestCase("UsingPointerDownUpEventTrigger")]
         [TestCase("UsingMultipleEventTriggers")]
         [LoadScene(TestScene)]
-        public void CanNotInputText(string targetName)
+        public void IsMatch_CanNotInputText_ReturnFalse(string targetName)
         {
             var target = new InteractiveComponentCollector().FindInteractableComponents()
                 .First(x => x.gameObject.name == targetName);
