@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using TestHelper.Monkey.DefaultStrategies;
 using TestHelper.Monkey.Operators;
-using TestHelper.Monkey.ScreenPointStrategies;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using Object = UnityEngine.Object;
@@ -18,11 +17,7 @@ namespace TestHelper.Monkey
     // TODO: Rename to InteractableComponentsFinder
     public class InteractiveComponentCollector
     {
-        private readonly Func<GameObject, Vector2> _getScreenPoint;
-
-        private readonly Func<GameObject, Func<GameObject, Vector2>, PointerEventData, List<RaycastResult>, bool>
-            _isReachable;
-
+        private readonly Func<GameObject, PointerEventData, List<RaycastResult>, bool> _isReachable;
         private readonly Func<Component, bool> _isInteractable;
         private readonly IEnumerable<IOperator> _operators;
         private readonly PointerEventData _eventData = new PointerEventData(EventSystem.current);
@@ -31,20 +26,16 @@ namespace TestHelper.Monkey
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="getScreenPoint">The function returns the screen position where raycast for the found <c>GameObject</c>.
-        /// Default is <c>DefaultScreenPointStrategy.GetScreenPoint</c>.</param>
         /// <param name="isReachable">The function returns the <c>GameObject</c> is reachable from user or not.
         /// Default is <c>DefaultReachableStrategy.IsReachable</c>.</param>
         /// <param name="isInteractable">The function returns the <c>Component</c> is interactable or not.
         /// Default is <c>DefaultComponentInteractableStrategy.IsInteractable</c>.</param>
         /// <param name="operators">All available operators in autopilot/tests. Usually defined in <c>MonkeyConfig</c></param>
         public InteractiveComponentCollector(
-            Func<GameObject, Vector2> getScreenPoint = null,
-            Func<GameObject, Func<GameObject, Vector2>, PointerEventData, List<RaycastResult>, bool> isReachable = null,
+            Func<GameObject, PointerEventData, List<RaycastResult>, bool> isReachable = null,
             Func<Component, bool> isInteractable = null,
             IEnumerable<IOperator> operators = null)
         {
-            _getScreenPoint = getScreenPoint ?? DefaultScreenPointStrategy.GetScreenPoint;
             _isReachable = isReachable ?? DefaultReachableStrategy.IsReachable;
             _isInteractable = isInteractable ?? DefaultComponentInteractableStrategy.IsInteractable;
             _operators = operators;
@@ -64,7 +55,6 @@ namespace TestHelper.Monkey
                 if (_isInteractable.Invoke(component))
                 {
                     yield return InteractiveComponent.CreateInteractableComponent(component,
-                        _getScreenPoint,
                         _isReachable,
                         _isInteractable,
                         _operators);
@@ -90,7 +80,7 @@ namespace TestHelper.Monkey
         {
             foreach (var interactiveComponent in FindInteractableComponents())
             {
-                if (_isReachable.Invoke(interactiveComponent.gameObject, _getScreenPoint, _eventData, _results))
+                if (_isReachable.Invoke(interactiveComponent.gameObject, _eventData, _results))
                 {
                     yield return interactiveComponent;
                 }
@@ -101,7 +91,7 @@ namespace TestHelper.Monkey
         public static IEnumerable<InteractiveComponent> FindReallyInteractiveComponents(
             Func<GameObject, Vector2> screenPointStrategy)
         {
-            var instance = new InteractiveComponentCollector(getScreenPoint: screenPointStrategy);
+            var instance = new InteractiveComponentCollector();
             return instance.FindReachableInteractableComponents();
         }
 

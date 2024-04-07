@@ -46,7 +46,6 @@ namespace TestHelper.Monkey
             }
 
             var interactiveComponentCollector = new InteractiveComponentCollector(
-                getScreenPoint: config.ScreenPointStrategy,
                 isReachable: config.IsReachable,
                 isInteractable: config.IsInteractable,
                 operators: config.Operators);

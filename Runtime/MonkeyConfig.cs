@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using TestHelper.Monkey.DefaultStrategies;
 using TestHelper.Monkey.Operators;
-using TestHelper.Monkey.ScreenPointStrategies;
 using TestHelper.Random;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -33,12 +32,6 @@ namespace TestHelper.Monkey
         public int SecondsToErrorForNoInteractiveComponent { get; set; } = 5;
 
         /// <summary>
-        /// Delay time for touch-and-hold
-        /// </summary>
-        [Obsolete]
-        public int TouchAndHoldDelayMillis { get; set; } = 1000;
-
-        /// <summary>
         /// Random number generator
         /// </summary>
         public IRandom Random { get; set; } = new RandomWrapper();
@@ -49,16 +42,11 @@ namespace TestHelper.Monkey
         public ILogger Logger { get; set; } = Debug.unityLogger;
 
         /// <summary>
-        /// Function returns the screen position where monkey operators operate on for the specified gameObject
-        /// </summary>
-        [Obsolete]
-        public Func<GameObject, Vector2> ScreenPointStrategy { get; set; } = DefaultScreenPointStrategy.GetScreenPoint;
-
-        /// <summary>
         /// Function returns the <c>GameObject</c> is reachable from user or not.
+        /// This function is include ScreenPointStrategy (GetScreenPoint function).
         /// </summary>
-        public Func<GameObject, Func<GameObject, Vector2>, PointerEventData, List<RaycastResult>, bool>
-            IsReachable { get; set; } = DefaultReachableStrategy.IsReachable;
+        public Func<GameObject, PointerEventData, List<RaycastResult>, bool> IsReachable { get; set; } =
+            DefaultReachableStrategy.IsReachable;
 
         /// <summary>
         /// Function returns the <c>Component</c> is interactable or not.

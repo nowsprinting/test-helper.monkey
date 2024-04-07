@@ -14,25 +14,22 @@ namespace TestHelper.Monkey.DefaultStrategies
     /// </summary>
     public static class DefaultReachableStrategy
     {
+        private static Func<GameObject, Vector2> GetScreenPoint => DefaultScreenPointStrategy.GetScreenPoint;
+
         /// <summary>
         /// Make sure the <c>GameObject</c> is reachable from user.
         /// Hit test using raycaster
         /// </summary>
         /// <param name="gameObject"></param>
-        /// <param name="getScreenPoint">The function returns the screen position where raycast for the found <c>GameObject</c>.
-        /// Default is <c>DefaultScreenPointStrategy.GetScreenPoint</c>.</param>
         /// <param name="eventData">Specify if avoid GC memory allocation</param>
         /// <param name="results">Specify if avoid GC memory allocation</param>
         /// <returns>True if this GameObject is reachable from user</returns>
         public static bool IsReachable(GameObject gameObject,
-            Func<GameObject, Vector2> getScreenPoint = null,
             PointerEventData eventData = null,
             List<RaycastResult> results = null)
         {
-            getScreenPoint = getScreenPoint ?? DefaultScreenPointStrategy.GetScreenPoint;
-
             eventData = eventData ?? new PointerEventData(EventSystem.current);
-            eventData.position = getScreenPoint.Invoke(gameObject);
+            eventData.position = GetScreenPoint.Invoke(gameObject);
 
             results = results ?? new List<RaycastResult>();
             results.Clear();

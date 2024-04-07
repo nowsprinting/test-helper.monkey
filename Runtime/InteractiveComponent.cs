@@ -10,7 +10,6 @@ using Cysharp.Threading.Tasks;
 using TestHelper.Monkey.DefaultStrategies;
 using TestHelper.Monkey.Extensions;
 using TestHelper.Monkey.Operators;
-using TestHelper.Monkey.ScreenPointStrategies;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -40,22 +39,16 @@ namespace TestHelper.Monkey
         [SuppressMessage("ReSharper", "InconsistentNaming")]
         public GameObject gameObject => component.gameObject;
 
-        private readonly Func<GameObject, Vector2> _getScreenPoint;
-
-        private readonly Func<GameObject, Func<GameObject, Vector2>, PointerEventData, List<RaycastResult>, bool>
-            _isReachable;
-
+        private readonly Func<GameObject, PointerEventData, List<RaycastResult>, bool> _isReachable;
         private readonly IEnumerable<IOperator> _operators;
         private readonly PointerEventData _eventData = new PointerEventData(EventSystem.current);
         private readonly List<RaycastResult> _results = new List<RaycastResult>();
 
         private InteractiveComponent(MonoBehaviour component,
-            Func<GameObject, Vector2> getScreenPoint = null,
-            Func<GameObject, Func<GameObject, Vector2>, PointerEventData, List<RaycastResult>, bool> isReachable = null,
+            Func<GameObject, PointerEventData, List<RaycastResult>, bool> isReachable = null,
             IEnumerable<IOperator> operators = null)
         {
             this.component = component;
-            _getScreenPoint = getScreenPoint ?? DefaultScreenPointStrategy.GetScreenPoint;
             _isReachable = isReachable ?? DefaultReachableStrategy.IsReachable;
             _operators = operators;
         }
@@ -64,8 +57,6 @@ namespace TestHelper.Monkey
         /// Create <c>InteractableComponent</c> instance from MonoBehaviour.
         /// </summary>
         /// <param name="component"></param>
-        /// <param name="getScreenPoint">The function returns the screen position where raycast for the found <c>GameObject</c>.
-        /// Default is <c>DefaultScreenPointStrategy.GetScreenPoint</c>.</param>
         /// <param name="isReachable">The function returns the <c>GameObject</c> is reachable from user or not.
         /// Default is <c>DefaultReachableStrategy.IsReachable</c>.</param>
         /// <param name="isComponentInteractable">The function returns the <c>Component</c> is interactable or not.
@@ -73,8 +64,7 @@ namespace TestHelper.Monkey
         /// <param name="operators">All available operators in autopilot/tests. Usually defined in <c>MonkeyConfig</c></param>
         /// <returns>Returns new InteractableComponent instance from MonoBehaviour. If MonoBehaviour is not interactable so, return null.</returns>
         public static InteractiveComponent CreateInteractableComponent(MonoBehaviour component,
-            Func<GameObject, Vector2> getScreenPoint = null,
-            Func<GameObject, Func<GameObject, Vector2>, PointerEventData, List<RaycastResult>, bool> isReachable = null,
+            Func<GameObject, PointerEventData, List<RaycastResult>, bool> isReachable = null,
             Func<Component, bool> isComponentInteractable = null,
             IEnumerable<IOperator> operators = null)
         {
@@ -82,7 +72,7 @@ namespace TestHelper.Monkey
 
             if (isComponentInteractable.Invoke(component))
             {
-                return new InteractiveComponent(component, getScreenPoint, isReachable, operators);
+                return new InteractiveComponent(component, isReachable, operators);
             }
 
             throw new ArgumentException("Component is not interactable.");
@@ -92,8 +82,6 @@ namespace TestHelper.Monkey
         /// Create <c>InteractableComponent</c> instance from GameObject.
         /// </summary>
         /// <param name="gameObject"></param>
-        /// <param name="getScreenPoint">The function returns the screen position where raycast for the found <c>GameObject</c>.
-        /// Default is <c>DefaultScreenPointStrategy.GetScreenPoint</c>.</param>
         /// <param name="isReachable">The function returns the <c>GameObject</c> is reachable from user or not.
         /// Default is <c>DefaultReachableStrategy.IsReachable</c>.</param>
         /// <param name="isComponentInteractable">The function returns the <c>Component</c> is interactable or not.
@@ -102,8 +90,7 @@ namespace TestHelper.Monkey
         /// <returns>Returns new InteractableComponent instance from GameObject. If GameObject is not interactable so, return null.</returns>
         [Obsolete("Obsolete due to non-deterministic behavior when GameObject has multiple interactable components.")]
         public static InteractiveComponent CreateInteractableComponent(GameObject gameObject,
-            Func<GameObject, Vector2> getScreenPoint = null,
-            Func<GameObject, Func<GameObject, Vector2>, PointerEventData, List<RaycastResult>, bool> isReachable = null,
+            Func<GameObject, PointerEventData, List<RaycastResult>, bool> isReachable = null,
             Func<Component, bool> isComponentInteractable = null,
             IEnumerable<IOperator> operators = null)
         {
@@ -113,7 +100,7 @@ namespace TestHelper.Monkey
             {
                 if (isComponentInteractable.Invoke(component))
                 {
-                    return new InteractiveComponent(component, getScreenPoint, isReachable, operators);
+                    return new InteractiveComponent(component, isReachable, operators);
                 }
             }
 
@@ -140,7 +127,7 @@ namespace TestHelper.Monkey
         /// <returns>true: this object can control by user</returns>
         public bool IsReachable()
         {
-            return _isReachable.Invoke(gameObject, _getScreenPoint, _eventData, _results);
+            return _isReachable.Invoke(gameObject, _eventData, _results);
         }
 
         /// <summary>

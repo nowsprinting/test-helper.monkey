@@ -8,7 +8,6 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using TestHelper.Monkey.DefaultStrategies;
 using TestHelper.Monkey.Extensions;
-using TestHelper.Monkey.ScreenPointStrategies;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -20,11 +19,7 @@ namespace TestHelper.Monkey
     public class GameObjectFinder
     {
         private readonly double _timeoutSeconds;
-        private readonly Func<GameObject, Vector2> _getScreenPoint;
-
-        private readonly Func<GameObject, Func<GameObject, Vector2>, PointerEventData, List<RaycastResult>, bool>
-            _isReachable;
-
+        private readonly Func<GameObject, PointerEventData, List<RaycastResult>, bool> _isReachable;
         private readonly Func<Component, bool> _isComponentInteractable;
         private readonly PointerEventData _eventData = new PointerEventData(EventSystem.current);
         private readonly List<RaycastResult> _results = new List<RaycastResult>();
@@ -33,19 +28,15 @@ namespace TestHelper.Monkey
         /// Constructor.
         /// </summary>
         /// <param name="timeoutSeconds">Seconds to wait until <c>GameObject</c> appear.</param>
-        /// <param name="getScreenPoint">The function returns the screen position where raycast for the found <c>GameObject</c>.
-        /// Default is <c>DefaultScreenPointStrategy.GetScreenPoint</c>.</param>
         /// <param name="isReachable">The function returns the <c>GameObject</c> is reachable from user or not.
         /// Default is <c>DefaultReachableStrategy.IsReachable</c>.</param>
         /// <param name="isComponentInteractable">The function returns the <c>Component</c> is interactable or not.
         /// Default is <c>DefaultComponentInteractableStrategy.IsInteractable</c>.</param>
         public GameObjectFinder(double timeoutSeconds = 1.0d,
-            Func<GameObject, Vector2> getScreenPoint = null,
-            Func<GameObject, Func<GameObject, Vector2>, PointerEventData, List<RaycastResult>, bool> isReachable = null,
+            Func<GameObject, PointerEventData, List<RaycastResult>, bool> isReachable = null,
             Func<Component, bool> isComponentInteractable = null)
         {
             _timeoutSeconds = timeoutSeconds;
-            _getScreenPoint = getScreenPoint ?? DefaultScreenPointStrategy.GetScreenPoint;
             _isReachable = isReachable ?? DefaultReachableStrategy.IsReachable;
             _isComponentInteractable = isComponentInteractable ?? DefaultComponentInteractableStrategy.IsInteractable;
         }
@@ -70,7 +61,7 @@ namespace TestHelper.Monkey
 
             if (reachable)
             {
-                if (!_isReachable.Invoke(foundObject, _getScreenPoint, _eventData, _results))
+                if (!_isReachable.Invoke(foundObject, _eventData, _results))
                 {
                     return (null, Reason.NotReachable);
                 }
