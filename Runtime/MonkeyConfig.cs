@@ -42,18 +42,6 @@ namespace TestHelper.Monkey
         public ILogger Logger { get; set; } = Debug.unityLogger;
 
         /// <summary>
-        /// Function returns the <c>GameObject</c> is reachable from user or not.
-        /// This function is include ScreenPointStrategy (GetScreenPoint function).
-        /// </summary>
-        public Func<GameObject, PointerEventData, List<RaycastResult>, bool> IsReachable { get; set; } =
-            DefaultReachableStrategy.IsReachable;
-
-        /// <summary>
-        /// Function returns the <c>Component</c> is interactable or not.
-        /// </summary>
-        public Func<Component, bool> IsInteractable { get; set; } = DefaultComponentInteractableStrategy.IsInteractable;
-
-        /// <summary>
         /// Show Gizmos on <c>GameView</c> during running monkey test if true
         /// </summary>
         public bool Gizmos { get; set; }
@@ -64,7 +52,19 @@ namespace TestHelper.Monkey
         public ScreenshotOptions Screenshots { get; set; }
 
         /// <summary>
-        /// Operators that the monkey performs.
+        /// Function returns the <c>GameObject</c> is reachable from user or not.
+        /// This function is include ScreenPointStrategy (GetScreenPoint function).
+        /// </summary>
+        public Func<GameObject, PointerEventData, List<RaycastResult>, bool>
+            IsReachable { get; set; } = DefaultReachableStrategy.IsReachable;
+
+        /// <summary>
+        /// Function returns the <c>Component</c> is interactable or not.
+        /// </summary>
+        public Func<Component, bool> IsInteractable { get; set; } = DefaultComponentInteractableStrategy.IsInteractable;
+
+        /// <summary>
+        /// Operators that the monkey invokes.
         /// </summary>
         public IEnumerable<IOperator> Operators { get; set; } = new IOperator[]
         {

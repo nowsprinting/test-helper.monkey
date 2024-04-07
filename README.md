@@ -50,18 +50,20 @@ Configurations in `MonkeyConfig`:
 - **Lifetime**: Running time
 - **DelayMillis**: Delay time between operations
 - **SecondsToErrorForNoInteractiveComponent**: Seconds to determine that an error has occurred when an object that can be interacted with does not exist
-- **TouchAndHoldDelayMillis**: Delay time for touch-and-hold
 - **Random**: Random generator
 - **Logger**: Logger
 - **Gizmos**: Show Gizmos on `GameView` during running monkey test if true
 - **Screenshots**: Take screenshots during running the monkey test if set a `ScreenshotOptions` instance.
+    - **Directory**: Directory to save screenshots. If omitted, the directory specified by command line argument "-testHelperScreenshotDirectory" is used. If the command line argument is also omitted, `Application.persistentDataPath` + "/TestHelper/Screenshots/" is used.
+    - **FilenameStrategy**: Strategy for file paths of screenshot images. Default is test case name and four digit sequential number.
+    - **SuperSize**: The factor to increase resolution with. Default is 1.
+    - **StereoCaptureMode**: The eye texture to capture when stereo rendering is enabled. Default is `LeftEye`.
 
-Configurations in `ScreenshotOptions`:
+More customize for your project:
 
-- **Directory**: Directory to save screenshots. If omitted, the directory specified by command line argument "-testHelperScreenshotDirectory" is used. If the command line argument is also omitted, `Application.persistentDataPath` + "/TestHelper/Screenshots/" is used.
-- **FilenameStrategy**: Strategy for file paths of screenshot images. Default is test case name and four digit sequential number.
-- **SuperSize**: The factor to increase resolution with. Default is 1.
-- **StereoCaptureMode**: The eye texture to capture when stereo rendering is enabled. Default is `LeftEye`.
+- **IsReachable**: Function returns the `GameObject` is reachable from user or not. Default implementation is using Raycaster and includes ScreenPointStrategy (GetScreenPoint function).
+- **IsInteractable**: Function returns the `Component` is interactable or not. The default implementation is support for standard Unity UI (uGUI) components.
+- **Operators**: Operators that the monkey invokes. Default is ClickOperator, ClickAndHoldOperator, and TextInputOperator. There is support for standard Unity UI (uGUI) components.
 
 
 ### Annotations for Monkey's behavior
@@ -151,31 +153,6 @@ public class MyIntegrationTest
 }
 ```
 
-#### InteractiveComponent.CreateInteractableComponent
-
-Returns new InteractableComponent instance from GameObject. If GameObject is not interactable so, return null.
-
-Usage:
-
-```csharp
-using NUnit.Framework;
-using TestHelper.Monkey;
-
-[TestFixture]
-public class MyIntegrationTest
-{
-    [Test]
-    public void MyTestMethod()
-    {
-        var finder = new GameObjectFinder();
-        var button = await finder.FindByNameAsync("Button", interactable: true);
-
-        var interactableComponent = InteractiveComponent.CreateInteractableComponent(button);
-        interactableComponent.Click();
-    }
-}
-```
-
 #### InteractiveComponentCollector.FindInteractableComponents
 
 Returns interactable uGUI components.
@@ -220,6 +197,32 @@ public class MyIntegrationTest
 
         Assume.That(component.CanClick(), Is.True);
         component.Click();
+    }
+}
+```
+
+#### InteractiveComponent.CreateInteractableComponent
+
+Returns new InteractableComponent instance from GameObject. If GameObject is not interactable so, return null.
+
+Usage:
+
+```csharp
+using NUnit.Framework;
+using TestHelper.Monkey;
+
+[TestFixture]
+public class MyIntegrationTest
+{
+    [Test]
+    public void MyTestMethod()
+    {
+        var finder = new GameObjectFinder();
+        var button = await finder.FindByNameAsync("Button", interactable: true);
+
+        var interactableComponent = InteractiveComponent.CreateInteractableComponent(button);
+        Assume.That(interactableComponent.CanClick(), Is.True);
+        interactableComponent.Click();
     }
 }
 ```
