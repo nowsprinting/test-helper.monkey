@@ -5,7 +5,6 @@ using System;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using TestHelper.Monkey.Annotations;
 using TestHelper.Monkey.ScreenPointStrategies;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -37,11 +36,6 @@ namespace TestHelper.Monkey.Operators
         /// <inheritdoc />
         public bool IsMatch(Component component)
         {
-            if (component.gameObject.TryGetComponent(typeof(IgnoreAnnotation), out _))
-            {
-                return false;
-            }
-
             if (component as EventTrigger)
             {
                 return ((EventTrigger)component).triggers.Any(x => x.eventID == EventTriggerType.PointerClick);

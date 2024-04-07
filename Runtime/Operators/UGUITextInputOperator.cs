@@ -41,11 +41,6 @@ namespace TestHelper.Monkey.Operators
         /// <inheritdoc />
         public bool IsMatch(Component component)
         {
-            if (component.gameObject.TryGetComponent(typeof(IgnoreAnnotation), out _))
-            {
-                return false;
-            }
-
             return component is InputField;
         }
 

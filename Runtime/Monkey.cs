@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using TestHelper.Monkey.Annotations;
 using TestHelper.Monkey.Operators;
 using TestHelper.Random;
 using TestHelper.RuntimeInternals;
@@ -128,7 +129,8 @@ namespace TestHelper.Monkey
         internal static IEnumerable<(InteractiveComponent, IOperator)> GetOperators(
             InteractiveComponentCollector interactiveComponentCollector)
         {
-            var components = interactiveComponentCollector.FindInteractableComponents();
+            var components = interactiveComponentCollector.FindInteractableComponents()
+                .Where(x => !x.gameObject.TryGetComponent(typeof(IgnoreAnnotation), out _));
             return components.SelectMany(x => x.GetOperators(), (x, o) => (x, o));
         }
 

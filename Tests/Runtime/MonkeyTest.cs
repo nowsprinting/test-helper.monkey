@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
+using TestHelper.Monkey.Annotations;
 using TestHelper.Monkey.Operators;
 using TestHelper.Monkey.TestDoubles;
 using TestHelper.Random;
@@ -217,6 +218,23 @@ namespace TestHelper.Monkey
             };
 
             Assert.That(actual, Is.EquivalentTo(expected));
+        }
+
+        [Test]
+        [LoadScene(TestScene)]
+        public void GetOperators_WithIgnoreAnnotation_Excluded()
+        {
+            GameObject.Find("UsingOnPointerClickHandler").AddComponent<IgnoreAnnotation>();
+
+            var interactiveComponentCollector = new InteractiveComponentCollector(operators: _operators);
+            var operators = Monkey.GetOperators(interactiveComponentCollector);
+            var actual = new List<string>();
+            foreach (var (component, @operator) in operators)
+            {
+                actual.Add($"{component.gameObject.name}");
+            }
+
+            Assert.That(actual, Does.Not.Contain("UsingOnPointerClickHandler"));
         }
 
         [Test]
