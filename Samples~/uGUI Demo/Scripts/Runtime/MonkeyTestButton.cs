@@ -19,7 +19,6 @@ namespace TestHelper.Monkey.Samples.UGUIDemo
         public int lifetimeSeconds = 30;
         public int delayMillis = 200;
         public int secondsToErrorForNoInteractiveComponent = 5;
-        public int touchAndHoldDelayMillis = 1000;
         public bool gizmos;
         public bool screenshots = true;
 
@@ -53,7 +52,6 @@ namespace TestHelper.Monkey.Samples.UGUIDemo
                     Lifetime = TimeSpan.FromSeconds(lifetimeSeconds),
                     DelayMillis = delayMillis,
                     SecondsToErrorForNoInteractiveComponent = secondsToErrorForNoInteractiveComponent,
-                    TouchAndHoldDelayMillis = touchAndHoldDelayMillis,
                     Gizmos = gizmos,
                     Screenshots = screenshots
                         ? new ScreenshotOptions() { FilenameStrategy = new CounterBasedStrategy("uGUI Demo") }
