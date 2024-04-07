@@ -57,7 +57,7 @@ namespace TestHelper.Monkey
             this.component = component;
             _getScreenPoint = getScreenPoint ?? DefaultScreenPointStrategy.GetScreenPoint;
             _isReachable = isReachable ?? DefaultReachableStrategy.IsReachable;
-            _operators = operators ?? new IOperator[] { };
+            _operators = operators;
         }
 
         /// <summary>
@@ -149,6 +149,11 @@ namespace TestHelper.Monkey
         /// <returns>Available operators</returns>
         public IEnumerable<IOperator> GetOperators()
         {
+            if (_operators == null || !_operators.Any())
+            {
+                throw new NotSupportedException("Operators are not set.");
+            }
+
             return _operators.Where(iOperator => iOperator.IsMatch(component));
         }
 
@@ -159,6 +164,11 @@ namespace TestHelper.Monkey
         /// <returns>Available operators</returns>
         public IEnumerable<IOperator> GetOperatorsByType(OperatorType type)
         {
+            if (_operators == null || !_operators.Any())
+            {
+                throw new NotSupportedException("Operators are not set.");
+            }
+
             return _operators.Where(iOperator => iOperator.Type == type && iOperator.IsMatch(component));
         }
 
@@ -170,7 +180,7 @@ namespace TestHelper.Monkey
         /// <summary>
         /// Click component.
         /// </summary>
-        public void Click() => GetOperatorsByType(OperatorType.Click).FirstOrDefault()?.OperateAsync(component);
+        public void Click() => GetOperatorsByType(OperatorType.Click).First().OperateAsync(component);
 
         [Obsolete("Use CanClick() instead")]
         public bool CanTap() => CanClick();
@@ -188,11 +198,8 @@ namespace TestHelper.Monkey
         /// </summary>
         public async UniTask ClickAndHold(CancellationToken cancellationToken = default)
         {
-            var clickAndHoldOperator = GetOperatorsByType(OperatorType.ClickAndHold).FirstOrDefault();
-            if (clickAndHoldOperator != null)
-            {
-                await clickAndHoldOperator.OperateAsync(component, cancellationToken);
-            }
+            var clickAndHoldOperator = GetOperatorsByType(OperatorType.ClickAndHold).First();
+            await clickAndHoldOperator.OperateAsync(component, cancellationToken);
         }
 
         [Obsolete("Use CanClickAndHold() instead")]
@@ -210,18 +217,15 @@ namespace TestHelper.Monkey
         /// <summary>
         /// Input random text.
         /// </summary>
-        public void TextInput() => GetOperatorsByType(OperatorType.TextInput).FirstOrDefault()?.OperateAsync(component);
+        public void TextInput() => GetOperatorsByType(OperatorType.TextInput).First().OperateAsync(component);
 
         /// <summary>
         /// Input specified text.
         /// </summary>
         public void TextInput(string text)
         {
-            var textInputOperator = GetOperatorsByType(OperatorType.TextInput).FirstOrDefault() as ITextInputOperator;
-            if (textInputOperator != null)
-            {
-                textInputOperator.OperateAsync(component, text);
-            }
+            var textInputOperator = (ITextInputOperator)GetOperatorsByType(OperatorType.TextInput).First();
+            textInputOperator.OperateAsync(component, text);
         }
     }
 }
