@@ -229,7 +229,7 @@ namespace TestHelper.Monkey
             var interactiveComponentCollector = new InteractiveComponentCollector(operators: _operators);
             var operators = Monkey.GetOperators(interactiveComponentCollector);
             var actual = new List<string>();
-            foreach (var (component, @operator) in operators)
+            foreach (var (component, _) in operators)
             {
                 actual.Add($"{component.gameObject.name}");
             }
