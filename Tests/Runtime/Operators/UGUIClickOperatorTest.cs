@@ -1,10 +1,10 @@
 ﻿// Copyright (c) 2023-2024 Koji Hasegawa.
 // This software is released under the MIT License.
 
-using System.Linq;
 using NUnit.Framework;
-using TestHelper.Attributes;
+using TestHelper.Monkey.TestDoubles;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.TestTools;
 
 namespace TestHelper.Monkey.Operators
@@ -12,32 +12,37 @@ namespace TestHelper.Monkey.Operators
     [TestFixture]
     public class UGUIClickOperatorTest
     {
-        private const string TestScene = "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/Operators.unity";
         private readonly IOperator _sut = new UGUIClickOperator();
 
-        [TestCase("UsingOnPointerClickHandler", "OnPointerClick")]
-        [TestCase("UsingPointerClickEventTrigger", "ReceivePointerClick")]
-        [LoadScene(TestScene)]
-        public void OperateAsync_InvokeOnClick(string targetName, string expectedMessage)
+        [Test]
+        public void IsMatch_CanNotClick_ReturnFalse()
         {
-            var target = new InteractiveComponentCollector().FindInteractableComponents()
-                .First(x => x.gameObject.name == targetName);
+            var component = new GameObject().AddComponent<SpyOnPointerDownUpHandler>();
 
-            Assume.That(_sut.IsMatch(target.component), Is.True);
-            _sut.OperateAsync(target.component);
-
-            LogAssert.Expect(LogType.Log, $"{targetName}.{expectedMessage}");
+            Assert.That(_sut.IsMatch(component), Is.False);
         }
 
-        [TestCase("UsingOnPointerDownUpHandler")]
-        [TestCase("UsingPointerDownUpEventTrigger")]
-        [LoadScene(TestScene)]
-        public void IsMatch_CanNotClick_ReturnFalse(string targetName)
+        [Test]
+        public void OperateAsync_EventHandler_InvokeOnClick()
         {
-            var target = new InteractiveComponentCollector().FindInteractableComponents()
-                .First(x => x.gameObject.name == targetName);
+            var component = new GameObject("ClickTarget").AddComponent<SpyOnPointerClickHandler>();
 
-            Assert.That(_sut.IsMatch(target.component), Is.False);
+            Assume.That(_sut.IsMatch(component), Is.True);
+            _sut.OperateAsync(component);
+
+            LogAssert.Expect(LogType.Log, "ClickTarget.OnPointerClick");
+        }
+
+        [Test]
+        public void OperateAsync_EventTrigger_InvokeOnClick()
+        {
+            var receiver = new GameObject("ClickTarget").AddComponent<SpyPointerClickEventReceiver>();
+            var component = receiver.gameObject.GetComponent<EventTrigger>();
+
+            Assume.That(_sut.IsMatch(component), Is.True);
+            _sut.OperateAsync(component);
+
+            LogAssert.Expect(LogType.Log, "ClickTarget.ReceivePointerClick");
         }
     }
 }

@@ -1,11 +1,10 @@
 // Copyright (c) 2023-2024 Koji Hasegawa.
 // This software is released under the MIT License.
 
-using System.Linq;
 using NUnit.Framework;
-using TestHelper.Attributes;
 using TestHelper.Monkey.Random;
 using TestHelper.Monkey.TestDoubles;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace TestHelper.Monkey.Operators
@@ -13,37 +12,38 @@ namespace TestHelper.Monkey.Operators
     [TestFixture]
     public class UGUITextInputOperatorTest
     {
-        private const string TestScene = "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/Operators.unity";
-
-        private readonly IOperator _sut = new UGUITextInputOperator(
+        private readonly ITextInputOperator _sut = new UGUITextInputOperator(
             _ => RandomStringParameters.Default,
             new StubRandomString("RANDOM"));
 
-        [TestCase("InputField")]
-        [LoadScene(TestScene)]
-        public void OperateAsync_InputText(string targetName)
+        [Test]
+        public void IsMatch_CanNotInputText_ReturnFalse()
         {
-            var target = new InteractiveComponentCollector().FindInteractableComponents()
-                .First(x => x.gameObject.name == targetName);
+            var component = new GameObject().AddComponent<Button>();
 
-            Assume.That(_sut.IsMatch(target.component), Is.True);
-            _sut.OperateAsync(target.component);
-
-            Assert.That(((InputField)target.component).text, Is.EqualTo("RANDOM"));
+            Assert.That(_sut.IsMatch(component), Is.False);
         }
 
-        [TestCase("UsingPointerClickEventTrigger")]
-        [TestCase("UsingOnPointerClickHandler")]
-        [TestCase("UsingOnPointerDownUpHandler")]
-        [TestCase("UsingPointerDownUpEventTrigger")]
-        [TestCase("UsingMultipleEventTriggers")]
-        [LoadScene(TestScene)]
-        public void IsMatch_CanNotInputText_ReturnFalse(string targetName)
+        [Test]
+        public void OperateAsync_InputText()
         {
-            var target = new InteractiveComponentCollector().FindInteractableComponents()
-                .First(x => x.gameObject.name == targetName);
+            var component = new GameObject().AddComponent<InputField>();
 
-            Assert.That(_sut.IsMatch(target.component), Is.False);
+            Assume.That(_sut.IsMatch(component), Is.True);
+            _sut.OperateAsync(component);
+
+            Assert.That(component.text, Is.EqualTo("RANDOM"));
+        }
+
+        [Test]
+        public void OperateAsync_InputSpecifiedText()
+        {
+            var component = new GameObject().AddComponent<InputField>();
+
+            Assume.That(_sut.IsMatch(component), Is.True);
+            _sut.OperateAsync(component, "SPECIFIED");
+
+            Assert.That(component.text, Is.EqualTo("SPECIFIED"));
         }
     }
 }
