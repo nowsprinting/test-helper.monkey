@@ -4,6 +4,7 @@
 using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using TestHelper.Monkey.Operators;
 using TestHelper.Monkey.ScreenshotFilenameStrategies;
 using UnityEngine;
 using UnityEngine.UI;
@@ -19,9 +20,9 @@ namespace TestHelper.Monkey.Samples.UGUIDemo
         public int lifetimeSeconds = 30;
         public int delayMillis = 200;
         public int secondsToErrorForNoInteractiveComponent = 5;
-        public int touchAndHoldDelayMillis = 1000;
         public bool gizmos;
         public bool screenshots = true;
+        public int touchAndHoldDelayMillis = 1000;
 
         private Text _buttonLabel;
 
@@ -53,11 +54,16 @@ namespace TestHelper.Monkey.Samples.UGUIDemo
                     Lifetime = TimeSpan.FromSeconds(lifetimeSeconds),
                     DelayMillis = delayMillis,
                     SecondsToErrorForNoInteractiveComponent = secondsToErrorForNoInteractiveComponent,
-                    TouchAndHoldDelayMillis = touchAndHoldDelayMillis,
                     Gizmos = gizmos,
                     Screenshots = screenshots
                         ? new ScreenshotOptions() { FilenameStrategy = new CounterBasedStrategy("uGUI Demo") }
-                        : null
+                        : null,
+                    Operators = new IOperator[]
+                    {
+                        new UGUIClickOperator(),
+                        new UGUIClickAndHoldOperator(holdMillis: touchAndHoldDelayMillis),
+                        new UGUITextInputOperator(),
+                    },
                 };
 
                 _cts = new CancellationTokenSource();

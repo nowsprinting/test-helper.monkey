@@ -4,13 +4,12 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using TestHelper.Monkey.DefaultStrategies;
 using TestHelper.Monkey.Extensions;
 using TestHelper.Monkey.Operators;
-using TestHelper.Monkey.Random;
-using TestHelper.Monkey.ScreenPointStrategies;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -40,46 +39,40 @@ namespace TestHelper.Monkey
         [SuppressMessage("ReSharper", "InconsistentNaming")]
         public GameObject gameObject => component.gameObject;
 
-        private readonly Func<GameObject, Vector2> _getScreenPoint;
-
-        private readonly Func<GameObject, Func<GameObject, Vector2>, PointerEventData, List<RaycastResult>, bool>
-            _isReachable;
-
+        private readonly Func<GameObject, PointerEventData, List<RaycastResult>, bool> _isReachable;
+        private readonly IEnumerable<IOperator> _operators;
         private readonly PointerEventData _eventData = new PointerEventData(EventSystem.current);
         private readonly List<RaycastResult> _results = new List<RaycastResult>();
 
-        internal InteractiveComponent(MonoBehaviour component,
-            Func<GameObject, Vector2> getScreenPoint = null,
-            Func<GameObject, Func<GameObject, Vector2>, PointerEventData, List<RaycastResult>, bool> isReachable = null)
+        private InteractiveComponent(MonoBehaviour component,
+            Func<GameObject, PointerEventData, List<RaycastResult>, bool> isReachable = null,
+            IEnumerable<IOperator> operators = null)
         {
             this.component = component;
-            _getScreenPoint = getScreenPoint ?? DefaultScreenPointStrategy.GetScreenPoint;
             _isReachable = isReachable ?? DefaultReachableStrategy.IsReachable;
+            _operators = operators;
         }
 
         /// <summary>
         /// Create <c>InteractableComponent</c> instance from MonoBehaviour.
         /// </summary>
         /// <param name="component"></param>
-        /// <param name="getScreenPoint">The function returns the screen position where raycast for the found <c>GameObject</c>.
-        /// Default is <c>DefaultScreenPointStrategy.GetScreenPoint</c>.</param>
         /// <param name="isReachable">The function returns the <c>GameObject</c> is reachable from user or not.
         /// Default is <c>DefaultReachableStrategy.IsReachable</c>.</param>
         /// <param name="isComponentInteractable">The function returns the <c>Component</c> is interactable or not.
         /// Default is <c>DefaultComponentInteractableStrategy.IsInteractable</c>.</param>
+        /// <param name="operators">All available operators in autopilot/tests. Usually defined in <c>MonkeyConfig</c></param>
         /// <returns>Returns new InteractableComponent instance from MonoBehaviour. If MonoBehaviour is not interactable so, return null.</returns>
         public static InteractiveComponent CreateInteractableComponent(MonoBehaviour component,
-            Func<GameObject, Vector2> getScreenPoint = null,
-            Func<GameObject, Func<GameObject, Vector2>, PointerEventData, List<RaycastResult>, bool> isReachable = null,
-            Func<Component, bool> isComponentInteractable = null)
+            Func<GameObject, PointerEventData, List<RaycastResult>, bool> isReachable = null,
+            Func<Component, bool> isComponentInteractable = null,
+            IEnumerable<IOperator> operators = null)
         {
-            getScreenPoint = getScreenPoint ?? DefaultScreenPointStrategy.GetScreenPoint;
-            isReachable = isReachable ?? DefaultReachableStrategy.IsReachable;
             isComponentInteractable = isComponentInteractable ?? DefaultComponentInteractableStrategy.IsInteractable;
 
             if (isComponentInteractable.Invoke(component))
             {
-                return new InteractiveComponent(component, getScreenPoint, isReachable);
+                return new InteractiveComponent(component, isReachable, operators);
             }
 
             throw new ArgumentException("Component is not interactable.");
@@ -89,28 +82,25 @@ namespace TestHelper.Monkey
         /// Create <c>InteractableComponent</c> instance from GameObject.
         /// </summary>
         /// <param name="gameObject"></param>
-        /// <param name="getScreenPoint">The function returns the screen position where raycast for the found <c>GameObject</c>.
-        /// Default is <c>DefaultScreenPointStrategy.GetScreenPoint</c>.</param>
         /// <param name="isReachable">The function returns the <c>GameObject</c> is reachable from user or not.
         /// Default is <c>DefaultReachableStrategy.IsReachable</c>.</param>
         /// <param name="isComponentInteractable">The function returns the <c>Component</c> is interactable or not.
         /// Default is <c>DefaultComponentInteractableStrategy.IsInteractable</c>.</param>
+        /// <param name="operators">All available operators in autopilot/tests. Usually defined in <c>MonkeyConfig</c></param>
         /// <returns>Returns new InteractableComponent instance from GameObject. If GameObject is not interactable so, return null.</returns>
         [Obsolete("Obsolete due to non-deterministic behavior when GameObject has multiple interactable components.")]
         public static InteractiveComponent CreateInteractableComponent(GameObject gameObject,
-            Func<GameObject, Vector2> getScreenPoint = null,
-            Func<GameObject, Func<GameObject, Vector2>, PointerEventData, List<RaycastResult>, bool> isReachable = null,
-            Func<Component, bool> isComponentInteractable = null)
+            Func<GameObject, PointerEventData, List<RaycastResult>, bool> isReachable = null,
+            Func<Component, bool> isComponentInteractable = null,
+            IEnumerable<IOperator> operators = null)
         {
-            getScreenPoint = getScreenPoint ?? DefaultScreenPointStrategy.GetScreenPoint;
-            isReachable = isReachable ?? DefaultReachableStrategy.IsReachable;
             isComponentInteractable = isComponentInteractable ?? DefaultComponentInteractableStrategy.IsInteractable;
 
             foreach (var component in gameObject.GetComponents<MonoBehaviour>())
             {
                 if (isComponentInteractable.Invoke(component))
                 {
-                    return new InteractiveComponent(component, getScreenPoint, isReachable);
+                    return new InteractiveComponent(component, isReachable, operators);
                 }
             }
 
@@ -137,60 +127,99 @@ namespace TestHelper.Monkey
         /// <returns>true: this object can control by user</returns>
         public bool IsReachable()
         {
-            return _isReachable.Invoke(gameObject, _getScreenPoint, _eventData, _results);
+            return _isReachable.Invoke(gameObject, _eventData, _results);
         }
 
         /// <summary>
-        /// Check inner component can receive click event
+        /// Returns the operators available to this component.
         /// </summary>
-        /// <returns>true: Can click</returns>
-        public bool CanClick() => ClickOperator.CanClick(component);
+        /// <returns>Available operators</returns>
+        public IEnumerable<IOperator> GetOperators()
+        {
+            if (_operators == null || !_operators.Any())
+            {
+                throw new NotSupportedException("Operators are not set.");
+            }
+
+            return _operators.Where(iOperator => iOperator.CanOperate(component));
+        }
 
         /// <summary>
-        /// Click inner component
+        /// Returns the operators that specify types and are available to this component.
         /// </summary>
-        public void Click() => ClickOperator.Click(component, _getScreenPoint);
+        /// <param name="type">Operator type</param>
+        /// <returns>Available operators</returns>
+        public IEnumerable<IOperator> GetOperatorsByType(OperatorType type)
+        {
+            if (_operators == null || !_operators.Any())
+            {
+                throw new NotSupportedException("Operators are not set.");
+            }
+
+            return _operators.Where(iOperator => iOperator.Type == type && iOperator.CanOperate(component));
+        }
 
         /// <summary>
-        /// Check inner component can receive tap (click) event
+        /// Check component can receive click (tap) event.
         /// </summary>
-        /// <returns>true: Can tap</returns>
-        public bool CanTap() => ClickOperator.CanClick(component);
+        [Obsolete]
+        public bool CanClick() => GetOperatorsByType(OperatorType.Click).Any();
 
         /// <summary>
-        /// Tap (click) inner component
+        /// Click component.
         /// </summary>
-        public void Tap() => ClickOperator.Click(component, _getScreenPoint);
+        [Obsolete]
+        public void Click() => GetOperatorsByType(OperatorType.Click).First().OperateAsync(component);
+
+        [Obsolete]
+        public bool CanTap() => CanClick();
+
+        [Obsolete]
+        public void Tap() => Click();
 
         /// <summary>
-        /// Check inner component can receive touch-and-hold event
+        /// Check component can receive click (tap) and hold event.
         /// </summary>
-        /// <returns>true: Can touch-and-hold</returns>
-        public bool CanTouchAndHold() => TouchAndHoldOperator.CanTouchAndHold(component);
+        [Obsolete]
+        public bool CanClickAndHold() => GetOperatorsByType(OperatorType.ClickAndHold).Any();
 
         /// <summary>
-        /// Touch-and-hold inner component
+        /// Click (touch) and hold component.
         /// </summary>
-        /// <param name="delayMillis">Delay time between down to up</param>
-        /// <param name="cancellationToken">Task cancellation token</param>
-        public async UniTask TouchAndHold(int delayMillis = 1000, CancellationToken cancellationToken = default)
-            => await TouchAndHoldOperator.TouchAndHold(component, _getScreenPoint, delayMillis, cancellationToken);
+        [Obsolete]
+        public async UniTask ClickAndHold(CancellationToken cancellationToken = default)
+        {
+            var clickAndHoldOperator = GetOperatorsByType(OperatorType.ClickAndHold).First();
+            await clickAndHoldOperator.OperateAsync(component, cancellationToken);
+        }
+
+        [Obsolete]
+        public bool CanTouchAndHold() => CanClickAndHold();
+
+        [Obsolete]
+        public async UniTask TouchAndHold(CancellationToken cancellationToken = default) =>
+            await ClickAndHold(cancellationToken);
 
         /// <summary>
-        /// Check inner component can input text
+        /// Check component can input text.
         /// </summary>
-        /// <returns>true: Can click</returns>
-        public bool CanTextInput() => TextInputOperator.CanTextInput(component);
+        [Obsolete]
+        public bool CanTextInput() => GetOperatorsByType(OperatorType.TextInput).Any();
 
         /// <summary>
-        /// Input random text that is randomly generated by <paramref name="randomStringParams"/>
+        /// Input random text.
         /// </summary>
-        /// <param name="randomStringParams">Random string generation parameters</param>
-        /// <param name="randomString">Random string generator</param>
-        public void TextInput(Func<GameObject, RandomStringParameters> randomStringParams,
-            IRandomString randomString) =>
-            TextInputOperator.Input(component, randomStringParams, randomString);
+        [Obsolete]
+        public void TextInput() => GetOperatorsByType(OperatorType.TextInput).First().OperateAsync(component);
 
-        // TODO: drag, swipe, flick, etc...
+        /// <summary>
+        /// Input specified text.
+        /// </summary>
+        [Obsolete]
+        public void TextInput(string text)
+        {
+            var textInputOperator = (ITextInputOperator)GetOperatorsByType(OperatorType.TextInput).First();
+            textInputOperator.OperateAsync(component, text);
+        }
     }
 }

@@ -50,18 +50,20 @@ Configurations in `MonkeyConfig`:
 - **Lifetime**: Running time
 - **DelayMillis**: Delay time between operations
 - **SecondsToErrorForNoInteractiveComponent**: Seconds to determine that an error has occurred when an object that can be interacted with does not exist
-- **TouchAndHoldDelayMillis**: Delay time for touch-and-hold
 - **Random**: Random generator
 - **Logger**: Logger
 - **Gizmos**: Show Gizmos on `GameView` during running monkey test if true
 - **Screenshots**: Take screenshots during running the monkey test if set a `ScreenshotOptions` instance.
+    - **Directory**: Directory to save screenshots. If omitted, the directory specified by command line argument "-testHelperScreenshotDirectory" is used. If the command line argument is also omitted, `Application.persistentDataPath` + "/TestHelper/Screenshots/" is used.
+    - **FilenameStrategy**: Strategy for file paths of screenshot images. Default is test case name and four digit sequential number.
+    - **SuperSize**: The factor to increase resolution with. Default is 1.
+    - **StereoCaptureMode**: The eye texture to capture when stereo rendering is enabled. Default is `LeftEye`.
 
-Configurations in `ScreenshotOptions`:
+More customize for your project:
 
-- **Directory**: Directory to save screenshots. If omitted, the directory specified by command line argument "-testHelperScreenshotDirectory" is used. If the command line argument is also omitted, `Application.persistentDataPath` + "/TestHelper/Screenshots/" is used.
-- **FilenameStrategy**: Strategy for file paths of screenshot images. Default is test case name and four digit sequential number.
-- **SuperSize**: The factor to increase resolution with. Default is 1.
-- **StereoCaptureMode**: The eye texture to capture when stereo rendering is enabled. Default is `LeftEye`.
+- **IsReachable**: Function returns the `GameObject` is reachable from user or not. Default implementation is using Raycaster and includes ScreenPointStrategy (GetScreenPoint function).
+- **IsInteractable**: Function returns the `Component` is interactable or not. The default implementation is support for standard Unity UI (uGUI) components.
+- **Operators**: Operators that the monkey invokes. Default is ClickOperator, ClickAndHoldOperator, and TextInputOperator. There is support for standard Unity UI (uGUI) components.
 
 
 ### Annotations for Monkey's behavior
@@ -151,9 +153,13 @@ public class MyIntegrationTest
 }
 ```
 
-#### InteractiveComponent.CreateInteractableComponent
+#### InteractiveComponent and Operators
 
-Returns new InteractableComponent instance from GameObject. If GameObject is not interactable so, return null.
+##### InteractiveComponent
+Returns new `InteractableComponent` instance from GameObject. If GameObject is not interactable so, return null.
+
+##### Operators
+Operators implements `IOperator` interface. It has `OperateAsync` method that operates on the component.
 
 Usage:
 
@@ -168,10 +174,11 @@ public class MyIntegrationTest
     public void MyTestMethod()
     {
         var finder = new GameObjectFinder();
-        var button = await finder.FindByNameAsync("Button", interactable: true);
+        var button = await finder.FindByNameAsync("StartButton", interactable: true);
 
         var interactableComponent = InteractiveComponent.CreateInteractableComponent(button);
-        interactableComponent.Click();
+        var clickOperator = interactableComponent.GetOperatorsByType(OperatorType.Click).First();
+        clickOperator.OperateAsync(interactableComponent.component);
     }
 }
 ```
@@ -183,8 +190,10 @@ Returns interactable uGUI components.
 Usage:
 
 ```csharp
+using System.Linq;
 using NUnit.Framework;
 using TestHelper.Monkey;
+using TestHelper.Monkey.Operators;
 
 [TestFixture]
 public class MyIntegrationTest
@@ -193,6 +202,10 @@ public class MyIntegrationTest
     public void MyTestMethod()
     {
         var components = InteractiveComponentCollector.FindInteractableComponents();
+
+        var firstComponent = components.First();
+        var clickAndHoldOperator = firstComponent.GetOperatorsByType(OperatorType.ClickAndHold).First();
+        await clickAndHoldOperator.OperateAsync(firstComponent.component);
     }
 }
 ```
@@ -208,6 +221,7 @@ Usage:
 using System.Linq;
 using NUnit.Framework;
 using TestHelper.Monkey;
+using TestHelper.Monkey.Operators;
 
 [TestFixture]
 public class MyIntegrationTest
@@ -215,11 +229,11 @@ public class MyIntegrationTest
     [Test]
     public void MyTestMethod()
     {
-        var component = InteractiveComponentCollector.FindReachableInteractableComponents()
-            .First();
+        var components = InteractiveComponentCollector.FindReachableInteractableComponents();
 
-        Assume.That(component.CanClick(), Is.True);
-        component.Click();
+        var firstComponent = components.First();
+        var textInputOperator = firstComponent.GetOperatorsByType(OperatorType.TextInput).First();
+        textInputOperator.OperateAsync(firstComponent.component);   // input random text
     }
 }
 ```

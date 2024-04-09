@@ -1,11 +1,10 @@
-﻿// Copyright (c) 2023 Koji Hasegawa.
+﻿// Copyright (c) 2023-2024 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System;
 using System.Collections.Generic;
 using TestHelper.Monkey.DefaultStrategies;
-using TestHelper.Monkey.Random;
-using TestHelper.Monkey.ScreenPointStrategies;
+using TestHelper.Monkey.Operators;
 using TestHelper.Random;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -33,19 +32,9 @@ namespace TestHelper.Monkey
         public int SecondsToErrorForNoInteractiveComponent { get; set; } = 5;
 
         /// <summary>
-        /// Delay time for touch-and-hold
-        /// </summary>
-        public int TouchAndHoldDelayMillis { get; set; } = 1000;
-
-        /// <summary>
         /// Random number generator
         /// </summary>
         public IRandom Random { get; set; } = new RandomWrapper();
-
-        /// <summary>
-        /// Random string generator
-        /// </summary>
-        public IRandomString RandomString { get; set; } = new RandomStringImpl(new RandomWrapper());
 
         /// <summary>
         /// Logger
@@ -53,39 +42,35 @@ namespace TestHelper.Monkey
         public ILogger Logger { get; set; } = Debug.unityLogger;
 
         /// <summary>
-        /// Function returns the screen position where monkey operators operate on for the specified gameObject
+        /// Show Gizmos on <c>GameView</c> during running monkey test if true
         /// </summary>
-        public Func<GameObject, Vector2> ScreenPointStrategy { get; set; } = DefaultScreenPointStrategy.GetScreenPoint;
+        public bool Gizmos { get; set; }
+
+        /// <summary>
+        /// Take screenshots during running the monkey test if set a <c>ScreenshotOptions</c> instance.
+        /// </summary>
+        public ScreenshotOptions Screenshots { get; set; }
 
         /// <summary>
         /// Function returns the <c>GameObject</c> is reachable from user or not.
+        /// This function is include ScreenPointStrategy (GetScreenPoint function).
         /// </summary>
-        public Func<GameObject, Func<GameObject, Vector2>, PointerEventData, List<RaycastResult>, bool>
+        public Func<GameObject, PointerEventData, List<RaycastResult>, bool>
             IsReachable { get; set; } = DefaultReachableStrategy.IsReachable;
 
         /// <summary>
         /// Function returns the <c>Component</c> is interactable or not.
         /// </summary>
-        public Func<Component, bool>
-            IsInteractable { get; set; } = DefaultComponentInteractableStrategy.IsInteractable;
+        public Func<Component, bool> IsInteractable { get; set; } = DefaultComponentInteractableStrategy.IsInteractable;
 
         /// <summary>
-        /// Function returns the random string generation parameters
+        /// Operators that the monkey invokes.
         /// </summary>
-        public Func<GameObject, RandomStringParameters> RandomStringParametersStrategy { get; set; } =
-            DefaultRandomStringParameterGen;
-
-        private static RandomStringParameters DefaultRandomStringParameterGen(GameObject _) =>
-            RandomStringParameters.Default;
-
-        /// <summary>
-        /// Show Gizmos on <c>GameView</c> during running monkey test if true
-        /// </summary>
-        public bool Gizmos { get; set; } = false;
-
-        /// <summary>
-        /// Take screenshots during running the monkey test if set a <c>ScreenshotOptions</c> instance.
-        /// </summary>
-        public ScreenshotOptions Screenshots { get; set; } = null;
+        public IEnumerable<IOperator> Operators { get; set; } = new IOperator[]
+        {
+            new UGUIClickOperator(), // Specify screen click point strategy as a constructor argument, if necessary
+            new UGUIClickAndHoldOperator(), // Specify screen click point strategy and hold millis, if necessary
+            new UGUITextInputOperator(), // Specify random text input strategy, if necessary
+        };
     }
 }

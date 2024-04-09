@@ -1,10 +1,13 @@
-﻿// Copyright (c) 2023 Koji Hasegawa.
+﻿// Copyright (c) 2023-2024 Koji Hasegawa.
 // This software is released under the MIT License.
 
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
+using TestHelper.Monkey.Operators;
+using TestHelper.Monkey.TestDoubles;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.TestTools;
@@ -32,6 +35,7 @@ namespace TestHelper.Monkey
                 .And.Message.Contains("Component is not interactable"));
         }
 
+
         /// <summary>
         /// InteractiveComponent test cases using 3D objects
         /// </summary>
@@ -58,7 +62,7 @@ namespace TestHelper.Monkey
             [TestCase("UsingEventTrigger")] // Attached EventTrigger
             [TestCase("ChildInTheSight")] // Parent object is out of sight, but this object is in the sight
             [LoadScene(TestScene)]
-            public void IsReallyInteractiveFromUser_reachableObjects_returnTrue(string targetName)
+            public void IsReachable_reachableObjects_returnTrue(string targetName)
             {
                 var target = new InteractiveComponentCollector().FindInteractableComponents()
                     .First(x => x.gameObject.name == targetName);
@@ -69,7 +73,7 @@ namespace TestHelper.Monkey
             [TestCase("BeyondTheWall")] // Beyond the another object
             [TestCase("OutOfSight")] // Out of sight
             [LoadScene(TestScene)]
-            public void IsReallyInteractiveFromUser_unreachableObjects_returnFalse(string targetName)
+            public void IsReachable_unreachableObjects_returnFalse(string targetName)
             {
                 var target = new InteractiveComponentCollector().FindInteractableComponents()
                     .First(x => x.gameObject.name == targetName);
@@ -91,7 +95,7 @@ namespace TestHelper.Monkey
             [TestCase("ChildInTheSight")] // Parent object is out of sight, but this object is in the sight
             [TestCase("ButtonOnInnerCanvas")] // On the inner Canvas
             [LoadScene(TestScene)]
-            public async Task IsReallyInteractiveFromUser_reachableObjects_returnTrue(string targetName)
+            public async Task IsReachable_reachableObjects_returnTrue(string targetName)
             {
                 await Task.Yield(); // wait for GraphicRaycaster initialization
 
@@ -106,7 +110,7 @@ namespace TestHelper.Monkey
             [TestCase("BeyondThe2D")] // Beyond the 2D object (GraphicRaycaster.blockingObjects is BlockingObjects.All)
             [TestCase("BeyondThe3D")] // Beyond the 3D object (GraphicRaycaster.blockingObjects is BlockingObjects.All)
             [LoadScene(TestScene)]
-            public async Task IsReallyInteractiveFromUser_unreachableObjects_returnFalse(string targetName)
+            public async Task IsReachable_unreachableObjects_returnFalse(string targetName)
             {
                 await Task.Yield(); // wait for GraphicRaycaster initialization
 
@@ -115,18 +119,121 @@ namespace TestHelper.Monkey
 
                 Assert.That(target.IsReachable(), Is.False);
             }
+        }
 
-            [TestCase("Button", "ReceiveOnClick")]
-            [LoadScene(TestScene)]
-            public void Tap_Tapped(string targetName, string expectedMessage)
+        [TestFixture]
+        public class Operators
+        {
+            private static readonly IOperator s_clickOperator = new UGUIClickOperator();
+            private static readonly IOperator s_clickAndHoldOperator = new UGUIClickAndHoldOperator();
+            private static readonly IOperator s_textInputOperator = new UGUITextInputOperator();
+
+            private readonly IEnumerable<IOperator> _operators = new[]
             {
-                var target = new InteractiveComponentCollector().FindInteractableComponents()
-                    .First(x => x.gameObject.name == targetName);
+                s_clickOperator, s_clickAndHoldOperator, // Matches UnityEngine.UI.Button
+                s_textInputOperator, // Does not match UnityEngine.UI.Button
+            };
 
-                Assert.That(target.CanTap(), Is.True);
-                target.Tap();
+            [Test]
+            public void GetOperators_Button_GotClickAndClickAndHoldOperator()
+            {
+                var button = new GameObject().AddComponent<Button>();
+                var sut = InteractiveComponent.CreateInteractableComponent(button, operators: _operators);
+                var actual = sut.GetOperators();
 
-                LogAssert.Expect(LogType.Log, $"{targetName}.{expectedMessage}");
+                Assert.That(actual, Is.EquivalentTo(new[] { s_clickOperator, s_clickAndHoldOperator }));
+            }
+
+            [Test]
+            public void GetOperators_OperatorsNotSet_ThrowsNotSupportedException()
+            {
+                var button = new GameObject().AddComponent<Button>();
+                var sut = InteractiveComponent.CreateInteractableComponent(button); // operators not set
+                try
+                {
+                    sut.GetOperators();
+                    Assert.Fail("Expected exception was not thrown");
+                }
+                catch (System.NotSupportedException e)
+                {
+                    Assert.That(e.Message, Is.EqualTo("Operators are not set."));
+                }
+            }
+
+            [Test]
+            public void GetOperatorsByType_Button_GotClickOperator()
+            {
+                var button = new GameObject().AddComponent<Button>();
+                var sut = InteractiveComponent.CreateInteractableComponent(button, operators: _operators);
+                var actual = sut.GetOperatorsByType(OperatorType.Click);
+
+                Assert.That(actual, Is.EquivalentTo(new[] { s_clickOperator }));
+            }
+
+            [Test]
+            public void GetOperatorsByType_OperatorsNotSet_ThrowsNotSupportedException()
+            {
+                var button = new GameObject().AddComponent<Button>();
+                var sut = InteractiveComponent.CreateInteractableComponent(button); // operators not set
+                try
+                {
+                    sut.GetOperatorsByType(OperatorType.Click);
+                    Assert.Fail("Expected exception was not thrown");
+                }
+                catch (System.NotSupportedException e)
+                {
+                    Assert.That(e.Message, Is.EqualTo("Operators are not set."));
+                }
+            }
+
+            [Test]
+            public void Click_InvokeOnClick()
+            {
+                var button = new GameObject().AddComponent<Button>();
+                button.onClick.AddListener(() => Debug.Log("Invoke Button.OnClick!"));
+                var sut = InteractiveComponent.CreateInteractableComponent(button, operators: _operators);
+
+                Assume.That(sut.CanClick(), Is.True);
+                sut.Click();
+
+                LogAssert.Expect(LogType.Log, "Invoke Button.OnClick!");
+            }
+
+            [Test]
+            public async Task ClickAndHold_InvokeOnPointerDownAndUp()
+            {
+                var button = new GameObject("ClickAndHoldTarget").AddComponent<SpyOnPointerDownUpHandler>();
+                var sut = InteractiveComponent.CreateInteractableComponent(button, operators: _operators);
+
+                Assume.That(sut.CanClickAndHold(), Is.True);
+                await sut.ClickAndHold();
+
+                LogAssert.Expect(LogType.Log, "ClickAndHoldTarget.OnPointerDown");
+                LogAssert.Expect(LogType.Log, "ClickAndHoldTarget.OnPointerUp");
+            }
+
+            [Test]
+            public void TextInput_InputRandomText()
+            {
+                var inputField = new GameObject("InputField").AddComponent<InputField>();
+                var sut = InteractiveComponent.CreateInteractableComponent(inputField, operators: _operators);
+
+                Assume.That(sut.CanTextInput(), Is.True);
+                sut.TextInput();
+
+                Assert.That(inputField.text, Does.Match("\\w{5,10}"));
+            }
+
+            [Test]
+            public void TextInput_InputSpecifiedText()
+            {
+                var inputField = new GameObject("InputField").AddComponent<InputField>();
+                var sut = InteractiveComponent.CreateInteractableComponent(inputField, operators: _operators);
+
+                Assume.That(sut.CanTextInput(), Is.True);
+                sut.TextInput("specified text!");
+
+                Assert.That(inputField.text, Is.EqualTo("specified text!"));
             }
         }
     }

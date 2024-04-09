@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2023 Koji Hasegawa.
+﻿// Copyright (c) 2023-2024 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System;
@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using TestHelper.Monkey.Annotations;
+using TestHelper.Monkey.Operators;
 using TestHelper.Random;
 using TestHelper.RuntimeInternals;
 using UnityEngine;
@@ -45,9 +47,9 @@ namespace TestHelper.Monkey
             }
 
             var interactiveComponentCollector = new InteractiveComponentCollector(
-                getScreenPoint: config.ScreenPointStrategy,
                 isReachable: config.IsReachable,
-                isInteractable: config.IsInteractable);
+                isInteractable: config.IsInteractable,
+                operators: config.Operators);
 
             config.Logger.Log($"Using {config.Random}");
 
@@ -91,14 +93,14 @@ namespace TestHelper.Monkey
         /// <param name="interactiveComponentCollector"></param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns></returns>
-        public static async UniTask<bool> RunStep(MonkeyConfig config,
-            InteractiveComponentCollector interactiveComponentCollector, CancellationToken cancellationToken = default)
+        public static async UniTask<bool> RunStep(
+            MonkeyConfig config,
+            InteractiveComponentCollector interactiveComponentCollector,
+            CancellationToken cancellationToken = default)
         {
-            var components = interactiveComponentCollector
-                .FindInteractableComponents()
-                .ToList();
-            var component = Lottery(ref components, config.Random);
-            if (component == null)
+            var operators = GetOperators(interactiveComponentCollector);
+            var (selectedComponent, selectedOperator) = LotteryOperator(operators.ToList(), config.Random);
+            if (selectedComponent == null || selectedOperator == null)
             {
                 return false;
             }
@@ -107,7 +109,7 @@ namespace TestHelper.Monkey
             {
                 if (s_coroutineRunner == null || (bool)s_coroutineRunner == false)
                 {
-                    s_coroutineRunner = new GameObject().AddComponent<CoroutineRunner>();
+                    s_coroutineRunner = new GameObject("CoroutineRunner").AddComponent<CoroutineRunner>();
                 }
 
                 await ScreenshotHelper.TakeScreenshot(
@@ -119,76 +121,35 @@ namespace TestHelper.Monkey
                     .ToUniTask(s_coroutineRunner);
             }
 
-            await DoOperation(component, config, cancellationToken);
+            config.Logger.Log($"{selectedOperator} operates to {selectedComponent.gameObject.name}");
+            await selectedOperator.OperateAsync(selectedComponent.component, cancellationToken);
             return true;
         }
 
-        internal static InteractiveComponent Lottery(
-            ref List<InteractiveComponent> components,
+        internal static IEnumerable<(InteractiveComponent, IOperator)> GetOperators(
+            InteractiveComponentCollector interactiveComponentCollector)
+        {
+            var components = interactiveComponentCollector.FindInteractableComponents()
+                .Where(x => !x.gameObject.TryGetComponent(typeof(IgnoreAnnotation), out _));
+            return components.SelectMany(x => x.GetOperators(), (x, o) => (x, o));
+        }
+
+        internal static (InteractiveComponent, IOperator) LotteryOperator(
+            List<(InteractiveComponent, IOperator)> operators,
             IRandom random)
         {
-            if (components == null || components.Count == 0)
+            while (operators.Count > 0)
             {
-                return null;
-            }
-
-            while (true)
-            {
-                if (components.Count == 0)
+                var (selectedComponent, selectedOperator) = operators[random.Next(operators.Count)];
+                if (selectedComponent.IsReachable())
                 {
-                    return null;
+                    return (selectedComponent, selectedOperator);
                 }
 
-                var next = components[random.Next(components.Count)];
-                if (next.IsReachable() && GetCanOperations(next).Any())
-                {
-                    return next;
-                }
-
-                components.Remove(next);
+                operators.Remove((selectedComponent, selectedOperator));
             }
-        }
 
-        private enum SupportOperation
-        {
-            Click,
-            TouchAndHold,
-            TextInput,
-        }
-
-        private static IEnumerable<SupportOperation> GetCanOperations(InteractiveComponent component)
-        {
-            if (component.CanClick()) yield return SupportOperation.Click;
-            if (component.CanTouchAndHold()) yield return SupportOperation.TouchAndHold;
-            if (component.CanTextInput()) yield return SupportOperation.TextInput;
-        }
-
-        internal static async UniTask DoOperation(
-            InteractiveComponent component,
-            MonkeyConfig config,
-            CancellationToken cancellationToken = default
-        )
-        {
-            var operations = GetCanOperations(component).ToArray();
-            var operation = operations[config.Random.Next(operations.Length)];
-            config.Logger.Log($"Do operation {component.gameObject.name} {operation.ToString()}");
-            switch (operation)
-            {
-                case SupportOperation.Click:
-                    component.Click();
-                    break;
-                case SupportOperation.TouchAndHold:
-                    await component.TouchAndHold(
-                        config.TouchAndHoldDelayMillis,
-                        cancellationToken
-                    );
-                    break;
-                case SupportOperation.TextInput:
-                    component.TextInput(config.RandomStringParametersStrategy, config.RandomString);
-                    break;
-                default:
-                    throw new IndexOutOfRangeException();
-            }
+            return (null, null);
         }
     }
 }
