@@ -162,53 +162,60 @@ namespace TestHelper.Monkey
         /// <summary>
         /// Check component can receive click (tap) event.
         /// </summary>
+        [Obsolete]
         public bool CanClick() => GetOperatorsByType(OperatorType.Click).Any();
 
         /// <summary>
         /// Click component.
         /// </summary>
+        [Obsolete]
         public void Click() => GetOperatorsByType(OperatorType.Click).First().OperateAsync(component);
 
-        [Obsolete("Use CanClick() instead")]
+        [Obsolete]
         public bool CanTap() => CanClick();
 
-        [Obsolete("Use Click() instead")]
+        [Obsolete]
         public void Tap() => Click();
 
         /// <summary>
         /// Check component can receive click (tap) and hold event.
         /// </summary>
+        [Obsolete]
         public bool CanClickAndHold() => GetOperatorsByType(OperatorType.ClickAndHold).Any();
 
         /// <summary>
         /// Click (touch) and hold component.
         /// </summary>
+        [Obsolete]
         public async UniTask ClickAndHold(CancellationToken cancellationToken = default)
         {
             var clickAndHoldOperator = GetOperatorsByType(OperatorType.ClickAndHold).First();
             await clickAndHoldOperator.OperateAsync(component, cancellationToken);
         }
 
-        [Obsolete("Use CanClickAndHold() instead")]
+        [Obsolete]
         public bool CanTouchAndHold() => CanClickAndHold();
 
-        [Obsolete("Use ClickAndHold() instead")]
+        [Obsolete]
         public async UniTask TouchAndHold(CancellationToken cancellationToken = default) =>
             await ClickAndHold(cancellationToken);
 
         /// <summary>
         /// Check component can input text.
         /// </summary>
+        [Obsolete]
         public bool CanTextInput() => GetOperatorsByType(OperatorType.TextInput).Any();
 
         /// <summary>
         /// Input random text.
         /// </summary>
+        [Obsolete]
         public void TextInput() => GetOperatorsByType(OperatorType.TextInput).First().OperateAsync(component);
 
         /// <summary>
         /// Input specified text.
         /// </summary>
+        [Obsolete]
         public void TextInput(string text)
         {
             var textInputOperator = (ITextInputOperator)GetOperatorsByType(OperatorType.TextInput).First();
