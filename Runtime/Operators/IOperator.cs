@@ -27,7 +27,7 @@ namespace TestHelper.Monkey.Operators
         /// </summary>
         /// <param name="component">Target component</param>
         /// <returns>True if can operate component this Operator.</returns>
-        bool IsMatch(Component component);
+        bool CanOperate(Component component);
 
         /// <summary>
         /// Execute this operator in monkey testing.

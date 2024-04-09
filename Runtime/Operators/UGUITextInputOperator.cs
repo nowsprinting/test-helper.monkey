@@ -39,7 +39,7 @@ namespace TestHelper.Monkey.Operators
         public OperatorType Type => OperatorType.TextInput;
 
         /// <inheritdoc />
-        public bool IsMatch(Component component)
+        public bool CanOperate(Component component)
         {
             return component is InputField;
         }

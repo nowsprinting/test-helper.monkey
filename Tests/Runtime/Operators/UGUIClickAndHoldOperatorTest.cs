@@ -18,11 +18,11 @@ namespace TestHelper.Monkey.Operators
         private readonly IOperator _sut = new UGUIClickAndHoldOperator(holdMillis: 500);
 
         [Test]
-        public void IsMatch_CanNotTouchAndHold_ReturnFalse()
+        public void CanOperate_CanNotTouchAndHold_ReturnFalse()
         {
             var component = new GameObject().AddComponent<SpyOnPointerClickHandler>();
 
-            Assert.That(_sut.IsMatch(component), Is.False);
+            Assert.That(_sut.CanOperate(component), Is.False);
         }
 
         [Test]
@@ -30,7 +30,7 @@ namespace TestHelper.Monkey.Operators
         {
             var component = new GameObject("ClickAndHoldTarget").AddComponent<SpyOnPointerDownUpHandler>();
 
-            Assume.That(_sut.IsMatch(component), Is.True);
+            Assume.That(_sut.CanOperate(component), Is.True);
             await _sut.OperateAsync(component);
 
             LogAssert.Expect(LogType.Log, "ClickAndHoldTarget.OnPointerDown");
@@ -43,7 +43,7 @@ namespace TestHelper.Monkey.Operators
             var receiver = new GameObject("ClickAndHoldTarget").AddComponent<SpyPointerDownUpEventReceiver>();
             var component = receiver.gameObject.GetComponent<EventTrigger>();
 
-            Assume.That(_sut.IsMatch(component), Is.True);
+            Assume.That(_sut.CanOperate(component), Is.True);
             await _sut.OperateAsync(component);
 
             LogAssert.Expect(LogType.Log, "ClickAndHoldTarget.ReceivePointerDown");
@@ -55,7 +55,7 @@ namespace TestHelper.Monkey.Operators
         {
             var component = new GameObject("ClickAndHoldTarget").AddComponent<StubDestroyingItselfWhenPointerDown>();
 
-            Assume.That(_sut.IsMatch(component), Is.True);
+            Assume.That(_sut.CanOperate(component), Is.True);
             await _sut.OperateAsync(component);
 
             LogAssert.Expect(LogType.Log, "ClickAndHoldTarget.OnPointerDown");
@@ -66,7 +66,7 @@ namespace TestHelper.Monkey.Operators
         public async Task OperateAsync_Cancel()
         {
             var component = new GameObject("ClickAndHoldTarget").AddComponent<StubLogErrorWhenOnPointerUp>();
-            Assume.That(_sut.IsMatch(component), Is.True);
+            Assume.That(_sut.CanOperate(component), Is.True);
 
             var cancellationTokenSource = new CancellationTokenSource();
             _sut.OperateAsync(component, cancellationTokenSource.Token).Forget();

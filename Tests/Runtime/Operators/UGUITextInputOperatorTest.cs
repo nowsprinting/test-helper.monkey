@@ -17,11 +17,11 @@ namespace TestHelper.Monkey.Operators
             new StubRandomString("RANDOM"));
 
         [Test]
-        public void IsMatch_CanNotInputText_ReturnFalse()
+        public void CanOperate_CanNotInputText_ReturnFalse()
         {
             var component = new GameObject().AddComponent<Button>();
 
-            Assert.That(_sut.IsMatch(component), Is.False);
+            Assert.That(_sut.CanOperate(component), Is.False);
         }
 
         [Test]
@@ -29,7 +29,7 @@ namespace TestHelper.Monkey.Operators
         {
             var component = new GameObject().AddComponent<InputField>();
 
-            Assume.That(_sut.IsMatch(component), Is.True);
+            Assume.That(_sut.CanOperate(component), Is.True);
             _sut.OperateAsync(component);
 
             Assert.That(component.text, Is.EqualTo("RANDOM"));
@@ -40,7 +40,7 @@ namespace TestHelper.Monkey.Operators
         {
             var component = new GameObject().AddComponent<InputField>();
 
-            Assume.That(_sut.IsMatch(component), Is.True);
+            Assume.That(_sut.CanOperate(component), Is.True);
             _sut.OperateAsync(component, "SPECIFIED");
 
             Assert.That(component.text, Is.EqualTo("SPECIFIED"));

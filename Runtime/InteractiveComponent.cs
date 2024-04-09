@@ -141,7 +141,7 @@ namespace TestHelper.Monkey
                 throw new NotSupportedException("Operators are not set.");
             }
 
-            return _operators.Where(iOperator => iOperator.IsMatch(component));
+            return _operators.Where(iOperator => iOperator.CanOperate(component));
         }
 
         /// <summary>
@@ -156,7 +156,7 @@ namespace TestHelper.Monkey
                 throw new NotSupportedException("Operators are not set.");
             }
 
-            return _operators.Where(iOperator => iOperator.Type == type && iOperator.IsMatch(component));
+            return _operators.Where(iOperator => iOperator.Type == type && iOperator.CanOperate(component));
         }
 
         /// <summary>

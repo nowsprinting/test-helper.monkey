@@ -36,7 +36,7 @@ namespace TestHelper.Monkey.Operators
         public OperatorType Type => OperatorType.ClickAndHold;
 
         /// <inheritdoc />
-        public bool IsMatch(Component component)
+        public bool CanOperate(Component component)
         {
             if (component as EventTrigger)
             {

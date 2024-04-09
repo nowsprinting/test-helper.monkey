@@ -15,11 +15,11 @@ namespace TestHelper.Monkey.Operators
         private readonly IOperator _sut = new UGUIClickOperator();
 
         [Test]
-        public void IsMatch_CanNotClick_ReturnFalse()
+        public void CanOperate_CanNotClick_ReturnFalse()
         {
             var component = new GameObject().AddComponent<SpyOnPointerDownUpHandler>();
 
-            Assert.That(_sut.IsMatch(component), Is.False);
+            Assert.That(_sut.CanOperate(component), Is.False);
         }
 
         [Test]
@@ -27,7 +27,7 @@ namespace TestHelper.Monkey.Operators
         {
             var component = new GameObject("ClickTarget").AddComponent<SpyOnPointerClickHandler>();
 
-            Assume.That(_sut.IsMatch(component), Is.True);
+            Assume.That(_sut.CanOperate(component), Is.True);
             _sut.OperateAsync(component);
 
             LogAssert.Expect(LogType.Log, "ClickTarget.OnPointerClick");
@@ -39,7 +39,7 @@ namespace TestHelper.Monkey.Operators
             var receiver = new GameObject("ClickTarget").AddComponent<SpyPointerClickEventReceiver>();
             var component = receiver.gameObject.GetComponent<EventTrigger>();
 
-            Assume.That(_sut.IsMatch(component), Is.True);
+            Assume.That(_sut.CanOperate(component), Is.True);
             _sut.OperateAsync(component);
 
             LogAssert.Expect(LogType.Log, "ClickTarget.ReceivePointerClick");
