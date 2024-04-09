@@ -21,7 +21,7 @@ namespace TestHelper.Monkey.Samples.UGUIDemo
         [TestCase("Difficulty")]
         [TestCase("Help")]
         [TestCase("Credit")]
-        [LoadScene("Assets/Samples/Monkey Test Helper/0.10.0/uGUI Demo/Scenes/uGUIDemo.unity")]
+        [LoadScene("Assets/Samples/Monkey Test Helper/0.11.0/uGUI Demo/Scenes/uGUIDemo.unity")]
         [TakeScreenshot]
         public async Task OpenSubScreens(string target)
         {
@@ -33,6 +33,7 @@ namespace TestHelper.Monkey.Samples.UGUIDemo
             var startComponent = CreateInteractableComponent(startButton.GetComponent<Button>());
             var startClickOperator = startComponent.GetOperatorsByType(OperatorType.Click).First();
             startClickOperator.OperateAsync(startComponent.component);
+
             await _finder.FindByNameAsync("Home");
 
             // When click target button, then open target screen.
@@ -40,6 +41,7 @@ namespace TestHelper.Monkey.Samples.UGUIDemo
             var targetComponent = CreateInteractableComponent(targetButton.GetComponent<Button>());
             var targetClickOperator = targetComponent.GetOperatorsByType(OperatorType.Click).First();
             targetClickOperator.OperateAsync(targetComponent.component);
+
             await _finder.FindByNameAsync(target);
 
             // When click Back button, then return Home screen.
@@ -47,6 +49,7 @@ namespace TestHelper.Monkey.Samples.UGUIDemo
             var backComponent = CreateInteractableComponent(backButton.GetComponent<Button>());
             var backClickOperator = backComponent.GetOperatorsByType(OperatorType.Click).First();
             backClickOperator.OperateAsync(backComponent.component);
+
             await _finder.FindByNameAsync("Home");
         }
 
