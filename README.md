@@ -153,9 +153,13 @@ public class MyIntegrationTest
 }
 ```
 
-#### InteractiveComponentCollector.FindInteractableComponents
+#### InteractiveComponent and Operators
 
-Returns interactable uGUI components.
+##### InteractiveComponent
+Returns new `InteractableComponent` instance from GameObject. If GameObject is not interactable so, return null.
+
+##### Operators
+Operators implements `IOperator` interface. It has `OperateAsync` method that operates on the component.
 
 Usage:
 
@@ -169,7 +173,39 @@ public class MyIntegrationTest
     [Test]
     public void MyTestMethod()
     {
+        var finder = new GameObjectFinder();
+        var button = await finder.FindByNameAsync("StartButton", interactable: true);
+
+        var interactableComponent = InteractiveComponent.CreateInteractableComponent(button);
+        var clickOperator = interactableComponent.GetOperatorsByType(OperatorType.Click).First();
+        clickOperator.OperateAsync(interactableComponent.component);
+    }
+}
+```
+
+#### InteractiveComponentCollector.FindInteractableComponents
+
+Returns interactable uGUI components.
+
+Usage:
+
+```csharp
+using System.Linq;
+using NUnit.Framework;
+using TestHelper.Monkey;
+using TestHelper.Monkey.Operators;
+
+[TestFixture]
+public class MyIntegrationTest
+{
+    [Test]
+    public void MyTestMethod()
+    {
         var components = InteractiveComponentCollector.FindInteractableComponents();
+
+        var firstComponent = components.First();
+        var clickAndHoldOperator = firstComponent.GetOperatorsByType(OperatorType.ClickAndHold).First();
+        await clickAndHoldOperator.OperateAsync(firstComponent.component);
     }
 }
 ```
@@ -185,6 +221,7 @@ Usage:
 using System.Linq;
 using NUnit.Framework;
 using TestHelper.Monkey;
+using TestHelper.Monkey.Operators;
 
 [TestFixture]
 public class MyIntegrationTest
@@ -192,37 +229,11 @@ public class MyIntegrationTest
     [Test]
     public void MyTestMethod()
     {
-        var component = InteractiveComponentCollector.FindReachableInteractableComponents()
-            .First();
+        var components = InteractiveComponentCollector.FindReachableInteractableComponents();
 
-        Assume.That(component.CanClick(), Is.True);
-        component.Click();
-    }
-}
-```
-
-#### InteractiveComponent.CreateInteractableComponent
-
-Returns new InteractableComponent instance from GameObject. If GameObject is not interactable so, return null.
-
-Usage:
-
-```csharp
-using NUnit.Framework;
-using TestHelper.Monkey;
-
-[TestFixture]
-public class MyIntegrationTest
-{
-    [Test]
-    public void MyTestMethod()
-    {
-        var finder = new GameObjectFinder();
-        var button = await finder.FindByNameAsync("Button", interactable: true);
-
-        var interactableComponent = InteractiveComponent.CreateInteractableComponent(button);
-        Assume.That(interactableComponent.CanClick(), Is.True);
-        interactableComponent.Click();
+        var firstComponent = components.First();
+        var textInputOperator = firstComponent.GetOperatorsByType(OperatorType.TextInput).First();
+        textInputOperator.OperateAsync(firstComponent.component);   // input random text
     }
 }
 ```
