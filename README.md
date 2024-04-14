@@ -70,6 +70,10 @@ More customize for your project:
 
 You can control the Monkey's behavior by attaching the annotation components to the GameObject.
 
+> [!NOTE]  
+> Since links with annotation components remain in the scenes and prefabs, a warning log will be generated at the time of instantiate.
+> To avoid this, annotation assembly are included in release builds.
+
 #### IgnoreAnnotation
 
 Monkey will not operate objects with `IgnoreAnnotation` attached.

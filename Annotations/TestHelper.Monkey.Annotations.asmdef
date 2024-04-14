@@ -8,9 +8,7 @@
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": false,
-    "defineConstraints": [
-        "UNITY_INCLUDE_TESTS || COM_NOWSPRINTING_TEST_HELPER_ENABLE"
-    ],
+    "defineConstraints": [],
     "versionDefines": [],
     "noEngineReferences": false
 }
