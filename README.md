@@ -240,6 +240,14 @@ public class MyIntegrationTest
 
 
 
+## Use in runtime code
+
+The "Define Constraints" is set to `UNITY_INCLUDE_TESTS || COM_NOWSPRINTING_TEST_HELPER_ENABLE` in this package's assembly definition files, so it is generally excluded from release builds.
+
+To use the feature in release builds, add `COM_NOWSPRINTING_TEST_HELPER_ENABLE` to the "Define Symbols" at build time.
+
+
+
 ## Installation
 
 You can choose from two typical installation methods.
