@@ -69,10 +69,13 @@ More customize for your project:
 ### Annotations for Monkey's behavior
 
 You can control the Monkey's behavior by attaching the annotation components to the GameObject.
+Use the `TestHelper.Monkey.Annotations` assembly by adding it to the Assembly Definition References.
+Please note that this will be included in the release build due to the way it works.
 
 > [!NOTE]  
-> Since links with annotation components remain in the scenes and prefabs, a warning log will be generated at the time of instantiate.
-> To avoid this, annotation assembly are included in release builds.
+> Even if the annotations assembly is removed from the release build, the link to the annotation component will remain Scenes and Prefabs in the asset bundle built.
+> Therefore, a warning log will be output during instantiate.
+> To avoid this, annotations assembly are included in release builds.
 
 #### IgnoreAnnotation
 
