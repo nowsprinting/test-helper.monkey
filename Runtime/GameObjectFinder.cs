@@ -9,6 +9,7 @@ using Cysharp.Threading.Tasks;
 using TestHelper.Monkey.DefaultStrategies;
 using TestHelper.Monkey.Extensions;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.EventSystems;
 
 namespace TestHelper.Monkey
@@ -24,6 +25,8 @@ namespace TestHelper.Monkey
         private readonly PointerEventData _eventData = new PointerEventData(EventSystem.current);
         private readonly List<RaycastResult> _results = new List<RaycastResult>();
 
+        private const double MinTimeoutSeconds = 0.01d;
+
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -36,6 +39,9 @@ namespace TestHelper.Monkey
             Func<GameObject, PointerEventData, List<RaycastResult>, bool> isReachable = null,
             Func<Component, bool> isComponentInteractable = null)
         {
+            Assert.IsTrue(timeoutSeconds > MinTimeoutSeconds,
+                $"TimeoutSeconds must be greater than {MinTimeoutSeconds}.");
+
             _timeoutSeconds = timeoutSeconds;
             _isReachable = isReachable ?? DefaultReachableStrategy.IsReachable;
             _isComponentInteractable = isComponentInteractable ?? DefaultComponentInteractableStrategy.IsInteractable;
@@ -90,7 +96,7 @@ namespace TestHelper.Monkey
         public async UniTask<GameObject> FindByNameAsync(string name, bool reachable = true, bool interactable = false,
             CancellationToken token = default)
         {
-            var delaySeconds = 0.01d;
+            var delaySeconds = MinTimeoutSeconds;
             var reason = Reason.None;
 
             while (delaySeconds < _timeoutSeconds)
