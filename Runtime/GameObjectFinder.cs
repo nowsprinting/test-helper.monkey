@@ -50,12 +50,13 @@ namespace TestHelper.Monkey
         private enum Reason
         {
             NotFound,
+            NotMatchPath,
             NotReachable,
             NotInteractable,
             None
         }
 
-        private (GameObject, Reason) FindByName(string name, bool reachable, bool interactable)
+        private (GameObject, Reason) FindByName(string name, string path, bool reachable, bool interactable)
         {
             var foundObject = GameObject.Find(name);
             // Note: Cases where there are multiple GameObjects with the same name are not considered.
@@ -65,23 +66,57 @@ namespace TestHelper.Monkey
                 return (null, Reason.NotFound);
             }
 
-            if (reachable)
+            if (path != null && !foundObject.transform.MatchPath(path))
             {
-                if (!_isReachable.Invoke(foundObject, _eventData, _results))
-                {
-                    return (null, Reason.NotReachable);
-                }
+                return (null, Reason.NotMatchPath);
             }
 
-            if (interactable)
+            if (reachable && !_isReachable.Invoke(foundObject, _eventData, _results))
             {
-                if (!foundObject.GetComponents<Component>().Any(_isComponentInteractable))
-                {
-                    return (null, Reason.NotInteractable);
-                }
+                return (null, Reason.NotReachable);
+            }
+
+            if (interactable && !foundObject.GetComponents<Component>().Any(_isComponentInteractable))
+            {
+                return (null, Reason.NotInteractable);
             }
 
             return (foundObject, Reason.None);
+        }
+
+        private async UniTask<GameObject> FindByNameAsync(string name, string path, bool reachable, bool interactable,
+            CancellationToken token)
+        {
+            var delaySeconds = MinTimeoutSeconds;
+            var reason = Reason.None;
+
+            while (delaySeconds < _timeoutSeconds)
+            {
+                GameObject foundObject;
+                (foundObject, reason) = FindByName(name, path, reachable, interactable);
+                if (foundObject != null)
+                {
+                    return foundObject;
+                }
+
+                delaySeconds = Math.Min(delaySeconds * 2, _timeoutSeconds);
+                await UniTask.Delay(TimeSpan.FromSeconds(delaySeconds), cancellationToken: token);
+            }
+
+            switch (reason)
+            {
+                case Reason.NotFound:
+                    throw new TimeoutException($"GameObject `{name}` is not found.");
+                case Reason.NotMatchPath:
+                    throw new TimeoutException($"GameObject `{name}` is found, but it does not match path `{path}`.");
+                case Reason.NotReachable:
+                    throw new TimeoutException($"GameObject `{name}` is found, but not reachable.");
+                case Reason.NotInteractable:
+                    throw new TimeoutException($"GameObject `{name}` is found, but not interactable.");
+                case Reason.None:
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         /// <summary>
@@ -96,34 +131,7 @@ namespace TestHelper.Monkey
         public async UniTask<GameObject> FindByNameAsync(string name, bool reachable = true, bool interactable = false,
             CancellationToken token = default)
         {
-            var delaySeconds = MinTimeoutSeconds;
-            var reason = Reason.None;
-
-            while (delaySeconds < _timeoutSeconds)
-            {
-                GameObject foundObject;
-                (foundObject, reason) = FindByName(name, reachable, interactable);
-                if (foundObject != null)
-                {
-                    return foundObject;
-                }
-
-                delaySeconds = Math.Min(delaySeconds * 2, _timeoutSeconds);
-                await UniTask.Delay(TimeSpan.FromSeconds(delaySeconds), cancellationToken: token);
-            }
-
-            switch (reason)
-            {
-                case Reason.NotFound:
-                    throw new TimeoutException($"GameObject `{name}` is not found.");
-                case Reason.NotReachable:
-                    throw new TimeoutException($"GameObject `{name}` is found, but not reachable.");
-                case Reason.NotInteractable:
-                    throw new TimeoutException($"GameObject `{name}` is found, but not interactable.");
-                case Reason.None:
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            return await FindByNameAsync(name, null, reachable, interactable, token);
         }
 
         /// <summary>
@@ -140,13 +148,7 @@ namespace TestHelper.Monkey
             CancellationToken token = default)
         {
             var name = path.Split('/').Last();
-            var foundObject = await FindByNameAsync(name, reachable, interactable, token);
-            if (foundObject.transform.MatchPath(path))
-            {
-                return foundObject;
-            }
-
-            throw new TimeoutException($"GameObject `{name}` is found, but it does not match path `{path}`.");
+            return await FindByNameAsync(name, path, reachable, interactable, token);
         }
     }
 }

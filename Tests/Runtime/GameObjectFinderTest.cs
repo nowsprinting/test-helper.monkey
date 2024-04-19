@@ -7,9 +7,11 @@ using System.Threading.Tasks;
 using Cysharp.Threading.Tasks; // Do not remove, required for Unity 2022 or earlier
 using NUnit.Framework;
 using TestHelper.Attributes;
+using TestHelper.Monkey.Extensions;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
+using UnityEngine.UI;
 #if UNITY_EDITOR
 using UnityEditor.SceneManagement;
 #endif
@@ -125,7 +127,7 @@ namespace TestHelper.Monkey
             public async Task FindByPathAsync_Found(string path)
             {
                 var actual = await _sut.FindByPathAsync(path, reachable: false, interactable: false);
-                Assert.That(actual.name, Is.EqualTo("Interactable"));
+                Assert.That(actual.transform.GetPath(), Is.EqualTo("/Canvas/Parent/Child/Grandchild/Interactable"));
             }
 
             [TestCase("/Parent/Child/Grandchild/Interactable")]
@@ -144,6 +146,28 @@ namespace TestHelper.Monkey
                     Assert.That(e.Message,
                         Is.EqualTo($"GameObject `Interactable` is found, but it does not match path `{path}`."));
                 }
+            }
+
+            [TestCase("/Canvas/Parent/**/Interactable")]
+            [LoadScene(TestScenePath)]
+            public async Task FindByPathAsync_DummyHasSameName_Found(string path)
+            {
+                var dummyInteractable = new GameObject("Interactable").AddComponent<Button>();
+                var canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
+                dummyInteractable.transform.SetParent(canvas.transform);
+
+                var target = GameObject.Find("Interactable");
+                target.SetActive(false);
+                new Task(async () =>
+                {
+                    await UniTask.Delay(100);
+                    target.SetActive(true);
+                    dummyInteractable.gameObject.SetActive(false);
+                }).Start();
+
+                var sut = new GameObjectFinder(0.5d);
+                var actual = await sut.FindByPathAsync(path, reachable: false, interactable: false);
+                Assert.That(actual.transform.GetPath(), Is.EqualTo("/Canvas/Parent/Child/Grandchild/Interactable"));
             }
         }
 
