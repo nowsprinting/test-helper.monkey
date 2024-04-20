@@ -18,7 +18,7 @@ namespace TestHelper.Monkey
     /// <summary>
     /// Wrapped component that provide interaction for user.
     /// </summary>
-    // TODO: Rename to InteractableComponent
+    [Obsolete]
     public class InteractiveComponent
     {
         /// <summary>

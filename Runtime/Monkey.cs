@@ -7,11 +7,13 @@ using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using TestHelper.Monkey.Annotations;
+using TestHelper.Monkey.Extensions;
 using TestHelper.Monkey.Operators;
 using TestHelper.Random;
 using TestHelper.RuntimeInternals;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.EventSystems;
 
 namespace TestHelper.Monkey
 {
@@ -46,7 +48,7 @@ namespace TestHelper.Monkey
                 GameViewControlHelper.SetGizmos(true);
             }
 
-            var interactiveComponentCollector = new InteractiveComponentCollector(
+            var interactableComponentCollector = new InteractiveComponentCollector(
                 isReachable: config.IsReachable,
                 isInteractable: config.IsInteractable,
                 operators: config.Operators);
@@ -57,7 +59,13 @@ namespace TestHelper.Monkey
             {
                 while (Time.time < endTime)
                 {
-                    var didAct = await RunStep(config, interactiveComponentCollector, cancellationToken);
+                    var didAct = await RunStep(
+                        config.Random,
+                        config.Logger,
+                        config.Screenshots,
+                        config.IsReachable,
+                        interactableComponentCollector,
+                        cancellationToken);
                     if (didAct)
                     {
                         lastOperationTime = Time.time;
@@ -89,23 +97,29 @@ namespace TestHelper.Monkey
         /// <summary>
         /// Run a step of monkey testing.
         /// </summary>
-        /// <param name="config">Run configuration for monkey testing</param>
-        /// <param name="interactiveComponentCollector"></param>
+        /// <param name="random">Random number generator from <c>MonkeyConfig</c></param>
+        /// <param name="logger">Logger from <c>MonkeyConfig</c></param>
+        /// <param name="screenshotOptions">Take screenshots options from <c>MonkeyConfig</c></param>
+        /// <param name="isReachable">Function returns the <c>GameObject</c> is reachable from user or not. from <c>MonkeyConfig</c></param>
+        /// <param name="interactableComponentCollector">InteractableComponentCollector instance includes isReachable, isInteractable, and operators</param>
         /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns></returns>
+        /// <returns>True if any operator was executed</returns>
         public static async UniTask<bool> RunStep(
-            MonkeyConfig config,
-            InteractiveComponentCollector interactiveComponentCollector,
+            IRandom random,
+            ILogger logger,
+            ScreenshotOptions screenshotOptions,
+            Func<GameObject, PointerEventData, List<RaycastResult>, bool> isReachable,
+            InteractiveComponentCollector interactableComponentCollector,
             CancellationToken cancellationToken = default)
         {
-            var operators = GetOperators(interactiveComponentCollector);
-            var (selectedComponent, selectedOperator) = LotteryOperator(operators.ToList(), config.Random);
+            var operators = GetOperators(interactableComponentCollector);
+            var (selectedComponent, selectedOperator) = LotteryOperator(operators.ToList(), random, isReachable);
             if (selectedComponent == null || selectedOperator == null)
             {
                 return false;
             }
 
-            if (config.Screenshots != null)
+            if (screenshotOptions != null)
             {
                 if (s_coroutineRunner == null || (bool)s_coroutineRunner == false)
                 {
@@ -113,35 +127,32 @@ namespace TestHelper.Monkey
                 }
 
                 await ScreenshotHelper.TakeScreenshot(
-                        directory: config.Screenshots.Directory,
-                        filename: config.Screenshots.FilenameStrategy.GetFilename(),
-                        superSize: config.Screenshots.SuperSize,
-                        stereoCaptureMode: config.Screenshots.StereoCaptureMode
+                        directory: screenshotOptions.Directory,
+                        filename: screenshotOptions.FilenameStrategy.GetFilename(),
+                        superSize: screenshotOptions.SuperSize,
+                        stereoCaptureMode: screenshotOptions.StereoCaptureMode
                     )
                     .ToUniTask(s_coroutineRunner);
             }
 
-            config.Logger.Log($"{selectedOperator} operates to {selectedComponent.gameObject.name}");
-            await selectedOperator.OperateAsync(selectedComponent.component, cancellationToken);
+            logger.Log($"{selectedOperator} operates to {selectedComponent.gameObject.name}");
+            await selectedOperator.OperateAsync(selectedComponent, cancellationToken);
             return true;
         }
 
-        internal static IEnumerable<(InteractiveComponent, IOperator)> GetOperators(
-            InteractiveComponentCollector interactiveComponentCollector)
+        internal static IEnumerable<(Component, IOperator)> GetOperators(InteractiveComponentCollector collector)
         {
-            var components = interactiveComponentCollector.FindInteractableComponents()
-                .Where(x => !x.gameObject.TryGetComponent(typeof(IgnoreAnnotation), out _));
-            return components.SelectMany(x => x.GetOperators(), (x, o) => (x, o));
+            return collector.FindInteractableComponentsAndOperators()
+                .Where(x => !x.Item1.gameObject.TryGetComponent(typeof(IgnoreAnnotation), out _));
         }
 
-        internal static (InteractiveComponent, IOperator) LotteryOperator(
-            List<(InteractiveComponent, IOperator)> operators,
-            IRandom random)
+        internal static (Component, IOperator) LotteryOperator(List<(Component, IOperator)> operators, IRandom random,
+            Func<GameObject, PointerEventData, List<RaycastResult>, bool> isReachable)
         {
             while (operators.Count > 0)
             {
                 var (selectedComponent, selectedOperator) = operators[random.Next(operators.Count)];
-                if (selectedComponent.IsReachable())
+                if (selectedComponent.gameObject.IsReachable(isReachable))
                 {
                     return (selectedComponent, selectedOperator);
                 }

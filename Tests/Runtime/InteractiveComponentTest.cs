@@ -6,6 +6,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
+using TestHelper.Monkey.DefaultStrategies;
+using TestHelper.Monkey.Extensions;
 using TestHelper.Monkey.Operators;
 using TestHelper.Monkey.TestDoubles;
 using UnityEngine;
@@ -67,7 +69,7 @@ namespace TestHelper.Monkey
                 var target = new InteractiveComponentCollector().FindInteractableComponents()
                     .First(x => x.gameObject.name == targetName);
 
-                Assert.That(target.IsReachable(), Is.True);
+                Assert.That(target.gameObject.IsReachable(DefaultReachableStrategy.IsReachable), Is.True);
             }
 
             [TestCase("BeyondTheWall")] // Beyond the another object
@@ -78,7 +80,7 @@ namespace TestHelper.Monkey
                 var target = new InteractiveComponentCollector().FindInteractableComponents()
                     .First(x => x.gameObject.name == targetName);
 
-                Assert.That(target.IsReachable(), Is.False);
+                Assert.That(target.gameObject.IsReachable(DefaultReachableStrategy.IsReachable), Is.False);
             }
         }
 
@@ -102,7 +104,7 @@ namespace TestHelper.Monkey
                 var target = new InteractiveComponentCollector().FindInteractableComponents()
                     .First(x => x.gameObject.name == targetName);
 
-                Assert.That(target.IsReachable(), Is.True);
+                Assert.That(target.gameObject.IsReachable(DefaultReachableStrategy.IsReachable), Is.True);
             }
 
             [TestCase("BeyondTheWall")] // Beyond the another object
@@ -117,7 +119,7 @@ namespace TestHelper.Monkey
                 var target = new InteractiveComponentCollector().FindInteractableComponents()
                     .First(x => x.gameObject.name == targetName);
 
-                Assert.That(target.IsReachable(), Is.False);
+                Assert.That(target.gameObject.IsReachable(DefaultReachableStrategy.IsReachable), Is.False);
             }
         }
 

@@ -3,7 +3,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using TestHelper.Monkey.DefaultStrategies;
+using TestHelper.Monkey.Extensions;
 using TestHelper.Monkey.Operators;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -47,17 +49,14 @@ namespace TestHelper.Monkey
         ///
         /// Note: If you only need UI elements, using UnityEngine.UI.Selectable.allSelectablesArray is faster.
         /// </summary>
-        /// <returns>Interactive components</returns>
-        public IEnumerable<InteractiveComponent> FindInteractableComponents()
+        /// <returns>Interactable components</returns>
+        public IEnumerable<Component> FindInteractableComponents()
         {
             foreach (var component in FindMonoBehaviours())
             {
                 if (_isInteractable.Invoke(component))
                 {
-                    yield return InteractiveComponent.CreateInteractableComponent(component,
-                        _isReachable,
-                        _isInteractable,
-                        _operators);
+                    yield return component;
                 }
             }
         }
@@ -65,8 +64,7 @@ namespace TestHelper.Monkey
         [Obsolete("Use FindInteractableComponents() instead")]
         public static IEnumerable<InteractiveComponent> FindInteractiveComponents()
         {
-            var instance = new InteractiveComponentCollector();
-            return instance.FindInteractableComponents();
+            throw new NotImplementedException("Use FindInteractableComponents() instead");
         }
 
         /// <summary>
@@ -75,24 +73,33 @@ namespace TestHelper.Monkey
         /// 
         /// Note: If you only need UI elements, using UnityEngine.UI.Selectable.allSelectablesArray is faster.
         /// </summary>
-        /// <returns>Really interactive components</returns>
-        public IEnumerable<InteractiveComponent> FindReachableInteractableComponents()
+        /// <returns>Reachable and Interactable components</returns>
+        public IEnumerable<Component> FindReachableInteractableComponents()
         {
-            foreach (var interactiveComponent in FindInteractableComponents())
+            foreach (var interactableComponent in FindInteractableComponents())
             {
-                if (_isReachable.Invoke(interactiveComponent.gameObject, _eventData, _results))
+                if (_isReachable.Invoke(interactableComponent.gameObject, _eventData, _results))
                 {
-                    yield return interactiveComponent;
+                    yield return interactableComponent;
                 }
             }
+        }
+
+        /// <summary>
+        /// Returns tuple of interactable component and operator.
+        /// Note: Not check reachable from user.
+        /// </summary>
+        /// <returns>Tuple of interactable component and operator</returns>
+        public IEnumerable<(Component, IOperator)> FindInteractableComponentsAndOperators()
+        {
+            return FindInteractableComponents().SelectMany(x => x.SelectOperators(_operators), (x, o) => (x, o));
         }
 
         [Obsolete("Use FindReachableInteractableComponents() instead")]
         public static IEnumerable<InteractiveComponent> FindReallyInteractiveComponents(
             Func<GameObject, Vector2> screenPointStrategy)
         {
-            var instance = new InteractiveComponentCollector();
-            return instance.FindReachableInteractableComponents();
+            throw new NotImplementedException("Use FindReachableInteractableComponents() instead");
         }
 
         private static IEnumerable<MonoBehaviour> FindMonoBehaviours()
