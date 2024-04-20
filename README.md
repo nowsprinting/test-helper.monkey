@@ -102,7 +102,7 @@ Specify the screen position offset on world space where Monkey operates.
 Specify the world position where Monkey operates.
 
 
-### Find and operate interactive uGUI elements API
+### Find and operate interactable uGUI components
 
 #### GameObjectFinder.FindByNameAsync
 
@@ -154,18 +154,17 @@ public class MyIntegrationTest
     [Test]
     public void MyTestMethod()
     {
-        var finder = new GameObjectFinder(5d); // 5 seconds timeout
+        var finder = new GameObjectFinder();
         var button = await finder.FindByPathAsync("/**/Confirm/**/Cancel", reachable: true, interactable: true);
     }
 }
 ```
 
-#### InteractiveComponent and Operators
+#### Get interactable components and operators
 
-##### InteractiveComponent
-Returns new `InteractableComponent` instance from GameObject. If GameObject is not interactable so, return null.
+`GetInteractableComponents` are extensions of `GameObject` that return interactable components.
 
-##### Operators
+`SelectOperators` and `SelectOperatorsOfType` are extensions of `Component` that return available operators.
 Operators implements `IOperator` interface. It has `OperateAsync` method that operates on the component.
 
 Usage:
@@ -178,14 +177,14 @@ using TestHelper.Monkey;
 public class MyIntegrationTest
 {
     [Test]
-    public void MyTestMethod()
+    public void ClickStartButton()
     {
         var finder = new GameObjectFinder();
         var button = await finder.FindByNameAsync("StartButton", interactable: true);
 
-        var interactableComponent = InteractiveComponent.CreateInteractableComponent(button);
-        var clickOperator = interactableComponent.GetOperatorsByType(OperatorType.Click).First();
-        clickOperator.OperateAsync(interactableComponent.component);
+        var buttonComponent = button.GetInteractableComponents().First();
+        var clickOperator = buttonComponent.SelectOperatorsOfType(_operators, OperatorType.Click).First();
+        clickOperator.OperateAsync(buttonComponent);
     }
 }
 ```
@@ -211,8 +210,8 @@ public class MyIntegrationTest
         var components = InteractiveComponentCollector.FindInteractableComponents();
 
         var firstComponent = components.First();
-        var clickAndHoldOperator = firstComponent.GetOperatorsByType(OperatorType.ClickAndHold).First();
-        await clickAndHoldOperator.OperateAsync(firstComponent.component);
+        var clickAndHoldOperator = firstComponent.SelectOperatorsOfType(_operators, OperatorType.ClickAndHold).First();
+        await clickAndHoldOperator.OperateAsync(firstComponent);
     }
 }
 ```
@@ -239,8 +238,8 @@ public class MyIntegrationTest
         var components = InteractiveComponentCollector.FindReachableInteractableComponents();
 
         var firstComponent = components.First();
-        var textInputOperator = firstComponent.GetOperatorsByType(OperatorType.TextInput).First();
-        textInputOperator.OperateAsync(firstComponent.component);   // input random text
+        var textInputOperator = firstComponent.SelectOperatorsOfType(_operators, OperatorType.TextInput).First();
+        textInputOperator.OperateAsync(firstComponent);   // input random text
     }
 }
 ```
