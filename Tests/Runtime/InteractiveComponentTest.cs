@@ -151,7 +151,7 @@ namespace TestHelper.Monkey
             {
                 var button = new GameObject().AddComponent<Button>();
                 var sut = InteractiveComponent.CreateInteractableComponent(button, operators: _operators);
-                var actual = sut.GetOperatorsByType(OperatorType.Click);
+                var actual = sut.GetOperatorsByType<IClickOperator>();
 
                 Assert.That(actual, Is.EquivalentTo(new[] { s_clickOperator }));
             }

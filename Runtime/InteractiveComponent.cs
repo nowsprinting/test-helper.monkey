@@ -144,25 +144,24 @@ namespace TestHelper.Monkey
         /// <summary>
         /// Returns the operators that specify types and are available to this component.
         /// </summary>
-        /// <param name="type">Operator type</param>
         /// <returns>Available operators</returns>
-        [Obsolete("Use ComponentExtensions.SelectOperatorsOfType() instead.")]
-        public IEnumerable<IOperator> GetOperatorsByType(OperatorType type)
+        [Obsolete("Use ComponentExtensions.SelectOperators<T>() instead.")]
+        public IEnumerable<T> GetOperatorsByType<T>() where T : IOperator
         {
-            return component.SelectOperatorsOfType(_operators, type);
+            return component.SelectOperators<T>(_operators);
         }
 
         /// <summary>
         /// Check component can receive click (tap) event.
         /// </summary>
         [Obsolete]
-        public bool CanClick() => GetOperatorsByType(OperatorType.Click).Any();
+        public bool CanClick() => GetOperatorsByType<IClickOperator>().Any();
 
         /// <summary>
         /// Click component.
         /// </summary>
         [Obsolete]
-        public void Click() => GetOperatorsByType(OperatorType.Click).First().OperateAsync(component);
+        public void Click() => GetOperatorsByType<IClickOperator>().First().OperateAsync(component);
 
         [Obsolete]
         public bool CanTap() => CanClick();
@@ -174,7 +173,7 @@ namespace TestHelper.Monkey
         /// Check component can receive click (tap) and hold event.
         /// </summary>
         [Obsolete]
-        public bool CanClickAndHold() => GetOperatorsByType(OperatorType.ClickAndHold).Any();
+        public bool CanClickAndHold() => GetOperatorsByType<IClickAndHoldOperator>().Any();
 
         /// <summary>
         /// Click (touch) and hold component.
@@ -182,7 +181,7 @@ namespace TestHelper.Monkey
         [Obsolete]
         public async UniTask ClickAndHold(CancellationToken cancellationToken = default)
         {
-            var clickAndHoldOperator = GetOperatorsByType(OperatorType.ClickAndHold).First();
+            var clickAndHoldOperator = GetOperatorsByType<IClickAndHoldOperator>().First();
             await clickAndHoldOperator.OperateAsync(component, cancellationToken);
         }
 
@@ -197,13 +196,13 @@ namespace TestHelper.Monkey
         /// Check component can input text.
         /// </summary>
         [Obsolete]
-        public bool CanTextInput() => GetOperatorsByType(OperatorType.TextInput).Any();
+        public bool CanTextInput() => GetOperatorsByType<ITextInputOperator>().Any();
 
         /// <summary>
         /// Input random text.
         /// </summary>
         [Obsolete]
-        public void TextInput() => GetOperatorsByType(OperatorType.TextInput).First().OperateAsync(component);
+        public void TextInput() => GetOperatorsByType<ITextInputOperator>().First().OperateAsync(component);
 
         /// <summary>
         /// Input specified text.
@@ -211,7 +210,7 @@ namespace TestHelper.Monkey
         [Obsolete]
         public void TextInput(string text)
         {
-            var textInputOperator = (ITextInputOperator)GetOperatorsByType(OperatorType.TextInput).First();
+            var textInputOperator = GetOperatorsByType<ITextInputOperator>().First();
             textInputOperator.OperateAsync(component, text);
         }
     }

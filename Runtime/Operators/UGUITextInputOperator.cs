@@ -36,9 +36,6 @@ namespace TestHelper.Monkey.Operators
         }
 
         /// <inheritdoc />
-        public OperatorType Type => OperatorType.TextInput;
-
-        /// <inheritdoc />
         public bool CanOperate(Component component)
         {
             return component is InputField;

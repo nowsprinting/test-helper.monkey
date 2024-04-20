@@ -164,7 +164,7 @@ public class MyIntegrationTest
 
 `GetInteractableComponents` are extensions of `GameObject` that return interactable components.
 
-`SelectOperators` and `SelectOperatorsOfType` are extensions of `Component` that return available operators.
+`SelectOperators` and `SelectOperators<T>` are extensions of `Component` that return available operators.
 Operators implements `IOperator` interface. It has `OperateAsync` method that operates on the component.
 
 Usage:
@@ -183,7 +183,7 @@ public class MyIntegrationTest
         var button = await finder.FindByNameAsync("StartButton", interactable: true);
 
         var buttonComponent = button.GetInteractableComponents().First();
-        var clickOperator = buttonComponent.SelectOperatorsOfType(_operators, OperatorType.Click).First();
+        var clickOperator = buttonComponent.SelectOperators<IClickOperator>(_operators).First();
         clickOperator.OperateAsync(buttonComponent);
     }
 }
@@ -210,7 +210,7 @@ public class MyIntegrationTest
         var components = InteractiveComponentCollector.FindInteractableComponents();
 
         var firstComponent = components.First();
-        var clickAndHoldOperator = firstComponent.SelectOperatorsOfType(_operators, OperatorType.ClickAndHold).First();
+        var clickAndHoldOperator = firstComponent.SelectOperators<IClickAndHoldOperator>(_operators).First();
         await clickAndHoldOperator.OperateAsync(firstComponent);
     }
 }
@@ -238,7 +238,7 @@ public class MyIntegrationTest
         var components = InteractiveComponentCollector.FindReachableInteractableComponents();
 
         var firstComponent = components.First();
-        var textInputOperator = firstComponent.SelectOperatorsOfType(_operators, OperatorType.TextInput).First();
+        var textInputOperator = firstComponent.SelectOperators<ITextInputOperator>(_operators).First();
         textInputOperator.OperateAsync(firstComponent);   // input random text
     }
 }
