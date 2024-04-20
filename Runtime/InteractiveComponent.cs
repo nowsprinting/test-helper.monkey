@@ -125,9 +125,10 @@ namespace TestHelper.Monkey
         /// Hit test using raycaster
         /// </summary>
         /// <returns>true: this object can control by user</returns>
+        [Obsolete("Use GameObjectExtensions.IsReachable() instead")]
         public bool IsReachable()
         {
-            return _isReachable.Invoke(gameObject, _eventData, _results);
+            return gameObject.IsReachable(_isReachable, _eventData, _results);
         }
 
         /// <summary>
