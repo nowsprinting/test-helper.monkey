@@ -9,19 +9,14 @@ namespace TestHelper.Monkey.Operators
 {
     /// <summary>
     /// Matcher and Operator pair for monkey testing.
-    /// Implement the <c>IsMatch</c> method to determine whether an operation such as click is possible, and the <c>Operate</c> method to execute the operation.
+    /// Implement the <c>CanOperate</c> method to determine whether an operation such as click is possible, and the <c>OperateAsync</c> method to execute the operation.
     /// </summary>
     /// <remarks>
+    /// Must be implements sub-interface (e.g., <c>IClickOperator</c>) to represent the type of operator.
     /// If required parameters for the operation, such as hold time, input text strategy, etc., keep them in instance fields of the implementation class.
     /// </remarks>
     public interface IOperator
     {
-        /// <summary>
-        /// Returns operator type.
-        /// Intended for use in capture and playback features.
-        /// </summary>
-        OperatorType Type { get; }
-
         /// <summary>
         /// Returns if can operate target component this Operator.
         /// </summary>

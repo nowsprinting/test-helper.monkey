@@ -30,7 +30,7 @@ namespace TestHelper.Monkey.Samples.UGUIDemo
             // When click Start button, then open Home screen.
             var startButton = await _finder.FindByNameAsync("StartButton", interactable: true);
             var startComponent = startButton.GetInteractableComponents().First();
-            var startOperator = startComponent.SelectOperatorsOfType(_config.Operators, OperatorType.Click).First();
+            var startOperator = startComponent.SelectOperators<IClickOperator>(_config.Operators).First();
             startOperator.OperateAsync(startComponent);
 
             await _finder.FindByNameAsync("Home");
@@ -38,7 +38,7 @@ namespace TestHelper.Monkey.Samples.UGUIDemo
             // When click target button, then open target screen.
             var targetButton = await _finder.FindByNameAsync($"{target}Button", interactable: true);
             var targetComponent = targetButton.GetInteractableComponents().First();
-            var targetOperator = targetComponent.SelectOperatorsOfType(_config.Operators, OperatorType.Click).First();
+            var targetOperator = targetComponent.SelectOperators<IClickOperator>(_config.Operators).First();
             targetOperator.OperateAsync(targetComponent);
 
             await _finder.FindByNameAsync(target);
@@ -46,7 +46,7 @@ namespace TestHelper.Monkey.Samples.UGUIDemo
             // When click Back button, then return Home screen.
             var backButton = await _finder.FindByPathAsync($"**/{target}/BackButton", interactable: true);
             var backComponent = backButton.GetInteractableComponents().First();
-            var backOperator = backComponent.SelectOperatorsOfType(_config.Operators, OperatorType.Click).First();
+            var backOperator = backComponent.SelectOperators<IClickOperator>(_config.Operators).First();
             backOperator.OperateAsync(backComponent);
 
             await _finder.FindByNameAsync("Home");

@@ -15,7 +15,7 @@ namespace TestHelper.Monkey.Operators
     /// Click and hold operator for Unity UI (uGUI) components.
     /// a.k.a. touch and hold, long press.
     /// </summary>
-    public class UGUIClickAndHoldOperator : IOperator
+    public class UGUIClickAndHoldOperator : IClickAndHoldOperator
     {
         private readonly int _holdMillis;
         private readonly Func<GameObject, Vector2> _getScreenPoint;
@@ -31,9 +31,6 @@ namespace TestHelper.Monkey.Operators
             this._holdMillis = holdMillis;
             this._getScreenPoint = getScreenPoint ?? DefaultScreenPointStrategy.GetScreenPoint;
         }
-
-        /// <inheritdoc />
-        public OperatorType Type => OperatorType.ClickAndHold;
 
         /// <inheritdoc />
         public bool CanOperate(Component component)

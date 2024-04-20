@@ -16,7 +16,7 @@ namespace TestHelper.Monkey.Operators
     /// <summary>
     /// Click (tap) operator for Unity UI (uGUI) components.
     /// </summary>
-    public class UGUIClickOperator : IOperator
+    public class UGUIClickOperator : IClickOperator
     {
         private readonly Func<GameObject, Vector2> _getScreenPoint;
         private readonly PointerEventData _eventData = new PointerEventData(EventSystem.current);
@@ -29,9 +29,6 @@ namespace TestHelper.Monkey.Operators
         {
             this._getScreenPoint = getScreenPoint ?? DefaultScreenPointStrategy.GetScreenPoint;
         }
-
-        /// <inheritdoc />
-        public OperatorType Type => OperatorType.Click;
 
         /// <inheritdoc />
         public bool CanOperate(Component component)

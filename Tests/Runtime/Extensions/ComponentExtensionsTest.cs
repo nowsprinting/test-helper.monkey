@@ -34,7 +34,7 @@ namespace TestHelper.Monkey.Extensions
         public void GetOperatorsByType_Button_GotClickOperator()
         {
             var button = new GameObject().AddComponent<Button>();
-            var actual = button.SelectOperatorsOfType(_operators, OperatorType.Click);
+            var actual = button.SelectOperators<IClickOperator>(_operators);
 
             Assert.That(actual, Is.EquivalentTo(new[] { s_clickOperator }));
         }
