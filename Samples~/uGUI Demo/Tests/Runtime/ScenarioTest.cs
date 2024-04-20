@@ -20,7 +20,7 @@ namespace TestHelper.Monkey.Samples.UGUIDemo
         [TestCase("Difficulty")]
         [TestCase("Help")]
         [TestCase("Credit")]
-        [LoadScene("Assets/Samples/Monkey Test Helper/0.11.1/uGUI Demo/Scenes/uGUIDemo.unity")]
+        [LoadScene("Assets/Samples/Monkey Test Helper/0.11.2/uGUI Demo/Scenes/uGUIDemo.unity")]
         [TakeScreenshot]
         public async Task OpenSubScreens(string target)
         {
