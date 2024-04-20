@@ -135,14 +135,10 @@ namespace TestHelper.Monkey
         /// Returns the operators available to this component.
         /// </summary>
         /// <returns>Available operators</returns>
+        [Obsolete("Use ComponentExtensions.SelectOperators() instead.")]
         public IEnumerable<IOperator> GetOperators()
         {
-            if (_operators == null || !_operators.Any())
-            {
-                throw new NotSupportedException("Operators are not set.");
-            }
-
-            return _operators.Where(iOperator => iOperator.CanOperate(component));
+            return component.SelectOperators(_operators);
         }
 
         /// <summary>
@@ -150,14 +146,10 @@ namespace TestHelper.Monkey
         /// </summary>
         /// <param name="type">Operator type</param>
         /// <returns>Available operators</returns>
+        [Obsolete("Use ComponentExtensions.SelectOperatorsOfType() instead.")]
         public IEnumerable<IOperator> GetOperatorsByType(OperatorType type)
         {
-            if (_operators == null || !_operators.Any())
-            {
-                throw new NotSupportedException("Operators are not set.");
-            }
-
-            return _operators.Where(iOperator => iOperator.Type == type && iOperator.CanOperate(component));
+            return component.SelectOperatorsOfType(_operators, type);
         }
 
         /// <summary>

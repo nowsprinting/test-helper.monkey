@@ -2,7 +2,9 @@
 // This software is released under the MIT License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using TestHelper.Monkey.Operators;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -11,6 +13,31 @@ namespace TestHelper.Monkey.Extensions
 {
     public static class ComponentExtensions
     {
+        /// <summary>
+        /// Returns the operators available to this component.
+        /// </summary>
+        /// <param name="component"></param>
+        /// <param name="operators">All available operators in autopilot/tests. Usually defined in <c>MonkeyConfig</c></param>
+        /// <returns>Available operators</returns>
+        public static IEnumerable<IOperator> SelectOperators(this Component component,
+            IEnumerable<IOperator> operators)
+        {
+            return operators.Where(iOperator => iOperator.CanOperate(component));
+        }
+
+        /// <summary>
+        /// Returns the operators that specify types and are available to this component.
+        /// </summary>
+        /// <param name="component"></param>
+        /// <param name="operators">All available operators in autopilot/tests. Usually defined in <c>MonkeyConfig</c></param>
+        /// <param name="type">Operator type</param>
+        /// <returns>Available operators</returns>
+        public static IEnumerable<IOperator> SelectOperatorsOfType(this Component component,
+            IEnumerable<IOperator> operators, OperatorType type)
+        {
+            return operators.Where(iOperator => iOperator.Type == type && iOperator.CanOperate(component));
+        }
+
         /// <summary>
         /// Make sure the <c>Component</c> is interactable.
         /// If any of the following is true:
