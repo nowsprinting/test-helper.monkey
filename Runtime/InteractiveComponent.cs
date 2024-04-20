@@ -18,7 +18,7 @@ namespace TestHelper.Monkey
     /// <summary>
     /// Wrapped component that provide interaction for user.
     /// </summary>
-    // TODO: Rename to InteractableComponent
+    [Obsolete]
     public class InteractiveComponent
     {
         /// <summary>
@@ -125,23 +125,20 @@ namespace TestHelper.Monkey
         /// Hit test using raycaster
         /// </summary>
         /// <returns>true: this object can control by user</returns>
+        [Obsolete("Use GameObjectExtensions.IsReachable() instead")]
         public bool IsReachable()
         {
-            return _isReachable.Invoke(gameObject, _eventData, _results);
+            return gameObject.IsReachable(_isReachable, _eventData, _results);
         }
 
         /// <summary>
         /// Returns the operators available to this component.
         /// </summary>
         /// <returns>Available operators</returns>
+        [Obsolete("Use ComponentExtensions.SelectOperators() instead.")]
         public IEnumerable<IOperator> GetOperators()
         {
-            if (_operators == null || !_operators.Any())
-            {
-                throw new NotSupportedException("Operators are not set.");
-            }
-
-            return _operators.Where(iOperator => iOperator.CanOperate(component));
+            return component.SelectOperators(_operators);
         }
 
         /// <summary>
@@ -149,14 +146,10 @@ namespace TestHelper.Monkey
         /// </summary>
         /// <param name="type">Operator type</param>
         /// <returns>Available operators</returns>
+        [Obsolete("Use ComponentExtensions.SelectOperatorsOfType() instead.")]
         public IEnumerable<IOperator> GetOperatorsByType(OperatorType type)
         {
-            if (_operators == null || !_operators.Any())
-            {
-                throw new NotSupportedException("Operators are not set.");
-            }
-
-            return _operators.Where(iOperator => iOperator.Type == type && iOperator.CanOperate(component));
+            return component.SelectOperatorsOfType(_operators, type);
         }
 
         /// <summary>

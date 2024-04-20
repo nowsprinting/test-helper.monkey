@@ -6,6 +6,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
+using TestHelper.Monkey.DefaultStrategies;
+using TestHelper.Monkey.Extensions;
 using TestHelper.Monkey.Operators;
 using TestHelper.Monkey.TestDoubles;
 using UnityEngine;
@@ -67,7 +69,7 @@ namespace TestHelper.Monkey
                 var target = new InteractiveComponentCollector().FindInteractableComponents()
                     .First(x => x.gameObject.name == targetName);
 
-                Assert.That(target.IsReachable(), Is.True);
+                Assert.That(target.gameObject.IsReachable(DefaultReachableStrategy.IsReachable), Is.True);
             }
 
             [TestCase("BeyondTheWall")] // Beyond the another object
@@ -78,7 +80,7 @@ namespace TestHelper.Monkey
                 var target = new InteractiveComponentCollector().FindInteractableComponents()
                     .First(x => x.gameObject.name == targetName);
 
-                Assert.That(target.IsReachable(), Is.False);
+                Assert.That(target.gameObject.IsReachable(DefaultReachableStrategy.IsReachable), Is.False);
             }
         }
 
@@ -102,7 +104,7 @@ namespace TestHelper.Monkey
                 var target = new InteractiveComponentCollector().FindInteractableComponents()
                     .First(x => x.gameObject.name == targetName);
 
-                Assert.That(target.IsReachable(), Is.True);
+                Assert.That(target.gameObject.IsReachable(DefaultReachableStrategy.IsReachable), Is.True);
             }
 
             [TestCase("BeyondTheWall")] // Beyond the another object
@@ -117,7 +119,7 @@ namespace TestHelper.Monkey
                 var target = new InteractiveComponentCollector().FindInteractableComponents()
                     .First(x => x.gameObject.name == targetName);
 
-                Assert.That(target.IsReachable(), Is.False);
+                Assert.That(target.gameObject.IsReachable(DefaultReachableStrategy.IsReachable), Is.False);
             }
         }
 
@@ -145,22 +147,6 @@ namespace TestHelper.Monkey
             }
 
             [Test]
-            public void GetOperators_OperatorsNotSet_ThrowsNotSupportedException()
-            {
-                var button = new GameObject().AddComponent<Button>();
-                var sut = InteractiveComponent.CreateInteractableComponent(button); // operators not set
-                try
-                {
-                    sut.GetOperators();
-                    Assert.Fail("Expected exception was not thrown");
-                }
-                catch (System.NotSupportedException e)
-                {
-                    Assert.That(e.Message, Is.EqualTo("Operators are not set."));
-                }
-            }
-
-            [Test]
             public void GetOperatorsByType_Button_GotClickOperator()
             {
                 var button = new GameObject().AddComponent<Button>();
@@ -168,22 +154,6 @@ namespace TestHelper.Monkey
                 var actual = sut.GetOperatorsByType(OperatorType.Click);
 
                 Assert.That(actual, Is.EquivalentTo(new[] { s_clickOperator }));
-            }
-
-            [Test]
-            public void GetOperatorsByType_OperatorsNotSet_ThrowsNotSupportedException()
-            {
-                var button = new GameObject().AddComponent<Button>();
-                var sut = InteractiveComponent.CreateInteractableComponent(button); // operators not set
-                try
-                {
-                    sut.GetOperatorsByType(OperatorType.Click);
-                    Assert.Fail("Expected exception was not thrown");
-                }
-                catch (System.NotSupportedException e)
-                {
-                    Assert.That(e.Message, Is.EqualTo("Operators are not set."));
-                }
             }
 
             [Test]

@@ -11,6 +11,7 @@ using Cysharp.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
 using TestHelper.Monkey.Annotations;
+using TestHelper.Monkey.DefaultStrategies;
 using TestHelper.Monkey.Operators;
 using TestHelper.Monkey.TestDoubles;
 using TestHelper.Random;
@@ -42,7 +43,12 @@ namespace TestHelper.Monkey
             };
 
             var interactiveComponentCollector = new InteractiveComponentCollector(operators: _operators);
-            var didAct = await Monkey.RunStep(config, interactiveComponentCollector);
+            var didAct = await Monkey.RunStep(
+                config.Random,
+                config.Logger,
+                config.Screenshots,
+                config.IsReachable,
+                interactiveComponentCollector);
             Assert.That(didAct, Is.EqualTo(true));
         }
 
@@ -61,7 +67,12 @@ namespace TestHelper.Monkey
                 DelayMillis = 1, // 1ms
             };
 
-            var didAct = await Monkey.RunStep(config, interactiveComponentCollector);
+            var didAct = await Monkey.RunStep(
+                config.Random,
+                config.Logger,
+                config.Screenshots,
+                config.IsReachable,
+                interactiveComponentCollector);
             Assert.That(didAct, Is.EqualTo(false));
         }
 
@@ -200,7 +211,7 @@ namespace TestHelper.Monkey
             foreach (var (component, @operator) in operators)
             {
                 actual.Add(
-                    $"{component.gameObject.name}|{component.component.GetType().Name}|{@operator.GetType().Name}");
+                    $"{component.gameObject.name}|{component.GetType().Name}|{@operator.GetType().Name}");
             }
 
             var expected = new List<string>
@@ -240,9 +251,9 @@ namespace TestHelper.Monkey
         [Test]
         public void LotteryOperator_NothingOperators_ReturnNull()
         {
-            var operators = new List<(InteractiveComponent, IOperator)>();
+            var operators = new List<(Component, IOperator)>();
             var random = new StubRandom(0);
-            var actual = Monkey.LotteryOperator(operators, random);
+            var actual = Monkey.LotteryOperator(operators, random, DefaultReachableStrategy.IsReachable);
 
             Assert.That(actual.Item1, Is.Null, "InteractiveComponent is null");
             Assert.That(actual.Item2, Is.Null, "Operator is null");
@@ -256,12 +267,9 @@ namespace TestHelper.Monkey
             var clickable = cube.AddComponent<SpyOnPointerClickHandler>();
             clickable.transform.position = new Vector3(0, 0, -20); // out of sight
 
-            var operators = new List<(InteractiveComponent, IOperator)>()
-            {
-                (InteractiveComponent.CreateInteractableComponent(clickable), new UGUIClickOperator()),
-            };
+            var operators = new List<(Component, IOperator)> { (clickable, new UGUIClickOperator()), };
             var random = new RandomWrapper();
-            var actual = Monkey.LotteryOperator(operators, random);
+            var actual = Monkey.LotteryOperator(operators, random, DefaultReachableStrategy.IsReachable);
 
             Assert.That(actual.Item1, Is.Null, "InteractiveComponent is null");
             Assert.That(actual.Item2, Is.Null, "Operator is null");
@@ -275,16 +283,16 @@ namespace TestHelper.Monkey
             var clickable = cube.AddComponent<SpyOnPointerClickHandler>();
             var clickOperator = new UGUIClickOperator();
 
-            var operators = new List<(InteractiveComponent, IOperator)>()
+            var operators = new List<(Component, IOperator)>()
             {
                 (null, null), // dummy
-                (InteractiveComponent.CreateInteractableComponent(clickable), clickOperator),
+                (clickable, clickOperator),
                 (null, null), // dummy
             };
             var random = new StubRandom(new int[] { 1 });
-            var actual = Monkey.LotteryOperator(operators, random);
+            var actual = Monkey.LotteryOperator(operators, random, DefaultReachableStrategy.IsReachable);
 
-            Assert.That(actual.Item1.component, Is.EqualTo(clickable));
+            Assert.That(actual.Item1, Is.EqualTo(clickable));
             Assert.That(actual.Item2, Is.EqualTo(clickOperator));
         }
 

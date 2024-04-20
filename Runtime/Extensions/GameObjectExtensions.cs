@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TestHelper.Monkey.DefaultStrategies;
 using TestHelper.Monkey.ScreenPointStrategies;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -59,6 +60,30 @@ namespace TestHelper.Monkey.Extensions
         }
 
         /// <summary>
+        /// Hit test using raycaster
+        /// </summary>
+        /// <param name="gameObject"></param>
+        /// <param name="isReachable">The function returns the <c>GameObject</c> is reachable from user or not.
+        /// Default is <c>DefaultReachableStrategy.IsReachable</c>.</param>
+        /// <param name="pointerEventData">Specify if avoid GC memory allocation</param>
+        /// <param name="raycastResults">Specify if avoid GC memory allocation</param>
+        /// <returns>true: this object can control by user</returns>
+        public static bool IsReachable(this GameObject gameObject,
+            Func<GameObject, PointerEventData, List<RaycastResult>, bool> isReachable = null,
+            PointerEventData pointerEventData = null,
+            List<RaycastResult> raycastResults = null)
+        {
+            Assert.IsNotNull(EventSystem.current);
+
+            isReachable = isReachable ?? DefaultReachableStrategy.IsReachable;
+            pointerEventData = pointerEventData ?? new PointerEventData(EventSystem.current);
+            raycastResults = raycastResults ?? new List<RaycastResult>();
+
+            raycastResults.Clear();
+            return isReachable.Invoke(gameObject, pointerEventData, raycastResults);
+        }
+
+        /// <summary>
         /// Make sure the <c>GameObject</c> is reachable from user.
         /// Hit test using raycaster
         /// </summary>
@@ -100,6 +125,20 @@ namespace TestHelper.Monkey.Extensions
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="gameObject"></param>
+        /// <param name="isComponentInteractable"></param>
+        /// <returns></returns>
+        public static IEnumerable<Component> GetInteractableComponents(this GameObject gameObject,
+            Func<Component, bool> isComponentInteractable = null)
+        {
+            isComponentInteractable = isComponentInteractable ?? DefaultComponentInteractableStrategy.IsInteractable;
+
+            return gameObject.GetComponents<Component>().Where(x => isComponentInteractable.Invoke(x));
         }
 
         /// <summary>
