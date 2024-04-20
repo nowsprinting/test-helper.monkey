@@ -7,9 +7,11 @@ using Cysharp.Threading.Tasks; // Do not remove, required for Unity 2022 or earl
 using NUnit.Framework;
 using TestHelper.Attributes;
 using TestHelper.Monkey.DefaultStrategies;
+using TestHelper.Monkey.TestDoubles;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
+using UnityEngine.UI;
 #if UNITY_EDITOR
 using UnityEditor.SceneManagement;
 #endif
@@ -107,6 +109,28 @@ namespace TestHelper.Monkey.Extensions
                 Assert.That(actual.IsReachable(DefaultReachableStrategy.IsReachable), Is.False);
                 // TODO: Remove argument after remove obsolete method
             }
+        }
+
+        [Test]
+        public void GetInteractableComponents_GotInteractableComponents()
+        {
+            var gameObject = new GameObject();
+            var onPointerClickHandler = gameObject.AddComponent<SpyOnPointerClickHandler>();
+            var onPointerDownUpHandler = gameObject.AddComponent<SpyOnPointerDownUpHandler>();
+            gameObject.AddComponent<Image>(); // Not interactable
+
+            var actual = gameObject.GetInteractableComponents();
+            Assert.That(actual, Is.EquivalentTo(new Component[] { onPointerClickHandler, onPointerDownUpHandler }));
+        }
+
+        [Test]
+        public void GetInteractableComponents_NoInteractableComponents_ReturnsEmpty()
+        {
+            var button = new GameObject().AddComponent<Button>();
+            button.interactable = false;
+
+            var actual = button.gameObject.GetInteractableComponents();
+            Assert.That(actual, Is.Empty);
         }
     }
 }

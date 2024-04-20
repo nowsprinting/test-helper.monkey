@@ -128,6 +128,20 @@ namespace TestHelper.Monkey.Extensions
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="gameObject"></param>
+        /// <param name="isComponentInteractable"></param>
+        /// <returns></returns>
+        public static IEnumerable<Component> GetInteractableComponents(this GameObject gameObject,
+            Func<Component, bool> isComponentInteractable = null)
+        {
+            isComponentInteractable = isComponentInteractable ?? DefaultComponentInteractableStrategy.IsInteractable;
+
+            return gameObject.GetComponents<Component>().Where(x => isComponentInteractable.Invoke(x));
+        }
+
+        /// <summary>
         /// Make sure the <c>GameObject</c> is interactable.
         /// If any of the following is true:
         /// 1. Attached <c>Selectable</c> component and <c>interactable</c> property is true.
