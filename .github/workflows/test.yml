@@ -1,4 +1,4 @@
-# Copyright (c) 2023 Koji Hasegawa.
+# Copyright (c) 2023-2024 Koji Hasegawa.
 # This software is released under the MIT License.
 
 name: Test
@@ -18,6 +18,9 @@ on:
       - '.github/**'
       - '!.github/workflows/test.yml'
 
+env:
+  PACKAGE_NAME: com.nowsprinting.test-helper.monkey
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -35,19 +38,13 @@ jobs:
       matrix:
         unityVersion: # Available versions see: https://game.ci/docs/docker/versions
           - 2019.4.40f1
-          - 2022.3.15f1
-          - 2023.2.3f1
+          - 2022.3.17f1
+          - 2023.2.5f1
         include:
           - unityVersion: 2019.4.40f1
             octocov: true
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          submodules: false
-          lfs: false
-
       - name: Crete project for tests
         uses: nowsprinting/create-unity-project-action@v3
         with:
@@ -60,9 +57,14 @@ jobs:
           restore-keys: |
             Library-
 
-      - name: Set package name
-        run: |
-          echo "package_name=$(grep -o -E '"name": "(.+)"' ./package.json | cut -d ' ' -f2)" >> "$GITHUB_ENV"
+      - name: Checkout repository as embedded package
+        uses: actions/checkout@v4
+        with:
+          submodules: false
+          lfs: false
+          path: ${{ env.CREATED_PROJECT_PATH }}/Packages/${{ env.PACKAGE_NAME }}
+          # In Linux editor, there is a problem that assets in local packages cannot be found with `AssetDatabase.FindAssets`.
+          # As a workaround, I have made it into an embedded package.
 
       - name: Install dependencies
         run: |
@@ -71,12 +73,11 @@ jobs:
           openupm add -f com.unity.testtools.codecoverage
           openupm add -f com.cysharp.unitask
           openupm add -f com.nowsprinting.test-helper
-          openupm add -ft "${{ env.package_name }}"@file:../../
         working-directory: ${{ env.CREATED_PROJECT_PATH }}
 
       - name: Set coverage assembly filters
         run: |
-          assemblies=$(find . -name "*.asmdef" -maxdepth 3 | sed -e s/.*\\//\+/ | sed -e s/\\.asmdef// | sed -e s/^.*\\.Tests//)
+          assemblies=$(find ${{ env.CREATED_PROJECT_PATH }}/Packages/${{ env.PACKAGE_NAME }} -name "*.asmdef" | sed -e s/.*\\//\+/ | sed -e s/\\.asmdef// | sed -e s/^.*\\.Tests//)
           # shellcheck disable=SC2001,SC2048,SC2086
           echo "assembly_filters=$(echo ${assemblies[*]} | sed -e s/\ /,/g),+<assets>,-*.Tests" >> "$GITHUB_ENV"
 
@@ -100,7 +101,9 @@ jobs:
         id: test
 
       - name: Set coverage path for octocov
-        run: sed -i -r 's/\.\/Logs/${{ steps.test.outputs.coveragePath }}/' .octocov.yml
+        run: |
+          mv ${{ env.CREATED_PROJECT_PATH }}/Packages/${{ env.PACKAGE_NAME }}/.octocov.yml .
+          sed -i -r 's/UnityProject~\/Logs/${{ steps.test.outputs.coveragePath }}/' .octocov.yml
         if: ${{ matrix.octocov }}
 
       - name: Run octocov
