@@ -76,6 +76,10 @@ jobs:
           openupm add -f com.nowsprinting.test-helper.random@0.3.0
         working-directory: ${{ env.CREATED_PROJECT_PATH }}
 
+      - name: Enable Samples~
+        run: |
+          mv ${{ env.CREATED_PROJECT_PATH }}/Packages/${{ env.PACKAGE_NAME }}/Samples~ ${{ env.CREATED_PROJECT_PATH }}/Assets/Samples
+
       - name: Set coverage assembly filters
         run: |
           assemblies=$(find ${{ env.CREATED_PROJECT_PATH }}/Packages/${{ env.PACKAGE_NAME }} -name "*.asmdef" | sed -e s/.*\\//\+/ | sed -e s/\\.asmdef// | sed -e s/^.*\\.Tests//)
