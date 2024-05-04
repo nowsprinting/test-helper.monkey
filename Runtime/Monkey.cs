@@ -48,10 +48,7 @@ namespace TestHelper.Monkey
                 GameViewControlHelper.SetGizmos(true);
             }
 
-            var interactableComponentCollector = new InteractiveComponentCollector(
-                isReachable: config.IsReachable,
-                isInteractable: config.IsInteractable,
-                operators: config.Operators);
+            var interactableComponentCollector = new InteractiveComponentCollector(config);
 
             config.Logger.Log($"Using {config.Random}");
 
