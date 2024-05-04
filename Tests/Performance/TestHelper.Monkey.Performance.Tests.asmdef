@@ -1,0 +1,34 @@
+{
+    "name": "TestHelper.Monkey.Performance.Tests",
+    "rootNamespace": "",
+    "references": [
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner",
+        "Unity.PerformanceTesting",
+        "TestHelper.Monkey",
+        "TestHelper",
+        "TestHelper.Random",
+        "UniTask"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS",
+        "UNITY_2020_3_OR_NEWER",
+        "ENABLED_PERFORMANCE_TESTING"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.unity.test-framework.performance",
+            "expression": "3.0.0",
+            "define": "ENABLED_PERFORMANCE_TESTING"
+        }
+    ],
+    "noEngineReferences": false
+}

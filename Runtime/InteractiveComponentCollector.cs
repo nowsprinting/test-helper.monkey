@@ -44,6 +44,15 @@ namespace TestHelper.Monkey
         }
 
         /// <summary>
+        /// Constructor overload.
+        /// </summary>
+        /// <param name="config">The configuration for autopilot/tests</param>
+        public InteractiveComponentCollector(MonkeyConfig config)
+            : this(config.IsReachable, config.IsInteractable, config.Operators)
+        {
+        }
+
+        /// <summary>
         /// Find components attached EventTrigger or implements IEventSystemHandler in scene.
         /// Includes UI elements that inherit from the Selectable class, such as Button.
         ///

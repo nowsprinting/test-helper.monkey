@@ -4,3 +4,4 @@
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("TestHelper.Monkey.Tests")]
+[assembly: InternalsVisibleTo("TestHelper.Monkey.Performance.Tests")]
