@@ -5,7 +5,10 @@
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
         "Unity.PerformanceTesting",
-        "TestHelper.Monkey"
+        "TestHelper.Monkey",
+        "TestHelper",
+        "TestHelper.Random",
+        "UniTask"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
