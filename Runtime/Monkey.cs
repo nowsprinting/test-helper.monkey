@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using TestHelper.Monkey.Annotations;
@@ -87,10 +88,6 @@ namespace TestHelper.Monkey
             }
         }
 
-        private class CoroutineRunner : MonoBehaviour
-        {
-        }
-
         /// <summary>
         /// Run a step of monkey testing.
         /// </summary>
@@ -116,23 +113,16 @@ namespace TestHelper.Monkey
                 return false;
             }
 
+            var message = new StringBuilder($"{selectedOperator} operates to {selectedComponent.gameObject.name}");
             if (screenshotOptions != null)
             {
-                if (s_coroutineRunner == null || (bool)s_coroutineRunner == false)
-                {
-                    s_coroutineRunner = new GameObject("CoroutineRunner").AddComponent<CoroutineRunner>();
-                }
-
-                await ScreenshotHelper.TakeScreenshot(
-                        directory: screenshotOptions.Directory,
-                        filename: screenshotOptions.FilenameStrategy.GetFilename(),
-                        superSize: screenshotOptions.SuperSize,
-                        stereoCaptureMode: screenshotOptions.StereoCaptureMode
-                    )
-                    .ToUniTask(s_coroutineRunner);
+                var filename = screenshotOptions.FilenameStrategy.GetFilename();
+                await TakeScreenshotAsync(screenshotOptions, filename);
+                message.Append($" ({filename})");
             }
 
-            logger.Log($"{selectedOperator} operates to {selectedComponent.gameObject.name}");
+            logger.Log(message.ToString());
+
             await selectedOperator.OperateAsync(selectedComponent, cancellationToken);
             return true;
         }
@@ -158,6 +148,27 @@ namespace TestHelper.Monkey
             }
 
             return (null, null);
+        }
+
+        private static async UniTask TakeScreenshotAsync(ScreenshotOptions screenshotOptions, string filename)
+        {
+            if (s_coroutineRunner == null || (bool)s_coroutineRunner == false)
+            {
+                s_coroutineRunner = new GameObject("CoroutineRunner").AddComponent<CoroutineRunner>();
+            }
+
+            await ScreenshotHelper.TakeScreenshot(
+                    directory: screenshotOptions.Directory,
+                    filename: filename,
+                    superSize: screenshotOptions.SuperSize,
+                    stereoCaptureMode: screenshotOptions.StereoCaptureMode,
+                    logFilepath: false
+                )
+                .ToUniTask(s_coroutineRunner);
+        }
+
+        private class CoroutineRunner : MonoBehaviour
+        {
         }
     }
 }
