@@ -17,7 +17,6 @@ using TestHelper.Monkey.TestDoubles;
 using TestHelper.Random;
 using TestHelper.RuntimeInternals;
 using UnityEngine;
-using AssertionException = UnityEngine.Assertions.AssertionException;
 
 // ReSharper disable MethodSupportsCancellation
 
@@ -116,7 +115,7 @@ namespace TestHelper.Monkey
 
         [Test]
         [LoadScene(TestScene)]
-        public async Task Run_noInteractiveComponent_abort()
+        public async Task Run_noInteractiveComponent_throwTimeoutException()
         {
             foreach (var component in _interactiveComponentCollector.FindInteractableComponents())
             {
@@ -125,16 +124,16 @@ namespace TestHelper.Monkey
 
             var config = new MonkeyConfig
             {
-                Lifetime = TimeSpan.FromSeconds(5), // 5sec
+                Lifetime = TimeSpan.FromSeconds(2), // 2sec
                 SecondsToErrorForNoInteractiveComponent = 1, // 1sec
             };
 
             try
             {
                 await Monkey.Run(config);
-                Assert.Fail("AssertionException was not thrown");
+                Assert.Fail("TimeoutException was not thrown");
             }
-            catch (AssertionException e)
+            catch (TimeoutException e)
             {
                 Assert.That(e.Message, Does.Contain("Interactive component not found in 1 seconds"));
             }
@@ -434,6 +433,36 @@ namespace TestHelper.Monkey
                 Assert.That(_path, Does.Exist);
                 // Note: Require stereo rendering settings.
                 //  See: https://docs.unity3d.com/Manual/SinglePassStereoRendering.html
+            }
+
+            [Test]
+            [LoadScene(TestScene)]
+            public async Task Run_withScreenshots_noInteractiveComponent_takeScreenshot()
+            {
+                var interactiveComponentCollector = new InteractiveComponentCollector();
+                foreach (var component in interactiveComponentCollector.FindInteractableComponents())
+                {
+                    component.gameObject.SetActive(false);
+                }
+
+                var config = new MonkeyConfig
+                {
+                    Lifetime = TimeSpan.FromSeconds(2), // 2sec
+                    SecondsToErrorForNoInteractiveComponent = 1, // 1sec
+                    Screenshots = new ScreenshotOptions() // take screenshots and save files
+                };
+
+                try
+                {
+                    await Monkey.Run(config);
+                    Assert.Fail("TimeoutException was not thrown");
+                }
+                catch (TimeoutException e)
+                {
+                    Assert.That(e.Message, Does.Contain($"Interactive component not found in 1 seconds ({_filename})"));
+                }
+
+                Assert.That(_path, Does.Exist);
             }
         }
     }

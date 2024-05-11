@@ -13,7 +13,6 @@ using TestHelper.Monkey.Operators;
 using TestHelper.Random;
 using TestHelper.RuntimeInternals;
 using UnityEngine;
-using UnityEngine.Assertions;
 using UnityEngine.EventSystems;
 
 namespace TestHelper.Monkey
@@ -68,12 +67,19 @@ namespace TestHelper.Monkey
                     {
                         lastOperationTime = Time.time;
                     }
-                    else if (config.SecondsToErrorForNoInteractiveComponent > 0)
+                    else if (0 < config.SecondsToErrorForNoInteractiveComponent &&
+                             config.SecondsToErrorForNoInteractiveComponent < (Time.time - lastOperationTime))
                     {
-                        Assert.IsTrue(
-                            (Time.time - lastOperationTime) < config.SecondsToErrorForNoInteractiveComponent,
-                            $"Interactive component not found in {config.SecondsToErrorForNoInteractiveComponent} seconds"
-                        );
+                        var message = new StringBuilder(
+                            $"Interactive component not found in {config.SecondsToErrorForNoInteractiveComponent} seconds");
+                        if (config.Screenshots != null)
+                        {
+                            var filename = config.Screenshots.FilenameStrategy.GetFilename();
+                            await TakeScreenshotAsync(config.Screenshots, filename);
+                            message.Append($" ({filename})");
+                        }
+
+                        throw new TimeoutException(message.ToString());
                     }
 
                     await UniTask.Delay(config.DelayMillis, DelayType.DeltaTime, cancellationToken: cancellationToken);
