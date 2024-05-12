@@ -6,11 +6,10 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
-using TestHelper.Monkey;
 using Unity.PerformanceTesting;
 using UnityEngine.TestTools;
 
-namespace Tests.Performance
+namespace TestHelper.Monkey
 {
     public class MonkeyTest
     {
@@ -19,14 +18,14 @@ namespace Tests.Performance
         [Test]
         [Performance, Version(MeasurePackageVersion)]
         [LoadScene("../Scenes/Operators.unity")]
-        public void GetOperators_GotAllInteractableComponentAndOperators()
+        public void GetLotteryEntries_GotAllInteractableComponentAndOperators()
         {
             var config = new MonkeyConfig();
             var interactableComponentCollector = new InteractiveComponentCollector(config);
 
             Measure.Method(() =>
                 {
-                    Monkey.GetOperators(interactableComponentCollector);
+                    Monkey.GetLotteryEntries(interactableComponentCollector);
                 })
                 .WarmupCount(5)
                 .MeasurementCount(20)
@@ -41,7 +40,7 @@ namespace Tests.Performance
         {
             var config = new MonkeyConfig();
             var interactableComponentCollector = new InteractiveComponentCollector(config);
-            var operators = Monkey.GetOperators(interactableComponentCollector);
+            var operators = Monkey.GetLotteryEntries(interactableComponentCollector);
 
             Measure.Method(() =>
                 {

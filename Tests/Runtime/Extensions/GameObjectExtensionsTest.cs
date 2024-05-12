@@ -56,7 +56,7 @@ namespace TestHelper.Monkey.Extensions
             {
                 var actual = await _sut.FindByNameAsync(target, reachable: false);
                 Assert.That(actual.IsReachable(DefaultReachableStrategy.IsReachable), Is.True);
-                // TODO: Remove argument after remove obsolete method
+                // TODO: Remove when remove obsolete method, Already copied to DefaultReachableStrategyTest.
             }
 
             [TestCase("OutOfSight")]
@@ -66,7 +66,7 @@ namespace TestHelper.Monkey.Extensions
             {
                 var actual = await _sut.FindByNameAsync(target, reachable: false);
                 Assert.That(actual.IsReachable(DefaultReachableStrategy.IsReachable), Is.False);
-                // TODO: Remove argument after remove obsolete method
+                // TODO: Remove when remove obsolete method, Already copied to DefaultReachableStrategyTest.
             }
         }
 
@@ -98,7 +98,7 @@ namespace TestHelper.Monkey.Extensions
             {
                 var actual = await _sut.FindByNameAsync(target, reachable: false);
                 Assert.That(actual.IsReachable(DefaultReachableStrategy.IsReachable), Is.True);
-                // TODO: Remove argument after remove obsolete method
+                // TODO: Remove when remove obsolete method, Already copied to DefaultReachableStrategyTest.
             }
 
             [TestCase("OutOfSight")]
@@ -107,7 +107,7 @@ namespace TestHelper.Monkey.Extensions
             {
                 var actual = await _sut.FindByNameAsync(target, reachable: false);
                 Assert.That(actual.IsReachable(DefaultReachableStrategy.IsReachable), Is.False);
-                // TODO: Remove argument after remove obsolete method
+                // TODO: Remove when remove obsolete method, Already copied to DefaultReachableStrategyTest.
             }
         }
 

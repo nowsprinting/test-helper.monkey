@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
@@ -17,6 +18,7 @@ using TestHelper.Monkey.TestDoubles;
 using TestHelper.Random;
 using TestHelper.RuntimeInternals;
 using UnityEngine;
+using UnityEngine.TestTools;
 
 // ReSharper disable MethodSupportsCancellation
 
@@ -25,7 +27,7 @@ namespace TestHelper.Monkey
     [TestFixture]
     public class MonkeyTest
     {
-        private const string TestScene = "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/Operators.unity";
+        private const string TestScene = "../Scenes/Operators.unity";
 
         private IEnumerable<IOperator> _operators;
         private InteractiveComponentCollector _interactiveComponentCollector;
@@ -202,11 +204,11 @@ namespace TestHelper.Monkey
 
         [Test]
         [LoadScene(TestScene)]
-        public void GetOperators_GotAllInteractableComponentAndOperators()
+        public void GetLotteryEntries_GotAllInteractableComponentAndOperators()
         {
-            var operators = Monkey.GetOperators(_interactiveComponentCollector);
+            var lotteryEntries = Monkey.GetLotteryEntries(_interactiveComponentCollector);
             var actual = new List<string>();
-            foreach (var (component, @operator) in operators)
+            foreach (var (component, @operator) in lotteryEntries)
             {
                 actual.Add(
                     $"{component.gameObject.name}|{component.GetType().Name}|{@operator.GetType().Name}");
@@ -231,13 +233,13 @@ namespace TestHelper.Monkey
 
         [Test]
         [LoadScene(TestScene)]
-        public void GetOperators_WithIgnoreAnnotation_Excluded()
+        public void GetLotteryEntries_WithIgnoreAnnotation_Excluded()
         {
             GameObject.Find("UsingOnPointerClickHandler").AddComponent<IgnoreAnnotation>();
 
-            var operators = Monkey.GetOperators(_interactiveComponentCollector);
+            var lotteryEntries = Monkey.GetLotteryEntries(_interactiveComponentCollector);
             var actual = new List<string>();
-            foreach (var (component, _) in operators)
+            foreach (var (component, _) in lotteryEntries)
             {
                 actual.Add($"{component.gameObject.name}");
             }
@@ -257,7 +259,7 @@ namespace TestHelper.Monkey
         }
 
         [Test]
-        [LoadScene("Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/PhysicsRaycasterSandbox.unity")]
+        [LoadScene("../Scenes/PhysicsRaycasterSandbox.unity")]
         public void LotteryOperator_NotReachableComponentOnly_ReturnNull()
         {
             var cube = GameObject.Find("Cube");
@@ -273,7 +275,7 @@ namespace TestHelper.Monkey
         }
 
         [Test]
-        [LoadScene("Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/PhysicsRaycasterSandbox.unity")]
+        [LoadScene("../Scenes/PhysicsRaycasterSandbox.unity")]
         public void LotteryOperator_BingoReachableComponent_ReturnOperator()
         {
             var cube = GameObject.Find("Cube");
@@ -463,6 +465,80 @@ namespace TestHelper.Monkey
                 }
 
                 Assert.That(_path, Does.Exist);
+            }
+        }
+
+        [TestFixture]
+        public class Verbose
+        {
+            private IEnumerable<IOperator> _operators;
+            private InteractiveComponentCollector _interactiveComponentCollector;
+
+            [SetUp]
+            public void SetUp()
+            {
+                _operators = new IOperator[]
+                {
+                    new UGUIClickOperator(), // click
+                    new UGUIClickAndHoldOperator(1), // click and hold 1ms
+                    new UGUITextInputOperator()
+                };
+                _interactiveComponentCollector = new InteractiveComponentCollector(operators: _operators);
+            }
+
+            [Test]
+            [LoadScene(TestScene)]
+            public void GetLotteryEntriesWithoutVerbose_NotOutputLog()
+            {
+                var lotteryEntries = Monkey.GetLotteryEntries(_interactiveComponentCollector);
+                Assume.That(lotteryEntries.Count, Is.GreaterThan(0));
+
+                LogAssert.NoUnexpectedReceived();
+            }
+
+            [Test]
+            [LoadScene(TestScene)]
+            public void GetLotteryEntriesWithVerbose_LogLotteryEntries()
+            {
+                GameObject.Find("UsingOnPointerClickHandler").AddComponent<IgnoreAnnotation>();
+
+                var spyLogger = new SpyLogger();
+                var lotteryEntries = Monkey.GetLotteryEntries(_interactiveComponentCollector, verboseLogger: spyLogger);
+                Assume.That(lotteryEntries.Count, Is.GreaterThan(0));
+
+                Assert.That(spyLogger.Messages.Count, Is.EqualTo(1));
+                Assert.That(spyLogger.Messages[0], Does.StartWith("Lottery entries: "));
+                Assert.That(spyLogger.Messages[0], Does.Match(@"\[Ignored\]UsingOnPointerClickHandler\(\d+\)"));
+                Assert.That(spyLogger.Messages[0], Does.Match(@"UsingPointerClickEventTrigger\(\d+\)"));
+                Assert.That(spyLogger.Messages[0], Does.Match(@"UsingOnPointerDownUpHandler\(\d+\)"));
+                Assert.That(spyLogger.Messages[0], Does.Match(@"UsingPointerDownUpEventTrigger\(\d+\)"));
+                Assert.That(spyLogger.Messages[0], Does.Match(@"UsingMultipleEventTriggers\(\d+\)"));
+                Assert.That(spyLogger.Messages[0], Does.Match(@"DestroyItselfIfPointerDown\(\d+\)"));
+                Assert.That(spyLogger.Messages[0], Does.Match(@"InputField\(\d+\)"));
+            }
+
+            [Test]
+            [LoadScene("../Scenes/PhysicsRaycasterSandbox.unity")] // no interactable objects
+            public void GetLotteryEntriesWithVerbose_NoInteractableObject_LogNoLotteryEntries()
+            {
+                var spyLogger = new SpyLogger();
+                var lotteryEntries = Monkey.GetLotteryEntries(_interactiveComponentCollector, verboseLogger: spyLogger);
+                Assume.That(lotteryEntries, Is.Empty);
+
+                Assert.That(spyLogger.Messages.Count, Is.EqualTo(1));
+                Assert.That(spyLogger.Messages[0], Is.EqualTo("No lottery entries."));
+            }
+
+            [Test]
+            [LoadScene("../Scenes/PhysicsRaycasterSandbox.unity")] // no interactable and reachable objects
+            public void LotteryOperatorWithVerbose_NotReachableComponentOnly_LogNoLotteryEntries()
+            {
+                var spyLogger = new SpyLogger();
+                var lotteryEntries = Monkey.GetLotteryEntries(_interactiveComponentCollector).ToList();
+                var random = new RandomWrapper();
+                Monkey.LotteryOperator(lotteryEntries, random, DefaultReachableStrategy.IsReachable, spyLogger);
+
+                Assert.That(spyLogger.Messages, Does.Contain("Lottery entries are empty or all of not reachable."));
             }
         }
     }

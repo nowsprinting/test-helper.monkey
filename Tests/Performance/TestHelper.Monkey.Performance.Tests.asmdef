@@ -1,6 +1,6 @@
 {
     "name": "TestHelper.Monkey.Performance.Tests",
-    "rootNamespace": "",
+    "rootNamespace": "TestHelper.Monkey",
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",

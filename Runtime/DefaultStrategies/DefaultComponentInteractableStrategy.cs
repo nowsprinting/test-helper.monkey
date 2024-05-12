@@ -26,7 +26,7 @@ namespace TestHelper.Monkey.DefaultStrategies
         {
             // UI element
             var selectable = component as Selectable;
-            if (selectable != null)
+            if (selectable)
             {
                 return selectable.interactable;
             }

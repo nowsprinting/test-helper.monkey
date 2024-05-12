@@ -33,7 +33,7 @@ namespace TestHelper.Monkey.Annotations
             // Without no position annotations, IsReallyInteractiveFromUser() is always false because
             // gameObject.transform.position is not in the mesh. So IsReallyInteractiveFromUser() is true means
             // the position annotation work well
-            Assert.That(target.gameObject.IsReachable(DefaultReachableStrategy.IsReachable), Is.True);
+            Assert.That(DefaultReachableStrategy.IsReachable(target.gameObject), Is.True);
         }
     }
 }

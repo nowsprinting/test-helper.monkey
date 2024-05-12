@@ -68,8 +68,9 @@ namespace TestHelper.Monkey.Extensions
         /// <param name="pointerEventData">Specify if avoid GC memory allocation</param>
         /// <param name="raycastResults">Specify if avoid GC memory allocation</param>
         /// <returns>true: this object can control by user</returns>
+        [Obsolete("Use DefaultReachableStrategy instead.")]
         public static bool IsReachable(this GameObject gameObject,
-            Func<GameObject, PointerEventData, List<RaycastResult>, bool> isReachable = null,
+            Func<GameObject, PointerEventData, List<RaycastResult>, ILogger, bool> isReachable = null,
             PointerEventData pointerEventData = null,
             List<RaycastResult> raycastResults = null)
         {
@@ -80,7 +81,7 @@ namespace TestHelper.Monkey.Extensions
             raycastResults = raycastResults ?? new List<RaycastResult>();
 
             raycastResults.Clear();
-            return isReachable.Invoke(gameObject, pointerEventData, raycastResults);
+            return isReachable.Invoke(gameObject, pointerEventData, raycastResults, null);
         }
 
         /// <summary>

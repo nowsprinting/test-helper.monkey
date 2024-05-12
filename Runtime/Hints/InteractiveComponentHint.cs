@@ -102,7 +102,7 @@ namespace TestHelper.Monkey.Hints
             var interactiveComponentCollector = new InteractiveComponentCollector();
             foreach (var component in interactiveComponentCollector.FindInteractableComponents())
             {
-                var dst = component.gameObject.IsReachable(isReachable: DefaultReachableStrategy.IsReachable)
+                var dst = DefaultReachableStrategy.IsReachable(component.gameObject)
                     ? _tmpReallyInteractives
                     : _tmpNotReallyInteractives;
 
