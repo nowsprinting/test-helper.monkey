@@ -20,7 +20,7 @@ namespace TestHelper.Monkey
     public class GameObjectFinder
     {
         private readonly double _timeoutSeconds;
-        private readonly Func<GameObject, PointerEventData, List<RaycastResult>, bool> _isReachable;
+        private readonly Func<GameObject, PointerEventData, List<RaycastResult>, ILogger, bool> _isReachable;
         private readonly Func<Component, bool> _isComponentInteractable;
         private readonly PointerEventData _eventData = new PointerEventData(EventSystem.current);
         private readonly List<RaycastResult> _results = new List<RaycastResult>();
@@ -36,7 +36,7 @@ namespace TestHelper.Monkey
         /// <param name="isComponentInteractable">The function returns the <c>Component</c> is interactable or not.
         /// Default is <c>DefaultComponentInteractableStrategy.IsInteractable</c>.</param>
         public GameObjectFinder(double timeoutSeconds = 1.0d,
-            Func<GameObject, PointerEventData, List<RaycastResult>, bool> isReachable = null,
+            Func<GameObject, PointerEventData, List<RaycastResult>, ILogger, bool> isReachable = null,
             Func<Component, bool> isComponentInteractable = null)
         {
             Assert.IsTrue(timeoutSeconds > MinTimeoutSeconds,
@@ -71,7 +71,7 @@ namespace TestHelper.Monkey
                 return (null, Reason.NotMatchPath);
             }
 
-            if (reachable && !_isReachable.Invoke(foundObject, _eventData, _results))
+            if (reachable && !_isReachable.Invoke(foundObject, _eventData, _results, null))
             {
                 return (null, Reason.NotReachable);
             }

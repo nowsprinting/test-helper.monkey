@@ -39,13 +39,13 @@ namespace TestHelper.Monkey
         [SuppressMessage("ReSharper", "InconsistentNaming")]
         public GameObject gameObject => component.gameObject;
 
-        private readonly Func<GameObject, PointerEventData, List<RaycastResult>, bool> _isReachable;
+        private readonly Func<GameObject, PointerEventData, List<RaycastResult>, ILogger, bool> _isReachable;
         private readonly IEnumerable<IOperator> _operators;
         private readonly PointerEventData _eventData = new PointerEventData(EventSystem.current);
         private readonly List<RaycastResult> _results = new List<RaycastResult>();
 
         private InteractiveComponent(MonoBehaviour component,
-            Func<GameObject, PointerEventData, List<RaycastResult>, bool> isReachable = null,
+            Func<GameObject, PointerEventData, List<RaycastResult>, ILogger, bool> isReachable = null,
             IEnumerable<IOperator> operators = null)
         {
             this.component = component;
@@ -64,7 +64,7 @@ namespace TestHelper.Monkey
         /// <param name="operators">All available operators in autopilot/tests. Usually defined in <c>MonkeyConfig</c></param>
         /// <returns>Returns new InteractableComponent instance from MonoBehaviour. If MonoBehaviour is not interactable so, return null.</returns>
         public static InteractiveComponent CreateInteractableComponent(MonoBehaviour component,
-            Func<GameObject, PointerEventData, List<RaycastResult>, bool> isReachable = null,
+            Func<GameObject, PointerEventData, List<RaycastResult>, ILogger, bool> isReachable = null,
             Func<Component, bool> isComponentInteractable = null,
             IEnumerable<IOperator> operators = null)
         {
@@ -90,7 +90,7 @@ namespace TestHelper.Monkey
         /// <returns>Returns new InteractableComponent instance from GameObject. If GameObject is not interactable so, return null.</returns>
         [Obsolete("Obsolete due to non-deterministic behavior when GameObject has multiple interactable components.")]
         public static InteractiveComponent CreateInteractableComponent(GameObject gameObject,
-            Func<GameObject, PointerEventData, List<RaycastResult>, bool> isReachable = null,
+            Func<GameObject, PointerEventData, List<RaycastResult>, ILogger, bool> isReachable = null,
             Func<Component, bool> isComponentInteractable = null,
             IEnumerable<IOperator> operators = null)
         {
@@ -128,7 +128,7 @@ namespace TestHelper.Monkey
         [Obsolete("Use GameObjectExtensions.IsReachable() instead")]
         public bool IsReachable()
         {
-            return gameObject.IsReachable(_isReachable, _eventData, _results);
+            return _isReachable(gameObject, _eventData, _results, null);
         }
 
         /// <summary>

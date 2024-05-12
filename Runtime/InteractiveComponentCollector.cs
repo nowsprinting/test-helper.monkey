@@ -19,7 +19,7 @@ namespace TestHelper.Monkey
     // TODO: Rename to InteractableComponentsFinder
     public class InteractiveComponentCollector
     {
-        private readonly Func<GameObject, PointerEventData, List<RaycastResult>, bool> _isReachable;
+        private readonly Func<GameObject, PointerEventData, List<RaycastResult>, ILogger, bool> _isReachable;
         private readonly Func<Component, bool> _isInteractable;
         private readonly IEnumerable<IOperator> _operators;
         private readonly PointerEventData _eventData = new PointerEventData(EventSystem.current);
@@ -34,7 +34,7 @@ namespace TestHelper.Monkey
         /// Default is <c>DefaultComponentInteractableStrategy.IsInteractable</c>.</param>
         /// <param name="operators">All available operators in autopilot/tests. Usually defined in <c>MonkeyConfig</c></param>
         public InteractiveComponentCollector(
-            Func<GameObject, PointerEventData, List<RaycastResult>, bool> isReachable = null,
+            Func<GameObject, PointerEventData, List<RaycastResult>, ILogger, bool> isReachable = null,
             Func<Component, bool> isInteractable = null,
             IEnumerable<IOperator> operators = null)
         {
@@ -87,7 +87,7 @@ namespace TestHelper.Monkey
         {
             foreach (var interactableComponent in FindInteractableComponents())
             {
-                if (_isReachable.Invoke(interactableComponent.gameObject, _eventData, _results))
+                if (_isReachable.Invoke(interactableComponent.gameObject, _eventData, _results, null))
                 {
                     yield return interactableComponent;
                 }

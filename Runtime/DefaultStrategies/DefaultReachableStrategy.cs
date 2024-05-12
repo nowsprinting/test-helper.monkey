@@ -3,9 +3,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text;
 using TestHelper.Monkey.ScreenPointStrategies;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using Object = UnityEngine.Object;
 
 namespace TestHelper.Monkey.DefaultStrategies
 {
@@ -23,10 +25,12 @@ namespace TestHelper.Monkey.DefaultStrategies
         /// <param name="gameObject"></param>
         /// <param name="eventData">Specify if avoid GC memory allocation</param>
         /// <param name="results">Specify if avoid GC memory allocation</param>
+        /// <param name="verboseLogger">Output verbose log if need</param>
         /// <returns>True if this GameObject is reachable from user</returns>
         public static bool IsReachable(GameObject gameObject,
             PointerEventData eventData = null,
-            List<RaycastResult> results = null)
+            List<RaycastResult> results = null,
+            ILogger verboseLogger = null)
         {
             eventData = eventData ?? new PointerEventData(EventSystem.current);
             eventData.position = GetScreenPoint.Invoke(gameObject);
@@ -35,12 +39,38 @@ namespace TestHelper.Monkey.DefaultStrategies
             results.Clear();
 
             EventSystem.current.RaycastAll(eventData, results);
-            return results.Count > 0 && IsSameOrChildObject(gameObject, results[0].gameObject.transform);
+            if (results.Count == 0)
+            {
+                if (verboseLogger != null)
+                {
+                    var message = new StringBuilder(CreateMessage(gameObject, eventData.position));
+                    message.Append(" Raycast is not hit.");
+                    verboseLogger.Log(message.ToString());
+                }
+
+                return false;
+            }
+
+            var isSameOrChildObject = IsSameOrChildObject(gameObject, results[0].gameObject.transform);
+            if (!isSameOrChildObject && verboseLogger != null)
+            {
+                var message = new StringBuilder(CreateMessage(gameObject, eventData.position));
+                message.Append(" Raycast hit other objects: ");
+                foreach (var result in results)
+                {
+                    message.Append(result.gameObject.name);
+                    message.Append(", ");
+                }
+
+                verboseLogger.Log(message.ToString(0, message.Length - 2));
+            }
+
+            return isSameOrChildObject;
         }
 
         private static bool IsSameOrChildObject(GameObject target, Transform hitObjectTransform)
         {
-            while (hitObjectTransform != null)
+            while (hitObjectTransform)
             {
                 if (hitObjectTransform == target.transform)
                 {
@@ -51,6 +81,13 @@ namespace TestHelper.Monkey.DefaultStrategies
             }
 
             return false;
+        }
+
+        private static string CreateMessage(Object gameObject, Vector2 position)
+        {
+            var x = (int)position.x;
+            var y = (int)position.y;
+            return $"Not reachable to {gameObject.name}({gameObject.GetInstanceID()}), position=({x},{y}).";
         }
     }
 }

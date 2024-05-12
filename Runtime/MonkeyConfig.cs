@@ -42,6 +42,11 @@ namespace TestHelper.Monkey
         public ILogger Logger { get; set; } = Debug.unityLogger;
 
         /// <summary>
+        /// Output verbose log if true
+        /// </summary>
+        public bool Verbose { get; set; }
+
+        /// <summary>
         /// Show Gizmos on <c>GameView</c> during running monkey test if true
         /// </summary>
         public bool Gizmos { get; set; }
@@ -55,8 +60,8 @@ namespace TestHelper.Monkey
         /// Function returns the <c>GameObject</c> is reachable from user or not.
         /// This function is include ScreenPointStrategy (GetScreenPoint function).
         /// </summary>
-        public Func<GameObject, PointerEventData, List<RaycastResult>, bool>
-            IsReachable { get; set; } = DefaultReachableStrategy.IsReachable;
+        public Func<GameObject, PointerEventData, List<RaycastResult>, ILogger, bool> IsReachable { get; set; } =
+            DefaultReachableStrategy.IsReachable;
 
         /// <summary>
         /// Function returns the <c>Component</c> is interactable or not.

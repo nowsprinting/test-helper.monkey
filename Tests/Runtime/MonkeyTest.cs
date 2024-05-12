@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
@@ -17,38 +18,44 @@ using TestHelper.Monkey.TestDoubles;
 using TestHelper.Random;
 using TestHelper.RuntimeInternals;
 using UnityEngine;
-using AssertionException = UnityEngine.Assertions.AssertionException;
+using UnityEngine.TestTools;
+
+// ReSharper disable MethodSupportsCancellation
 
 namespace TestHelper.Monkey
 {
     [TestFixture]
     public class MonkeyTest
     {
-        private const string TestScene = "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/Operators.unity";
+        private const string TestScene = "../Scenes/Operators.unity";
 
-        private readonly IEnumerable<IOperator> _operators = new IOperator[]
+        private IEnumerable<IOperator> _operators;
+        private InteractiveComponentCollector _interactiveComponentCollector;
+
+        [SetUp]
+        public void SetUp()
         {
-            new UGUIClickOperator(), // click
-            new UGUIClickAndHoldOperator(1), // click and hold 1ms
-            new UGUITextInputOperator()
-        };
+            _operators = new IOperator[]
+            {
+                new UGUIClickOperator(), // click
+                new UGUIClickAndHoldOperator(1), // click and hold 1ms
+                new UGUITextInputOperator()
+            };
+            _interactiveComponentCollector = new InteractiveComponentCollector(operators: _operators);
+        }
 
         [Test]
         [LoadScene(TestScene)]
         public async Task RunStep_finish()
         {
-            var config = new MonkeyConfig
-            {
-                DelayMillis = 1, // 1ms
-            };
-
-            var interactiveComponentCollector = new InteractiveComponentCollector(operators: _operators);
+            var config = new MonkeyConfig();
             var didAct = await Monkey.RunStep(
                 config.Random,
                 config.Logger,
                 config.Screenshots,
                 config.IsReachable,
-                interactiveComponentCollector);
+                _interactiveComponentCollector);
+
             Assert.That(didAct, Is.EqualTo(true));
         }
 
@@ -56,23 +63,19 @@ namespace TestHelper.Monkey
         [LoadScene(TestScene)]
         public async Task RunStep_noInteractiveComponent_abort()
         {
-            var interactiveComponentCollector = new InteractiveComponentCollector(operators: _operators);
-            foreach (var component in interactiveComponentCollector.FindInteractableComponents())
+            foreach (var component in _interactiveComponentCollector.FindInteractableComponents())
             {
                 component.gameObject.SetActive(false);
             }
 
-            var config = new MonkeyConfig
-            {
-                DelayMillis = 1, // 1ms
-            };
-
+            var config = new MonkeyConfig();
             var didAct = await Monkey.RunStep(
                 config.Random,
                 config.Logger,
                 config.Screenshots,
                 config.IsReachable,
-                interactiveComponentCollector);
+                _interactiveComponentCollector);
+
             Assert.That(didAct, Is.EqualTo(false));
         }
 
@@ -114,26 +117,25 @@ namespace TestHelper.Monkey
 
         [Test]
         [LoadScene(TestScene)]
-        public async Task Run_noInteractiveComponent_abort()
+        public async Task Run_noInteractiveComponent_throwTimeoutException()
         {
-            var interactiveComponentCollector = new InteractiveComponentCollector();
-            foreach (var component in interactiveComponentCollector.FindInteractableComponents())
+            foreach (var component in _interactiveComponentCollector.FindInteractableComponents())
             {
                 component.gameObject.SetActive(false);
             }
 
             var config = new MonkeyConfig
             {
-                Lifetime = TimeSpan.FromSeconds(5), // 5sec
+                Lifetime = TimeSpan.FromSeconds(2), // 2sec
                 SecondsToErrorForNoInteractiveComponent = 1, // 1sec
             };
 
             try
             {
                 await Monkey.Run(config);
-                Assert.Fail("AssertionException was not thrown");
+                Assert.Fail("TimeoutException was not thrown");
             }
-            catch (AssertionException e)
+            catch (TimeoutException e)
             {
                 Assert.That(e.Message, Does.Contain("Interactive component not found in 1 seconds"));
             }
@@ -143,8 +145,7 @@ namespace TestHelper.Monkey
         [LoadScene(TestScene)]
         public async Task Run_noInteractiveComponentAndSecondsToErrorForNoInteractiveComponentIsZero_finish()
         {
-            var interactiveComponentCollector = new InteractiveComponentCollector();
-            foreach (var component in interactiveComponentCollector.FindInteractableComponents())
+            foreach (var component in _interactiveComponentCollector.FindInteractableComponents())
             {
                 component.gameObject.SetActive(false);
             }
@@ -203,12 +204,11 @@ namespace TestHelper.Monkey
 
         [Test]
         [LoadScene(TestScene)]
-        public void GetOperators_GotAllInteractableComponentAndOperators()
+        public void GetLotteryEntries_GotAllInteractableComponentAndOperators()
         {
-            var interactiveComponentCollector = new InteractiveComponentCollector(operators: _operators);
-            var operators = Monkey.GetOperators(interactiveComponentCollector);
+            var lotteryEntries = Monkey.GetLotteryEntries(_interactiveComponentCollector);
             var actual = new List<string>();
-            foreach (var (component, @operator) in operators)
+            foreach (var (component, @operator) in lotteryEntries)
             {
                 actual.Add(
                     $"{component.gameObject.name}|{component.GetType().Name}|{@operator.GetType().Name}");
@@ -233,14 +233,13 @@ namespace TestHelper.Monkey
 
         [Test]
         [LoadScene(TestScene)]
-        public void GetOperators_WithIgnoreAnnotation_Excluded()
+        public void GetLotteryEntries_WithIgnoreAnnotation_Excluded()
         {
             GameObject.Find("UsingOnPointerClickHandler").AddComponent<IgnoreAnnotation>();
 
-            var interactiveComponentCollector = new InteractiveComponentCollector(operators: _operators);
-            var operators = Monkey.GetOperators(interactiveComponentCollector);
+            var lotteryEntries = Monkey.GetLotteryEntries(_interactiveComponentCollector);
             var actual = new List<string>();
-            foreach (var (component, _) in operators)
+            foreach (var (component, _) in lotteryEntries)
             {
                 actual.Add($"{component.gameObject.name}");
             }
@@ -260,7 +259,7 @@ namespace TestHelper.Monkey
         }
 
         [Test]
-        [LoadScene("Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/PhysicsRaycasterSandbox.unity")]
+        [LoadScene("../Scenes/PhysicsRaycasterSandbox.unity")]
         public void LotteryOperator_NotReachableComponentOnly_ReturnNull()
         {
             var cube = GameObject.Find("Cube");
@@ -276,7 +275,7 @@ namespace TestHelper.Monkey
         }
 
         [Test]
-        [LoadScene("Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/PhysicsRaycasterSandbox.unity")]
+        [LoadScene("../Scenes/PhysicsRaycasterSandbox.unity")]
         public void LotteryOperator_BingoReachableComponent_ReturnOperator()
         {
             var cube = GameObject.Find("Cube");
@@ -300,38 +299,58 @@ namespace TestHelper.Monkey
         [SuppressMessage("ReSharper", "MethodHasAsyncOverload")]
         public class Screenshots
         {
+            private IEnumerable<IOperator> _operators;
+            private InteractiveComponentCollector _interactiveComponentCollector;
+
             private const int FileSizeThreshold = 5441; // VGA size solid color file size
             private const int FileSizeThreshold2X = 100 * 1024; // Normal size is 80 to 90KB
             private readonly string _defaultOutputDirectory = CommandLineArgs.GetScreenshotDirectory();
+            private string _filename;
+            private string _path;
 
-            [Test]
-            [LoadScene(TestScene)]
-            public async Task Run_withScreenshots_takeScreenshotsAndSaveToDefaultPath()
+            [SetUp]
+            public void SetUp()
             {
-                var filename = $"{nameof(Run_withScreenshots_takeScreenshotsAndSaveToDefaultPath)}_0001.png";
-                var path = Path.Combine(_defaultOutputDirectory, filename);
-                if (File.Exists(path))
+                _operators = new IOperator[]
                 {
-                    File.Delete(path);
-                }
-
-                Assume.That(path, Does.Not.Exist);
-
-                var config = new MonkeyConfig
-                {
-                    Lifetime = TimeSpan.FromMilliseconds(200), // 200ms
-                    DelayMillis = 1, // 1ms
-                    Screenshots = new ScreenshotOptions() // take screenshots and save files
+                    new UGUIClickOperator(), // click
+                    new UGUIClickAndHoldOperator(1), // click and hold 1ms
+                    new UGUITextInputOperator()
                 };
-                await Monkey.Run(config);
+                _interactiveComponentCollector = new InteractiveComponentCollector(operators: _operators);
 
-                Assert.That(path, Does.Exist);
-                Assert.That(new FileInfo(path), Has.Length.GreaterThan(FileSizeThreshold));
+                _filename = $"{TestContext.CurrentContext.Test.Name}_0001.png";
+                _path = Path.Combine(_defaultOutputDirectory, _filename);
+
+                if (File.Exists(_path))
+                {
+                    File.Delete(_path);
+                }
             }
 
             [Test]
             [LoadScene(TestScene)]
-            public async Task Run_withScreenshots_specifyPath_takeScreenshotsAndSaveToSpecifiedPath()
+            public async Task RunStep_withScreenshots_takeScreenshotsAndSaveToDefaultPath()
+            {
+                var config = new MonkeyConfig
+                {
+                    Screenshots = new ScreenshotOptions(), // take screenshots and save files,
+                };
+
+                await Monkey.RunStep(
+                    config.Random,
+                    config.Logger,
+                    config.Screenshots,
+                    config.IsReachable,
+                    _interactiveComponentCollector);
+
+                Assert.That(_path, Does.Exist);
+                Assert.That(new FileInfo(_path), Has.Length.GreaterThan(FileSizeThreshold));
+            }
+
+            [Test]
+            [LoadScene(TestScene)]
+            public async Task RunStep_withScreenshots_specifyPath_takeScreenshotsAndSaveToSpecifiedPath()
             {
                 var relativeDirectory = Path.Combine("Logs", "TestHelper.Monkey", "SpecifiedPath");
                 var filenamePrefix = "Run_withScreenshots_specifyPath";
@@ -342,20 +361,22 @@ namespace TestHelper.Monkey
                     File.Delete(path);
                 }
 
-                Assume.That(path, Does.Not.Exist);
-
                 var config = new MonkeyConfig
                 {
-                    Lifetime = TimeSpan.FromMilliseconds(200), // 200ms
-                    DelayMillis = 1, // 1ms
-                    Screenshots = new ScreenshotOptions()
+                    Screenshots = new ScreenshotOptions
                     {
                         Directory = relativeDirectory,
                         FilenameStrategy = new StubScreenshotFilenameStrategy(filename),
                         SuperSize = 2,
                     },
                 };
-                await Monkey.Run(config);
+
+                await Monkey.RunStep(
+                    config.Random,
+                    config.Logger,
+                    config.Screenshots,
+                    config.IsReachable,
+                    _interactiveComponentCollector);
 
                 Assert.That(path, Does.Exist);
                 Assert.That(new FileInfo(path), Has.Length.GreaterThan(FileSizeThreshold));
@@ -364,17 +385,8 @@ namespace TestHelper.Monkey
             [Test]
             [Description("This test fails with stereo rendering settings.")]
             [LoadScene(TestScene)]
-            public async Task Run_withScreenshots_superSize_takeScreenshotsSuperSize()
+            public async Task RunStep_withScreenshots_superSize_takeScreenshotsSuperSize()
             {
-                var filename = $"{nameof(Run_withScreenshots_superSize_takeScreenshotsSuperSize)}_0001.png";
-                var path = Path.Combine(_defaultOutputDirectory, filename);
-                if (File.Exists(path))
-                {
-                    File.Delete(path);
-                }
-
-                Assume.That(path, Does.Not.Exist);
-
                 var config = new MonkeyConfig
                 {
                     Lifetime = TimeSpan.FromMilliseconds(200), // 200ms
@@ -384,10 +396,16 @@ namespace TestHelper.Monkey
                         SuperSize = 2, // 2x size
                     },
                 };
-                await Monkey.Run(config);
 
-                Assert.That(path, Does.Exist);
-                Assert.That(new FileInfo(path), Has.Length.GreaterThan(FileSizeThreshold2X));
+                await Monkey.RunStep(
+                    config.Random,
+                    config.Logger,
+                    config.Screenshots,
+                    config.IsReachable,
+                    _interactiveComponentCollector);
+
+                Assert.That(_path, Does.Exist);
+                Assert.That(new FileInfo(_path), Has.Length.GreaterThan(FileSizeThreshold2X));
                 // Note: This test fails with stereo rendering settings.
                 //  See: https://docs.unity3d.com/Manual/SinglePassStereoRendering.html
             }
@@ -395,17 +413,8 @@ namespace TestHelper.Monkey
             [Test]
             [LoadScene(TestScene)]
             [Description("Is it a stereo screenshot? See for yourself! Be a witness!!")]
-            public async Task Run_withScreenshots_stereo_takeScreenshotsStereo()
+            public async Task RunStep_withScreenshots_stereo_takeScreenshotsStereo()
             {
-                var filename = $"{nameof(Run_withScreenshots_stereo_takeScreenshotsStereo)}_0001.png";
-                var path = Path.Combine(_defaultOutputDirectory, filename);
-                if (File.Exists(path))
-                {
-                    File.Delete(path);
-                }
-
-                Assume.That(path, Does.Not.Exist);
-
                 var config = new MonkeyConfig
                 {
                     Lifetime = TimeSpan.FromMilliseconds(200), // 200ms
@@ -415,11 +424,121 @@ namespace TestHelper.Monkey
                         StereoCaptureMode = ScreenCapture.StereoScreenCaptureMode.BothEyes,
                     },
                 };
-                await Monkey.Run(config);
 
-                Assert.That(path, Does.Exist);
+                await Monkey.RunStep(
+                    config.Random,
+                    config.Logger,
+                    config.Screenshots,
+                    config.IsReachable,
+                    _interactiveComponentCollector);
+
+                Assert.That(_path, Does.Exist);
                 // Note: Require stereo rendering settings.
                 //  See: https://docs.unity3d.com/Manual/SinglePassStereoRendering.html
+            }
+
+            [Test]
+            [LoadScene(TestScene)]
+            public async Task Run_withScreenshots_noInteractiveComponent_takeScreenshot()
+            {
+                var interactiveComponentCollector = new InteractiveComponentCollector();
+                foreach (var component in interactiveComponentCollector.FindInteractableComponents())
+                {
+                    component.gameObject.SetActive(false);
+                }
+
+                var config = new MonkeyConfig
+                {
+                    Lifetime = TimeSpan.FromSeconds(2), // 2sec
+                    SecondsToErrorForNoInteractiveComponent = 1, // 1sec
+                    Screenshots = new ScreenshotOptions() // take screenshots and save files
+                };
+
+                try
+                {
+                    await Monkey.Run(config);
+                    Assert.Fail("TimeoutException was not thrown");
+                }
+                catch (TimeoutException e)
+                {
+                    Assert.That(e.Message, Does.Contain($"Interactive component not found in 1 seconds ({_filename})"));
+                }
+
+                Assert.That(_path, Does.Exist);
+            }
+        }
+
+        [TestFixture]
+        public class Verbose
+        {
+            private IEnumerable<IOperator> _operators;
+            private InteractiveComponentCollector _interactiveComponentCollector;
+
+            [SetUp]
+            public void SetUp()
+            {
+                _operators = new IOperator[]
+                {
+                    new UGUIClickOperator(), // click
+                    new UGUIClickAndHoldOperator(1), // click and hold 1ms
+                    new UGUITextInputOperator()
+                };
+                _interactiveComponentCollector = new InteractiveComponentCollector(operators: _operators);
+            }
+
+            [Test]
+            [LoadScene(TestScene)]
+            public void GetLotteryEntriesWithoutVerbose_NotOutputLog()
+            {
+                var lotteryEntries = Monkey.GetLotteryEntries(_interactiveComponentCollector);
+                Assume.That(lotteryEntries.Count, Is.GreaterThan(0));
+
+                LogAssert.NoUnexpectedReceived();
+            }
+
+            [Test]
+            [LoadScene(TestScene)]
+            public void GetLotteryEntriesWithVerbose_LogLotteryEntries()
+            {
+                GameObject.Find("UsingOnPointerClickHandler").AddComponent<IgnoreAnnotation>();
+
+                var spyLogger = new SpyLogger();
+                var lotteryEntries = Monkey.GetLotteryEntries(_interactiveComponentCollector, verboseLogger: spyLogger);
+                Assume.That(lotteryEntries.Count, Is.GreaterThan(0));
+
+                Assert.That(spyLogger.Messages.Count, Is.EqualTo(1));
+                Assert.That(spyLogger.Messages[0], Does.StartWith("Lottery entries: "));
+                Assert.That(spyLogger.Messages[0], Does.Match(@"\[Ignored\]UsingOnPointerClickHandler\(\d+\)"));
+                Assert.That(spyLogger.Messages[0], Does.Match(@"UsingPointerClickEventTrigger\(\d+\)"));
+                Assert.That(spyLogger.Messages[0], Does.Match(@"UsingOnPointerDownUpHandler\(\d+\)"));
+                Assert.That(spyLogger.Messages[0], Does.Match(@"UsingPointerDownUpEventTrigger\(\d+\)"));
+                Assert.That(spyLogger.Messages[0], Does.Match(@"UsingMultipleEventTriggers\(\d+\)"));
+                Assert.That(spyLogger.Messages[0], Does.Match(@"DestroyItselfIfPointerDown\(\d+\)"));
+                Assert.That(spyLogger.Messages[0], Does.Match(@"InputField\(\d+\)"));
+            }
+
+            [Test]
+            [LoadScene("../Scenes/PhysicsRaycasterSandbox.unity")] // no interactable objects
+            public void GetLotteryEntriesWithVerbose_NoInteractableObject_LogNoLotteryEntries()
+            {
+                var spyLogger = new SpyLogger();
+                var lotteryEntries = Monkey.GetLotteryEntries(_interactiveComponentCollector, verboseLogger: spyLogger);
+                Assume.That(lotteryEntries, Is.Empty);
+
+                Assert.That(spyLogger.Messages.Count, Is.EqualTo(1));
+                Assert.That(spyLogger.Messages[0], Is.EqualTo("No lottery entries."));
+            }
+
+            [Test]
+            [LoadScene("../Scenes/PhysicsRaycasterSandbox.unity")] // no interactable and reachable objects
+            public void LotteryOperatorWithVerbose_NotReachableComponentOnly_LogNoLotteryEntries()
+            {
+                var spyLogger = new SpyLogger();
+                var lotteryEntries = Monkey.GetLotteryEntries(_interactiveComponentCollector).ToList();
+                var random = new RandomWrapper();
+                Monkey.LotteryOperator(lotteryEntries, random, DefaultReachableStrategy.IsReachable, spyLogger);
+
+                Assert.That(spyLogger.Messages, Does.Contain("Lottery entries are empty or all of not reachable."));
             }
         }
     }
