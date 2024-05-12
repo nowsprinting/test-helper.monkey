@@ -145,11 +145,19 @@ namespace TestHelper.Monkey
             {
                 if (component.gameObject.TryGetComponent(typeof(IgnoreAnnotation), out _))
                 {
-                    dictionary?.TryAdd(component.gameObject, "Ignored");
+                    if (dictionary != null && !dictionary.Keys.Contains(component.gameObject))
+                    {
+                        dictionary.Add(component.gameObject, "Ignored");
+                    }
+
                     continue;
                 }
 
-                dictionary?.TryAdd(component.gameObject, null);
+                if (dictionary != null && !dictionary.Keys.Contains(component.gameObject))
+                {
+                    dictionary.Add(component.gameObject, null);
+                }
+
                 yield return (component, iOperator);
             }
 
