@@ -52,6 +52,7 @@ Configurations in `MonkeyConfig`:
 - **SecondsToErrorForNoInteractiveComponent**: Seconds to determine that an error has occurred when an object that can be interacted with does not exist
 - **Random**: Random generator
 - **Logger**: Logger
+- **Verbose**: Output verbose log if true
 - **Gizmos**: Show Gizmos on `GameView` during running monkey test if true
 - **Screenshots**: Take screenshots during running the monkey test if set a `ScreenshotOptions` instance.
     - **Directory**: Directory to save screenshots. If omitted, the directory specified by command line argument "-testHelperScreenshotDirectory" is used. If the command line argument is also omitted, `Application.persistentDataPath` + "/TestHelper/Screenshots/" is used.
