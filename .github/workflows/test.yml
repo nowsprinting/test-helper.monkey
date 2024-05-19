@@ -18,9 +18,6 @@ on:
       - '.github/**'
       - '!.github/workflows/test.yml'
 
-env:
-  PACKAGE_NAME: com.nowsprinting.test-helper.monkey
-
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -38,7 +35,7 @@ jobs:
       matrix:
         unityVersion: # Available versions see: https://game.ci/docs/docker/versions
           - 2019.4.40f1
-          - 2022.3.27f1
+          - 2022.3.29f1
           - 2023.2.20f1
         include:
           - unityVersion: 2019.4.40f1
@@ -57,12 +54,17 @@ jobs:
           restore-keys: |
             Library-
 
+      - name: Get package checkout path
+        run: |
+          name=com.$(echo "${GITHUB_REPOSITORY}" | sed 's/\//\./g')
+          echo "PACKAGE_PATH=$CREATED_PROJECT_PATH/Packages/$name" >> "$GITHUB_ENV"
+
       - name: Checkout repository as embedded package
         uses: actions/checkout@v4
         with:
           submodules: false
           lfs: false
-          path: ${{ env.CREATED_PROJECT_PATH }}/Packages/${{ env.PACKAGE_NAME }}
+          path: ${{ env.PACKAGE_PATH }}
           # In Linux editor, there is a problem that assets in local packages cannot be found with `AssetDatabase.FindAssets`.
           # As a workaround, I have made it into an embedded package.
 
@@ -78,11 +80,11 @@ jobs:
 
       - name: Enable Samples~
         run: |
-          mv ${{ env.CREATED_PROJECT_PATH }}/Packages/${{ env.PACKAGE_NAME }}/Samples~ ${{ env.CREATED_PROJECT_PATH }}/Assets/Samples
+          mv ${{ env.PACKAGE_PATH }}/Samples~ ${{ env.CREATED_PROJECT_PATH }}/Assets/Samples
 
       - name: Set coverage assembly filters
         run: |
-          assemblies=$(find ${{ env.CREATED_PROJECT_PATH }}/Packages/${{ env.PACKAGE_NAME }} -name "*.asmdef" | sed -e s/.*\\//\+/ | sed -e s/\\.asmdef// | sed -e s/^.*\\.Tests//)
+          assemblies=$(find ${{ env.PACKAGE_PATH }} -name "*.asmdef" | sed -e s/.*\\//\+/ | sed -e s/\\.asmdef// | sed -e s/^.*\\.Tests//)
           # shellcheck disable=SC2001,SC2048,SC2086
           echo "assembly_filters=$(echo ${assemblies[*]} | sed -e s/\ /,/g),+<assets>,-*.Tests" >> "$GITHUB_ENV"
 
@@ -107,7 +109,7 @@ jobs:
 
       - name: Set coverage path for octocov
         run: |
-          mv ${{ env.CREATED_PROJECT_PATH }}/Packages/${{ env.PACKAGE_NAME }}/.octocov.yml .
+          mv ${{ env.PACKAGE_PATH }}/.octocov.yml .
           sed -i -r 's/UnityProject~\/Logs/${{ steps.test.outputs.coveragePath }}/' .octocov.yml
         if: ${{ matrix.octocov }}
 
