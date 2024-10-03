@@ -51,9 +51,11 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: ${{ env.CREATED_PROJECT_PATH }}/Library
-          key: Library-${{ matrix.unityVersion }}
+          key: Library-linux-${{ matrix.unityVersion }}-${{ github.ref }}
           restore-keys: |
-            Library-
+            Library-linux-${{ matrix.unityVersion }}
+            Library-linux
+            Library
 
       - name: Get package checkout path
         run: |
