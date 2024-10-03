@@ -51,7 +51,7 @@ endif
 
 define base_arguments
 -projectPath $(PROJECT_HOME) \
--logFile $(LOG_DIR)/test_$(TEST_PLATFORM).log
+-logFile $(LOG_DIR)/$(TEST_PLATFORM).log
 endef
 
 define test_arguments
@@ -64,7 +64,8 @@ $(TEST_CATEGORY) \
 $(TEST_FILTER) \
 $(ASSEMBLY_NAMES) \
 -testPlatform $(TEST_PLATFORM) \
--testResults $(LOG_DIR)/test_$(TEST_PLATFORM)_results.xml \
+-testResults $(LOG_DIR)/$(TEST_PLATFORM)-results.xml \
+-testHelperJUnitResults $(LOG_DIR)/$(TEST_PLATFORM)-junit-results.xml \
 -testHelperScreenshotDirectory $(LOG_DIR)/Screenshots
 endef
 
