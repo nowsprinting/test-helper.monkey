@@ -26,6 +26,7 @@ jobs:
   test:
     if: github.event.pull_request.head.repo.fork == false # Skip on public fork, because can not read secrets.
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       contents: read
       checks: write
@@ -50,9 +51,11 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: ${{ env.CREATED_PROJECT_PATH }}/Library
-          key: Library-${{ matrix.unityVersion }}
+          key: Library-linux-${{ matrix.unityVersion }}-${{ github.ref }}
           restore-keys: |
-            Library-
+            Library-linux-${{ matrix.unityVersion }}
+            Library-linux
+            Library
 
       - name: Get package checkout path
         run: |
@@ -71,11 +74,11 @@ jobs:
       - name: Install dependencies
         run: |
           npm install -g openupm-cli
-          openupm add -f com.unity.test-framework
+          openupm add -f com.unity.test-framework@stable
           openupm add -f com.unity.testtools.codecoverage
-          openupm add -f com.cysharp.unitask@2.3.3
-          openupm add -f com.nowsprinting.test-helper@0.6.0
-          openupm add -f com.nowsprinting.test-helper.random@0.3.0
+          openupm add -f com.cysharp.unitask
+          openupm add -f com.nowsprinting.test-helper
+          openupm add -f com.nowsprinting.test-helper.random
         working-directory: ${{ env.CREATED_PROJECT_PATH }}
 
       - name: Enable Samples~
@@ -130,6 +133,7 @@ jobs:
     needs: test
     if: github.event.pull_request.head.repo.fork == false # Skip on public fork, because can not read secrets.
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     permissions:
       actions: read
 

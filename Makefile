@@ -10,7 +10,7 @@ PACKAGE_NAME?=$(shell grep -o -E '"name": "(.+)"' $(PACKAGE_HOME)/package.json |
 
 # Code Coverage report filter (comma separated)
 # see: https://docs.unity3d.com/Packages/com.unity.testtools.codecoverage@1.2/manual/CoverageBatchmode.html
-PACKAGE_ASSEMBLIES?=$(shell echo $(shell find $(PACKAGE_HOME) -name "*.asmdef" -maxdepth 3 | sed -e s/.*\\//\+/ | sed -e s/\\.asmdef// | sed -e s/^.*\\.Tests//) | sed -e s/\ /,/g)
+PACKAGE_ASSEMBLIES?=$(shell echo $(shell find $(PACKAGE_HOME) -name "*.asmdef" | grep -v -E "\/UnityProject~\/" | sed -e s/.*\\//\+/ | sed -e s/\\.asmdef// | sed -e s/^.*\\.Tests//) | sed -e s/\ /,/g)
 COVERAGE_ASSEMBLY_FILTERS?=$(PACKAGE_ASSEMBLIES),+<assets>,-*.Tests
 
 # -nographics` option
@@ -51,7 +51,7 @@ endif
 
 define base_arguments
 -projectPath $(PROJECT_HOME) \
--logFile $(LOG_DIR)/test_$(TEST_PLATFORM).log
+-logFile $(LOG_DIR)/$(TEST_PLATFORM).log
 endef
 
 define test_arguments
@@ -64,7 +64,8 @@ $(TEST_CATEGORY) \
 $(TEST_FILTER) \
 $(ASSEMBLY_NAMES) \
 -testPlatform $(TEST_PLATFORM) \
--testResults $(LOG_DIR)/test_$(TEST_PLATFORM)_results.xml \
+-testResults $(LOG_DIR)/$(TEST_PLATFORM)-results.xml \
+-testHelperJUnitResults $(LOG_DIR)/$(TEST_PLATFORM)-junit-results.xml \
 -testHelperScreenshotDirectory $(LOG_DIR)/Screenshots
 endef
 
@@ -122,13 +123,13 @@ create_project:
 	  -createProject $(PROJECT_HOME) \
 	  -batchmode \
 	  -quit
-	touch UnityProject~/Assets/.gitkeep
-	openupm -c $(PROJECT_HOME) add -f com.unity.test-framework
-	openupm -c $(PROJECT_HOME) add -f com.unity.testtools.codecoverage
-	openupm -c $(PROJECT_HOME) add -f com.cysharp.unitask@2.3.3
-	openupm -c $(PROJECT_HOME) add -f com.nowsprinting.test-helper@0.6.0
-	openupm -c $(PROJECT_HOME) add -f com.nowsprinting.test-helper.random@0.3.0
-	openupm -c $(PROJECT_HOME) add -ft $(PACKAGE_NAME)@file:../../
+	touch $(PROJECT_HOME)/Assets/.gitkeep
+	openupm add -c $(PROJECT_HOME) -f com.unity.test-framework@stable
+	openupm add -c $(PROJECT_HOME) -f com.unity.testtools.codecoverage
+	openupm add -c $(PROJECT_HOME) -f com.cysharp.unitask
+	openupm add -c $(PROJECT_HOME) -f com.nowsprinting.test-helper
+	openupm add -c $(PROJECT_HOME) -f com.nowsprinting.test-helper.random
+	openupm add -c $(PROJECT_HOME) -ft $(PACKAGE_NAME)@file:../../
 
 .PHONY: remove_project
 remove_project:

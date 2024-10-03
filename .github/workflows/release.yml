@@ -14,6 +14,7 @@ jobs:
   check-bump-version:
     if: github.repository_owner == 'nowsprinting' # Skip on forked repo
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     permissions:
       contents: read
     outputs:
@@ -34,6 +35,7 @@ jobs:
     needs: check-bump-version
     if: ${{ needs.check-bump-version.outputs.new-version }}
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     permissions:
       contents: write
       pull-requests: read
