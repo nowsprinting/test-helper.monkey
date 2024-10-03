@@ -11,6 +11,7 @@ jobs:
   pr-labeler:
     if: github.event.pull_request.head.repo.fork == false # Skip on public fork
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     permissions:
       contents: read
       pull-requests: write

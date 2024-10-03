@@ -26,6 +26,7 @@ jobs:
   test:
     if: github.event.pull_request.head.repo.fork == false # Skip on public fork, because can not read secrets.
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       contents: read
       checks: write
@@ -130,6 +131,7 @@ jobs:
     needs: test
     if: github.event.pull_request.head.repo.fork == false # Skip on public fork, because can not read secrets.
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     permissions:
       actions: read
 
