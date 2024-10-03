@@ -25,7 +25,8 @@ namespace TestHelper.Monkey
 
             Measure.Method(() =>
                 {
-                    Monkey.GetLotteryEntries(interactableComponentCollector);
+                    // ReSharper disable once IteratorMethodResultIsIgnored
+                    Monkey.GetLotteryEntries(interactableComponentCollector, config.IsIgnored);
                 })
                 .WarmupCount(5)
                 .MeasurementCount(20)
@@ -40,7 +41,7 @@ namespace TestHelper.Monkey
         {
             var config = new MonkeyConfig();
             var interactableComponentCollector = new InteractiveComponentCollector(config);
-            var operators = Monkey.GetLotteryEntries(interactableComponentCollector);
+            var operators = Monkey.GetLotteryEntries(interactableComponentCollector, config.IsIgnored);
 
             Measure.Method(() =>
                 {
@@ -67,6 +68,7 @@ namespace TestHelper.Monkey
                         config.Logger,
                         config.Screenshots,
                         config.IsReachable,
+                        config.IsIgnored,
                         interactableComponentCollector)
                     .ToCoroutine();
             }

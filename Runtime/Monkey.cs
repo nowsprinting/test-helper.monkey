@@ -7,7 +7,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using TestHelper.Monkey.Annotations;
 using TestHelper.Monkey.Operators;
 using TestHelper.Random;
 using TestHelper.RuntimeInternals;
@@ -60,6 +59,7 @@ namespace TestHelper.Monkey
                         config.Logger,
                         config.Screenshots,
                         config.IsReachable,
+                        config.IsIgnored,
                         interactableComponentCollector,
                         config.Verbose,
                         cancellationToken);
@@ -101,6 +101,7 @@ namespace TestHelper.Monkey
         /// <param name="logger">Logger from <c>MonkeyConfig</c></param>
         /// <param name="screenshotOptions">Take screenshots options from <c>MonkeyConfig</c></param>
         /// <param name="isReachable">Function returns the <c>GameObject</c> is reachable from user or not. from <c>MonkeyConfig</c></param>
+        /// <param name="isIgnored">Function returns the <c>GameObject</c> is ignored or not. from <c>MonkeyConfig</c></param>
         /// <param name="interactableComponentCollector">InteractableComponentCollector instance includes isReachable, isInteractable, and operators</param>
         /// <param name="verbose">Output verbose logs</param>
         /// <param name="cancellationToken">Cancellation token</param>
@@ -110,11 +111,12 @@ namespace TestHelper.Monkey
             ILogger logger,
             ScreenshotOptions screenshotOptions,
             Func<GameObject, PointerEventData, List<RaycastResult>, ILogger, bool> isReachable,
+            Func<GameObject, bool> isIgnored,
             InteractiveComponentCollector interactableComponentCollector,
             bool verbose = false,
             CancellationToken cancellationToken = default)
         {
-            var lotteryEntries = GetLotteryEntries(interactableComponentCollector, verbose ? logger : null);
+            var lotteryEntries = GetLotteryEntries(interactableComponentCollector, isIgnored, verbose ? logger : null);
             var (selectedComponent, selectedOperator) = LotteryOperator(lotteryEntries.ToList(), random, isReachable,
                 verbose ? logger : null);
             if (selectedComponent == null || selectedOperator == null)
@@ -136,14 +138,16 @@ namespace TestHelper.Monkey
             return true;
         }
 
-        internal static IEnumerable<(Component, IOperator)> GetLotteryEntries(InteractiveComponentCollector collector,
+        internal static IEnumerable<(Component, IOperator)> GetLotteryEntries(
+            InteractiveComponentCollector collector,
+            Func<GameObject, bool> isIgnored,
             ILogger verboseLogger = null)
         {
             var dictionary = verboseLogger != null ? new Dictionary<GameObject, string>() : null;
 
             foreach (var (component, iOperator) in collector.FindInteractableComponentsAndOperators())
             {
-                if (component.gameObject.TryGetComponent(typeof(IgnoreAnnotation), out _))
+                if (isIgnored(component.gameObject))
                 {
                     if (dictionary != null && !dictionary.Keys.Contains(component.gameObject))
                     {

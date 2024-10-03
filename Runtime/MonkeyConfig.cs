@@ -64,6 +64,11 @@ namespace TestHelper.Monkey
             DefaultReachableStrategy.IsReachable;
 
         /// <summary>
+        /// Function returns the <c>GameObject</c> is ignored or not.
+        /// </summary>
+        public Func<GameObject, bool> IsIgnored { get; set; } = DefaultIgnoreStrategy.IsIgnored;
+
+        /// <summary>
         /// Function returns the <c>Component</c> is interactable or not.
         /// </summary>
         public Func<Component, bool> IsInteractable { get; set; } = DefaultComponentInteractableStrategy.IsInteractable;

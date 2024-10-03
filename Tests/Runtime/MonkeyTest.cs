@@ -54,6 +54,7 @@ namespace TestHelper.Monkey
                 config.Logger,
                 config.Screenshots,
                 config.IsReachable,
+                config.IsIgnored,
                 _interactiveComponentCollector);
 
             Assert.That(didAct, Is.EqualTo(true));
@@ -74,6 +75,7 @@ namespace TestHelper.Monkey
                 config.Logger,
                 config.Screenshots,
                 config.IsReachable,
+                config.IsIgnored,
                 _interactiveComponentCollector);
 
             Assert.That(didAct, Is.EqualTo(false));
@@ -206,7 +208,7 @@ namespace TestHelper.Monkey
         [LoadScene(TestScene)]
         public void GetLotteryEntries_GotAllInteractableComponentAndOperators()
         {
-            var lotteryEntries = Monkey.GetLotteryEntries(_interactiveComponentCollector);
+            var lotteryEntries = Monkey.GetLotteryEntries(_interactiveComponentCollector, DefaultIgnoreStrategy.IsIgnored);
             var actual = new List<string>();
             foreach (var (component, @operator) in lotteryEntries)
             {
@@ -237,7 +239,7 @@ namespace TestHelper.Monkey
         {
             GameObject.Find("UsingOnPointerClickHandler").AddComponent<IgnoreAnnotation>();
 
-            var lotteryEntries = Monkey.GetLotteryEntries(_interactiveComponentCollector);
+            var lotteryEntries = Monkey.GetLotteryEntries(_interactiveComponentCollector, DefaultIgnoreStrategy.IsIgnored);
             var actual = new List<string>();
             foreach (var (component, _) in lotteryEntries)
             {
@@ -342,6 +344,7 @@ namespace TestHelper.Monkey
                     config.Logger,
                     config.Screenshots,
                     config.IsReachable,
+                    config.IsIgnored,
                     _interactiveComponentCollector);
 
                 Assert.That(_path, Does.Exist);
@@ -376,6 +379,7 @@ namespace TestHelper.Monkey
                     config.Logger,
                     config.Screenshots,
                     config.IsReachable,
+                    config.IsIgnored,
                     _interactiveComponentCollector);
 
                 Assert.That(path, Does.Exist);
@@ -402,6 +406,7 @@ namespace TestHelper.Monkey
                     config.Logger,
                     config.Screenshots,
                     config.IsReachable,
+                    config.IsIgnored,
                     _interactiveComponentCollector);
 
                 Assert.That(_path, Does.Exist);
@@ -430,6 +435,7 @@ namespace TestHelper.Monkey
                     config.Logger,
                     config.Screenshots,
                     config.IsReachable,
+                    config.IsIgnored,
                     _interactiveComponentCollector);
 
                 Assert.That(_path, Does.Exist);
@@ -490,7 +496,7 @@ namespace TestHelper.Monkey
             [LoadScene(TestScene)]
             public void GetLotteryEntriesWithoutVerbose_NotOutputLog()
             {
-                var lotteryEntries = Monkey.GetLotteryEntries(_interactiveComponentCollector);
+                var lotteryEntries = Monkey.GetLotteryEntries(_interactiveComponentCollector, DefaultIgnoreStrategy.IsIgnored);
                 Assume.That(lotteryEntries.Count, Is.GreaterThan(0));
 
                 LogAssert.NoUnexpectedReceived();
@@ -503,7 +509,7 @@ namespace TestHelper.Monkey
                 GameObject.Find("UsingOnPointerClickHandler").AddComponent<IgnoreAnnotation>();
 
                 var spyLogger = new SpyLogger();
-                var lotteryEntries = Monkey.GetLotteryEntries(_interactiveComponentCollector, verboseLogger: spyLogger);
+                var lotteryEntries = Monkey.GetLotteryEntries(_interactiveComponentCollector, DefaultIgnoreStrategy.IsIgnored, verboseLogger: spyLogger);
                 Assume.That(lotteryEntries.Count, Is.GreaterThan(0));
 
                 Assert.That(spyLogger.Messages.Count, Is.EqualTo(1));
@@ -522,7 +528,7 @@ namespace TestHelper.Monkey
             public void GetLotteryEntriesWithVerbose_NoInteractableObject_LogNoLotteryEntries()
             {
                 var spyLogger = new SpyLogger();
-                var lotteryEntries = Monkey.GetLotteryEntries(_interactiveComponentCollector, verboseLogger: spyLogger);
+                var lotteryEntries = Monkey.GetLotteryEntries(_interactiveComponentCollector, DefaultIgnoreStrategy.IsIgnored, verboseLogger: spyLogger);
                 Assume.That(lotteryEntries, Is.Empty);
 
                 Assert.That(spyLogger.Messages.Count, Is.EqualTo(1));
@@ -534,7 +540,7 @@ namespace TestHelper.Monkey
             public void LotteryOperatorWithVerbose_NotReachableComponentOnly_LogNoLotteryEntries()
             {
                 var spyLogger = new SpyLogger();
-                var lotteryEntries = Monkey.GetLotteryEntries(_interactiveComponentCollector).ToList();
+                var lotteryEntries = Monkey.GetLotteryEntries(_interactiveComponentCollector, DefaultIgnoreStrategy.IsIgnored).ToList();
                 var random = new RandomWrapper();
                 Monkey.LotteryOperator(lotteryEntries, random, DefaultReachableStrategy.IsReachable, spyLogger);
 
