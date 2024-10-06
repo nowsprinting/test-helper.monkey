@@ -31,7 +31,7 @@ namespace TestHelper.Monkey.Samples.UGUIDemo
             var startButton = await _finder.FindByNameAsync("StartButton", interactable: true);
             var startComponent = startButton.GetInteractableComponents().First();
             var startOperator = startComponent.SelectOperators<IClickOperator>(_config.Operators).First();
-            startOperator.OperateAsync(startComponent);
+            await startOperator.OperateAsync(startComponent);
 
             await _finder.FindByNameAsync("Home");
 
@@ -39,7 +39,7 @@ namespace TestHelper.Monkey.Samples.UGUIDemo
             var targetButton = await _finder.FindByNameAsync($"{target}Button", interactable: true);
             var targetComponent = targetButton.GetInteractableComponents().First();
             var targetOperator = targetComponent.SelectOperators<IClickOperator>(_config.Operators).First();
-            targetOperator.OperateAsync(targetComponent);
+            await targetOperator.OperateAsync(targetComponent);
 
             await _finder.FindByNameAsync(target);
 
@@ -47,7 +47,7 @@ namespace TestHelper.Monkey.Samples.UGUIDemo
             var backButton = await _finder.FindByPathAsync($"**/{target}/BackButton", interactable: true);
             var backComponent = backButton.GetInteractableComponents().First();
             var backOperator = backComponent.SelectOperators<IClickOperator>(_config.Operators).First();
-            backOperator.OperateAsync(backComponent);
+            await backOperator.OperateAsync(backComponent);
 
             await _finder.FindByNameAsync("Home");
         }
