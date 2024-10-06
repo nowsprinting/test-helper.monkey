@@ -100,7 +100,8 @@ namespace TestHelper.Monkey
                 }
 
                 delaySeconds = Math.Min(delaySeconds * 2, _timeoutSeconds);
-                await UniTask.Delay(TimeSpan.FromSeconds(delaySeconds), cancellationToken: token);
+                await UniTask.Delay(TimeSpan.FromSeconds(delaySeconds), ignoreTimeScale: true,
+                    cancellationToken: token);
             }
 
             switch (reason)
