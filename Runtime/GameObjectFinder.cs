@@ -26,6 +26,7 @@ namespace TestHelper.Monkey
         private readonly List<RaycastResult> _results = new List<RaycastResult>();
 
         private const double MinTimeoutSeconds = 0.01d;
+        private const double MaxPollingIntervalSeconds = 1.0d;
 
         /// <summary>
         /// Constructor.
@@ -87,10 +88,11 @@ namespace TestHelper.Monkey
         private async UniTask<GameObject> FindByNameAsync(string name, string path, bool reachable, bool interactable,
             CancellationToken token)
         {
+            var timeoutTime = Time.realtimeSinceStartup + (float)_timeoutSeconds;
             var delaySeconds = MinTimeoutSeconds;
             var reason = Reason.None;
 
-            while (delaySeconds < _timeoutSeconds)
+            while (Time.realtimeSinceStartup < timeoutTime)
             {
                 GameObject foundObject;
                 (foundObject, reason) = FindByName(name, path, reachable, interactable);
@@ -99,7 +101,7 @@ namespace TestHelper.Monkey
                     return foundObject;
                 }
 
-                delaySeconds = Math.Min(delaySeconds * 2, _timeoutSeconds);
+                delaySeconds = Math.Min(delaySeconds * 2, MaxPollingIntervalSeconds);
                 await UniTask.Delay(TimeSpan.FromSeconds(delaySeconds), ignoreTimeScale: true,
                     cancellationToken: token);
             }
