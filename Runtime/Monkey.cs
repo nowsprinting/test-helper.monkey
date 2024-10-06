@@ -82,7 +82,8 @@ namespace TestHelper.Monkey
                         throw new TimeoutException(message.ToString());
                     }
 
-                    await UniTask.Delay(config.DelayMillis, DelayType.DeltaTime, cancellationToken: cancellationToken);
+                    await UniTask.Delay(config.DelayMillis, ignoreTimeScale: true,
+                        cancellationToken: cancellationToken);
                 }
             }
             finally

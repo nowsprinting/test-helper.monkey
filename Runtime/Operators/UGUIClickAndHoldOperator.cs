@@ -55,7 +55,8 @@ namespace TestHelper.Monkey.Operators
 
             _eventData.position = _getScreenPoint(component.gameObject);
             downHandler.OnPointerDown(_eventData);
-            await UniTask.Delay(TimeSpan.FromMilliseconds(_holdMillis), cancellationToken: cancellationToken);
+            await UniTask.Delay(TimeSpan.FromMilliseconds(_holdMillis), ignoreTimeScale: true,
+                cancellationToken: cancellationToken);
 
             if (component == null || component.gameObject == null)
             {
