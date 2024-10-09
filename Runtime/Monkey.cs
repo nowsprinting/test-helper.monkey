@@ -36,8 +36,8 @@ namespace TestHelper.Monkey
         {
             var endTime = config.Lifetime == TimeSpan.MaxValue
                 ? TimeSpan.MaxValue.TotalSeconds
-                : config.Lifetime.Add(TimeSpan.FromSeconds(Time.time)).TotalSeconds;
-            var lastOperationTime = Time.time;
+                : config.Lifetime.Add(TimeSpan.FromSeconds(Time.realtimeSinceStartup)).TotalSeconds;
+            var lastOperationTime = Time.realtimeSinceStartup;
 
             var beforeGizmos = false;
             if (config.Gizmos)
@@ -52,7 +52,7 @@ namespace TestHelper.Monkey
 
             try
             {
-                while (Time.time < endTime)
+                while (Time.realtimeSinceStartup < endTime)
                 {
                     var didAct = await RunStep(
                         config.Random,
@@ -65,10 +65,11 @@ namespace TestHelper.Monkey
                         cancellationToken);
                     if (didAct)
                     {
-                        lastOperationTime = Time.time;
+                        lastOperationTime = Time.realtimeSinceStartup;
                     }
                     else if (0 < config.SecondsToErrorForNoInteractiveComponent &&
-                             config.SecondsToErrorForNoInteractiveComponent < (Time.time - lastOperationTime))
+                             config.SecondsToErrorForNoInteractiveComponent <
+                             (Time.realtimeSinceStartup - lastOperationTime))
                     {
                         var message = new StringBuilder(
                             $"Interactive component not found in {config.SecondsToErrorForNoInteractiveComponent} seconds");
