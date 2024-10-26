@@ -10,6 +10,12 @@ on:
     paths:
       - package.json
 
+permissions: {}
+
+defaults:
+  run:
+    shell: bash
+
 jobs:
   check-bump-version:
     if: github.repository_owner == 'nowsprinting' # Skip on forked repo
