@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -298,7 +297,8 @@ namespace TestHelper.Monkey
         }
 
         [TestFixture]
-        [SuppressMessage("ReSharper", "MethodHasAsyncOverload")]
+        [GameViewResolution(GameViewResolution.VGA)]
+        [UnityPlatform(RuntimePlatform.OSXEditor, RuntimePlatform.WindowsEditor, RuntimePlatform.LinuxEditor)]
         public class Screenshots
         {
             private IEnumerable<IOperator> _operators;
