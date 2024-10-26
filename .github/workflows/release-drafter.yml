@@ -13,6 +13,12 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions: {}
+
+defaults:
+  run:
+    shell: bash
+
 jobs:
   release-drafter:
     if: github.repository_owner == 'nowsprinting' # Skip on forked repo

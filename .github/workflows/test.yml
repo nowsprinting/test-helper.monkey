@@ -22,6 +22,12 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions: {}
+
+defaults:
+  run:
+    shell: bash
+
 jobs:
   test:
     if: github.event.pull_request.head.repo.fork == false # Skip on public fork, because can not read secrets.

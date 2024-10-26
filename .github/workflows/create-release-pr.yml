@@ -7,6 +7,12 @@ name: Create release pull request
 on:
   workflow_dispatch:
 
+permissions: {}
+
+defaults:
+  run:
+    shell: bash
+
 jobs:
   create-release-pr:
     runs-on: ubuntu-latest

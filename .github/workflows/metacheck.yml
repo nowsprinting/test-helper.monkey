@@ -10,6 +10,12 @@ on:
   pull_request:
     types: [ opened, synchronize, reopened ]  # Same as default
 
+permissions: {}
+
+defaults:
+  run:
+    shell: bash
+
 jobs:
   meta-check:
     runs-on: ubuntu-latest
