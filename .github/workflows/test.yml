@@ -39,9 +39,13 @@ jobs:
           - 2022.3.42f1
           - 2023.2.20f1
           - 6000.0.21f1
+        testMode:
+          - All # run tests in editor
         include:
           - unityVersion: 2019.4.40f1
             octocov: true
+          - unityVersion: 2023.2.20f1
+            testMode: Standalone  # run tests on player
 
     steps:
       - name: Crete project for tests
@@ -100,11 +104,12 @@ jobs:
         with:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           unityVersion: ${{ matrix.unityVersion }}  # Default is `auto`
-          checkName: test result (${{ matrix.unityVersion }})
+          checkName: test result (${{ matrix.unityVersion }}, matrix.testMode)
           projectPath: ${{ env.CREATED_PROJECT_PATH }}
           customParameters: -testCategory "!IgnoreCI" -testHelperScreenshotDirectory /github/workspace/artifacts/Screenshots
           coverageOptions: generateAdditionalMetrics;generateTestReferences;generateHtmlReport;generateAdditionalReports;dontClear;assemblyFilters:${{ env.assembly_filters }}
           # see: https://docs.unity3d.com/Packages/com.unity.testtools.codecoverage@1.2/manual/CoverageBatchmode.html
+          testMode: ${{ matrix.testMode }}
         env:
           UNITY_LICENSE: ${{ secrets[env.secret_key] }}
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
@@ -124,7 +129,7 @@ jobs:
       - name: Upload test results
         uses: actions/upload-artifact@v4
         with:
-          name: TestResults-Unity${{ matrix.unityVersion }}
+          name: TestResults-Unity${{ matrix.unityVersion }}-${{ matrix.testMode }}
           path: |
             ${{ steps.test.outputs.artifactsPath }}
             ${{ steps.test.outputs.coveragePath }}
