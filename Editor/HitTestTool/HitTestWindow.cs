@@ -181,6 +181,10 @@ namespace TestHelper.Monkey.Editor.HitTestTool
                 {
                     // TODO: Automatically select the hit object in the Hierarchy window.
                 }
+
+                // TODO: temporary
+                EditorGUIUtility.systemCopyBuffer = _hitGameObjectPath;
+                LoggingIfVerbose($"Hit object path: {_hitGameObjectPath}");
             }
             else
             {
