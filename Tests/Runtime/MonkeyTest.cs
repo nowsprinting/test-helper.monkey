@@ -355,14 +355,15 @@ namespace TestHelper.Monkey
             [LoadScene(TestScene)]
             public async Task RunStep_withScreenshots_specifyPath_takeScreenshotsAndSaveToSpecifiedPath()
             {
-                var relativeDirectory = Path.Combine("Logs", "TestHelper.Monkey", "SpecifiedPath");
-                var filenamePrefix = "Run_withScreenshots_specifyPath";
+                var relativeDirectory = Path.Combine(Application.temporaryCachePath, TestContext.CurrentContext.Test.ClassName);
+                if (Directory.Exists(relativeDirectory))
+                {
+                    Directory.Delete(relativeDirectory, true);
+                }
+
+                var filenamePrefix = TestContext.CurrentContext.Test.Name;
                 var filename = $"{filenamePrefix}_0001.png";
                 var path = Path.Combine(relativeDirectory, filename);
-                if (File.Exists(path))
-                {
-                    File.Delete(path);
-                }
 
                 var config = new MonkeyConfig
                 {
