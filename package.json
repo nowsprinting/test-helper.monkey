@@ -12,7 +12,7 @@
     "com.unity.ugui": "1.0.0"
   },
   "displayName": "Monkey Test Helper",
-  "documentationUrl": "https://github.com/nowsprinting/test-helper.monkey/blob/master/README.md",
+  "documentationUrl": "https://nowsprinting.github.io/test-helper.monkey/",
   "files": [
     "Annotations/",
     "Annotations.meta",

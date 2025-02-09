@@ -1,0 +1,96 @@
+# Copyright (c) 2023-2025 Koji Hasegawa.
+# This software is released under the MIT License.
+
+name: docfx
+
+on:
+  workflow_run:
+    workflows:
+      - Release if bump version number
+    types:
+      - completed
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions: {}
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  docfx:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Copy images
+        run: |
+          mkdir images
+          cp Documentation~/*.png images/
+          sed -i '/#gh-dark-mode-only/d' README.md
+          sed -i 's/Documentation~\//images\//g' README.md
+
+      - name: Remove badges
+        run: |
+          sed -i '/badge\.svg/d' README.md
+          sed -i '/shields\.io/d' README.md
+
+      - name: Remove undocumented files
+        run: |
+          rm -f .github/*.md
+          rm -f Documentation~/*.md
+          rm -rf Samples
+          rm -rf Tests
+
+      - name: Get package name
+        run: |
+          DISPLAY_NAME=$(jq -r '.displayName' package.json)
+          echo "PACKAGE_NAME=${DISPLAY_NAME}" >> "$GITHUB_ENV"
+
+      - name: Get package version
+        run: |
+          VERSION=$(jq -r '.version' package.json)
+          echo "PACKAGE_VERSION=${VERSION}" >> "$GITHUB_ENV"
+
+      - name: Get copyright
+        run: |
+          COPYRIGHT_LINE=$(grep '^Copyright' LICENSE.md)
+          echo "COPYRIGHT=${COPYRIGHT_LINE}" >> "$GITHUB_ENV"
+
+      - uses: sator-imaging/docfx-pages@v1
+        id: deployment
+        with:
+          app_name: ${{ env.PACKAGE_NAME }} ${{ env.PACKAGE_VERSION }}
+          site_title: ${{ env.PACKAGE_NAME }} | ${{ env.PACKAGE_VERSION }}
+          site_footer: ${{ env.COPYRIGHT }}
+          class_members: 'samePage'
+          define_symbols: ''
+          site_logo: ''
+          site_favicon: ''
+          main_js: |
+            export default {
+                defaultTheme: 'light',
+                showLightbox: (img) => true,
+                iconLinks: [
+                    {
+                        icon: 'github',
+                        href: '${{ github.server_url }}/${{ github.repository }}',
+                        title: 'GitHub'
+                    },
+                ],
+            }
+          main_css: |
