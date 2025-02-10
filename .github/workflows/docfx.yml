@@ -4,11 +4,8 @@
 name: docfx
 
 on:
-  workflow_run:
-    workflows:
-      - Release if bump version number
-    types:
-      - completed
+  release:
+    types: [ published ]
   workflow_dispatch:
 
 concurrency:
