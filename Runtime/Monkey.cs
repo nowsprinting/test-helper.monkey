@@ -18,10 +18,12 @@ namespace TestHelper.Monkey
     /// <summary>
     /// Reference implementation of the monkey testing.
     ///
-    /// - Can specific lifetime and delay time
-    /// - Can specific random number generator
-    /// - Can lottery and operation only clickable objects
-    /// - Can throw assert exception if Interactive component not found in 5 sec
+    /// <list type="bullet">
+    ///   <item>Can specific lifetime and delay time</item>
+    ///   <item>Can specific random number generator</item>
+    ///   <item>Can lottery and operation only clickable objects</item>
+    ///   <item>Can throw assert exception if Interactive component not found in 5 sec</item>
+    /// </list>
     /// </summary>
     public static class Monkey
     {
@@ -98,6 +100,7 @@ namespace TestHelper.Monkey
 
         /// <summary>
         /// Run a step of monkey testing.
+        /// This method is called from <c cref="Run">Run</c> method.
         /// </summary>
         /// <param name="random">Random number generator from <c>MonkeyConfig</c></param>
         /// <param name="logger">Logger from <c>MonkeyConfig</c></param>

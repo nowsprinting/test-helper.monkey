@@ -144,10 +144,13 @@ namespace TestHelper.Monkey.Extensions
 
         /// <summary>
         /// Make sure the <c>GameObject</c> is interactable.
+        ///
         /// If any of the following is true:
-        /// 1. Attached <c>Selectable</c> component and <c>interactable</c> property is true.
-        /// 2. Attached <c>EventTrigger</c> component.
-        /// 3. Attached component  implements <c>IEventSystemHandler</c> interface.
+        /// <list type="number">
+        ///   <item> Attached <c>Selectable</c> component and <c>interactable</c> property is true</item>
+        ///   <item>Attached <c>EventTrigger</c> component</item>
+        ///   <item>Attached component Implements <c>IEventSystemHandler</c> interface</item>
+        /// </list>
         /// </summary>
         /// <param name="gameObject"></param>
         /// <returns>True if this GameObject is interactable</returns>
