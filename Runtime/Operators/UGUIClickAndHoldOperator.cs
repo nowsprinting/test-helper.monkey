@@ -65,5 +65,11 @@ namespace TestHelper.Monkey.Operators
 
             upHandler.OnPointerUp(_eventData);
         }
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return nameof(UGUIClickAndHoldOperator);
+        }
     }
 }

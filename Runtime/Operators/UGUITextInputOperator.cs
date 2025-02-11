@@ -78,5 +78,11 @@ namespace TestHelper.Monkey.Operators
 
             inputField.text = text;
         }
+
+        /// <inheritdoc />
+        public override string ToString()
+        {
+            return nameof(UGUITextInputOperator);
+        }
     }
 }
