@@ -1,4 +1,4 @@
-// Copyright (c) 2023-2024 Koji Hasegawa.
+// Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System.Linq; // Do not remove, required for Unity 2022 or earlier
@@ -111,7 +111,7 @@ namespace TestHelper.Monkey.DefaultStrategies
 
                 var gameObject = await _finder.FindByNameAsync("Cube", reachable: false);
                 Assert.That(DefaultReachableStrategy.IsReachable(gameObject), Is.False);
-                LogAssert.Expect(LogType.Warning, "EventSystem is not found.");
+                LogAssert.Expect(LogType.Error, "EventSystem is not found.");
             }
         }
 

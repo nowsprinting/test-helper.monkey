@@ -1,4 +1,4 @@
-// Copyright (c) 2023-2024 Koji Hasegawa.
+// Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System;
@@ -40,7 +40,7 @@ namespace TestHelper.Monkey.DefaultStrategies
 
             if (EventSystem.current == null)
             {
-                Debug.LogWarning("EventSystem is not found.");
+                Debug.LogError("EventSystem is not found.");
                 return false;
             }
 
