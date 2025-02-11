@@ -1,4 +1,4 @@
-// Copyright (c) 2023-2024 Koji Hasegawa.
+// Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using TestHelper.Monkey.Annotations;
@@ -16,10 +16,17 @@ namespace TestHelper.Monkey.DefaultStrategies
         /// Default implementation is to check whether the GameObject has <c>IgnoreAnnotation</c> component.
         /// </summary>
         /// <param name="gameObject"></param>
+        /// <param name="verboseLogger">Output verbose log if need</param>
         /// <returns>True if GameObject is ignored</returns>
-        public static bool IsIgnored(GameObject gameObject)
+        public static bool IsIgnored(GameObject gameObject, ILogger verboseLogger = null)
         {
-            return gameObject.TryGetComponent(typeof(IgnoreAnnotation), out _);
+            var hasIgnoreAnnotation = gameObject.TryGetComponent(typeof(IgnoreAnnotation), out _);
+            if (hasIgnoreAnnotation && verboseLogger != null)
+            {
+                verboseLogger.Log($"{gameObject.name}({gameObject.GetInstanceID()}) is ignored.");
+            }
+
+            return hasIgnoreAnnotation;
         }
     }
 }

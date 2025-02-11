@@ -1,4 +1,4 @@
-// Copyright (c) 2023-2024 Koji Hasegawa.
+// Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System.Collections;
@@ -13,7 +13,7 @@ namespace TestHelper.Monkey
 {
     public class MonkeyTest
     {
-        private const string MeasurePackageVersion = "0.12.0";
+        private const string MeasurePackageVersion = "0.13.3";
 
         [Test]
         [Performance, Version(MeasurePackageVersion)]
@@ -26,7 +26,7 @@ namespace TestHelper.Monkey
             Measure.Method(() =>
                 {
                     // ReSharper disable once IteratorMethodResultIsIgnored
-                    Monkey.GetLotteryEntries(interactableComponentsFinder, config.IsIgnored);
+                    Monkey.GetLotteryEntries(interactableComponentsFinder);
                 })
                 .WarmupCount(5)
                 .MeasurementCount(20)
@@ -41,11 +41,11 @@ namespace TestHelper.Monkey
         {
             var config = new MonkeyConfig();
             var interactableComponentsFinder = new InteractableComponentsFinder(config);
-            var operators = Monkey.GetLotteryEntries(interactableComponentsFinder, config.IsIgnored);
+            var operators = Monkey.GetLotteryEntries(interactableComponentsFinder);
 
             Measure.Method(() =>
                 {
-                    Monkey.LotteryOperator(operators.ToList(), config.Random, config.IsReachable);
+                    Monkey.LotteryOperator(operators.ToList(), config.Random, config.IsIgnored, config.IsReachable);
                 })
                 .WarmupCount(5)
                 .MeasurementCount(20)
@@ -67,9 +67,9 @@ namespace TestHelper.Monkey
                         config.Random,
                         config.Logger,
                         config.Screenshots,
-                        config.IsReachable,
+                        interactableComponentsFinder,
                         config.IsIgnored,
-                        interactableComponentsFinder)
+                        config.IsReachable)
                     .ToCoroutine();
             }
         }
