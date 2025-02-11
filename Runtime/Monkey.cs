@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2023-2024 Koji Hasegawa.
+﻿// Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System;
@@ -60,9 +60,9 @@ namespace TestHelper.Monkey
                         config.Random,
                         config.Logger,
                         config.Screenshots,
-                        config.IsReachable,
-                        config.IsIgnored,
                         interactableComponentsFinder,
+                        config.IsIgnored,
+                        config.IsReachable,
                         config.Verbose,
                         cancellationToken);
                     if (didAction)
@@ -100,14 +100,14 @@ namespace TestHelper.Monkey
 
         /// <summary>
         /// Run a step of monkey testing.
-        /// This method is called from <c cref="Run">Run</c> method.
+        /// This method is internal by nature, called from <c cref="Run">Run</c> method.
         /// </summary>
         /// <param name="random">Random number generator from <c>MonkeyConfig</c></param>
         /// <param name="logger">Logger from <c>MonkeyConfig</c></param>
         /// <param name="screenshotOptions">Take screenshots options from <c>MonkeyConfig</c></param>
-        /// <param name="isReachable">Function returns the <c>GameObject</c> is reachable from user or not. from <c>MonkeyConfig</c></param>
-        /// <param name="isIgnored">Function returns the <c>GameObject</c> is ignored or not. from <c>MonkeyConfig</c></param>
         /// <param name="interactableComponentsFinder">InteractableComponentsFinder instance includes isInteractable and operators</param>
+        /// <param name="isIgnored">Function returns the <c>GameObject</c> is ignored or not. from <c>MonkeyConfig</c></param>
+        /// <param name="isReachable">Function returns the <c>GameObject</c> is reachable from user or not. from <c>MonkeyConfig</c></param>
         /// <param name="verbose">Output verbose logs</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>True if any operator was executed</returns>
@@ -115,15 +115,15 @@ namespace TestHelper.Monkey
             IRandom random,
             ILogger logger,
             ScreenshotOptions screenshotOptions,
-            Func<GameObject, PointerEventData, List<RaycastResult>, ILogger, bool> isReachable,
-            Func<GameObject, bool> isIgnored,
             InteractableComponentsFinder interactableComponentsFinder,
+            Func<GameObject, ILogger, bool> isIgnored,
+            Func<GameObject, PointerEventData, List<RaycastResult>, ILogger, bool> isReachable,
             bool verbose = false,
             CancellationToken cancellationToken = default)
         {
-            var lotteryEntries = GetLotteryEntries(interactableComponentsFinder, isIgnored, verbose ? logger : null);
-            var (selectedComponent, selectedOperator) = LotteryOperator(lotteryEntries.ToList(), random, isReachable,
-                verbose ? logger : null);
+            var lotteryEntries = GetLotteryEntries(interactableComponentsFinder, verbose ? logger : null);
+            var (selectedComponent, selectedOperator) =
+                LotteryOperator(lotteryEntries.ToList(), random, isIgnored, isReachable, verbose ? logger : null);
             if (selectedComponent == null || selectedOperator == null)
             {
                 return false;
@@ -145,7 +145,6 @@ namespace TestHelper.Monkey
 
         internal static IEnumerable<(Component, IOperator)> GetLotteryEntries(
             InteractableComponentsFinder interactableComponentsFinder,
-            Func<GameObject, bool> isIgnored,
             ILogger verboseLogger = null)
         {
             var dictionary = verboseLogger != null ? new Dictionary<GameObject, string>() : null;
@@ -153,16 +152,6 @@ namespace TestHelper.Monkey
             foreach (var (component, iOperator) in
                      interactableComponentsFinder.FindInteractableComponentsAndOperators())
             {
-                if (isIgnored(component.gameObject))
-                {
-                    if (dictionary != null && !dictionary.Keys.Contains(component.gameObject))
-                    {
-                        dictionary.Add(component.gameObject, "Ignored");
-                    }
-
-                    continue;
-                }
-
                 if (dictionary != null && !dictionary.Keys.Contains(component.gameObject))
                 {
                     dictionary.Add(component.gameObject, null);
@@ -182,12 +171,6 @@ namespace TestHelper.Monkey
                     var builder = new StringBuilder("Lottery entries: ");
                     foreach (var gameObject in dictionary.Keys)
                     {
-                        var value = dictionary[gameObject];
-                        if (value != null)
-                        {
-                            builder.Append($"[{value}]");
-                        }
-
                         builder.Append($"{gameObject.name}({gameObject.GetInstanceID()}), ");
                     }
 
@@ -199,6 +182,7 @@ namespace TestHelper.Monkey
         internal static (Component, IOperator) LotteryOperator(
             List<(Component, IOperator)> operators,
             IRandom random,
+            Func<GameObject, ILogger, bool> isIgnored,
             Func<GameObject, PointerEventData, List<RaycastResult>, ILogger, bool> isReachable,
             ILogger verboseLogger = null)
         {
@@ -208,7 +192,8 @@ namespace TestHelper.Monkey
             while (operators.Count > 0)
             {
                 var (selectedComponent, selectedOperator) = operators[random.Next(operators.Count)];
-                if (isReachable(selectedComponent.gameObject, pointerEventData, raycastResults, verboseLogger))
+                if (!isIgnored(selectedComponent.gameObject, verboseLogger) &&
+                    isReachable(selectedComponent.gameObject, pointerEventData, raycastResults, verboseLogger))
                 {
                     return (selectedComponent, selectedOperator);
                 }

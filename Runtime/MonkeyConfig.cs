@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2023-2024 Koji Hasegawa.
+﻿// Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System;
@@ -57,21 +57,21 @@ namespace TestHelper.Monkey
         public ScreenshotOptions Screenshots { get; set; }
 
         /// <summary>
+        /// Function returns the <c>Component</c> is interactable or not.
+        /// </summary>
+        public Func<Component, bool> IsInteractable { get; set; } = DefaultComponentInteractableStrategy.IsInteractable;
+
+        /// <summary>
+        /// Function returns the <c>GameObject</c> is ignored or not.
+        /// </summary>
+        public Func<GameObject, ILogger, bool> IsIgnored { get; set; } = DefaultIgnoreStrategy.IsIgnored;
+
+        /// <summary>
         /// Function returns the <c>GameObject</c> is reachable from user or not.
         /// This function is include ScreenPointStrategy (GetScreenPoint function).
         /// </summary>
         public Func<GameObject, PointerEventData, List<RaycastResult>, ILogger, bool> IsReachable { get; set; } =
             DefaultReachableStrategy.IsReachable;
-
-        /// <summary>
-        /// Function returns the <c>GameObject</c> is ignored or not.
-        /// </summary>
-        public Func<GameObject, bool> IsIgnored { get; set; } = DefaultIgnoreStrategy.IsIgnored;
-
-        /// <summary>
-        /// Function returns the <c>Component</c> is interactable or not.
-        /// </summary>
-        public Func<Component, bool> IsInteractable { get; set; } = DefaultComponentInteractableStrategy.IsInteractable;
 
         /// <summary>
         /// Operators that the monkey invokes.
