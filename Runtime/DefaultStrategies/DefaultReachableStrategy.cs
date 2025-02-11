@@ -38,6 +38,12 @@ namespace TestHelper.Monkey.DefaultStrategies
             results = results ?? new List<RaycastResult>();
             results.Clear();
 
+            if (EventSystem.current == null)
+            {
+                Debug.LogWarning("EventSystem is not found.");
+                return false;
+            }
+
             EventSystem.current.RaycastAll(eventData, results);
             if (results.Count == 0)
             {

@@ -97,6 +97,25 @@ namespace TestHelper.Monkey.DefaultStrategies
         }
 
         [TestFixture]
+        public class NoEventSystem
+        {
+            private readonly GameObjectFinder _finder = new GameObjectFinder(0.1d);
+
+            [Test]
+            [CreateScene(camera: true, unloadOthers: true)]
+            public async Task IsReachable_NoEventSystem_ReturnsFalseAndLogWarning()
+            {
+                var cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                cube.name = "Cube";
+                cube.transform.position = new Vector3(0, 0, 0);
+
+                var gameObject = await _finder.FindByNameAsync("Cube", reachable: false);
+                Assert.That(DefaultReachableStrategy.IsReachable(gameObject), Is.False);
+                LogAssert.Expect(LogType.Warning, "EventSystem is not found.");
+            }
+        }
+
+        [TestFixture]
         public class Verbose
         {
             private const string TestScenePath = "../../Scenes/GameObjectFinderUI.unity";
