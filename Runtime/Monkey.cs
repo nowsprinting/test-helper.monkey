@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2023-2024 Koji Hasegawa.
+﻿// Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System;
@@ -100,7 +100,7 @@ namespace TestHelper.Monkey
 
         /// <summary>
         /// Run a step of monkey testing.
-        /// This method is called from <c cref="Run">Run</c> method.
+        /// This method is internal by nature, called from <c cref="Run">Run</c> method.
         /// </summary>
         /// <param name="random">Random number generator from <c>MonkeyConfig</c></param>
         /// <param name="logger">Logger from <c>MonkeyConfig</c></param>
