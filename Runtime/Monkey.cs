@@ -28,7 +28,7 @@ namespace TestHelper.Monkey
         private static MonoBehaviour s_coroutineRunner; // for take screenshots
 
         /// <summary>
-        /// Run monkey testing by repeating to call <c cref="RunStep" /> and wait.
+        /// Run monkey testing by repeating to call <c cref="RunStep">RunStep</c> and wait.
         /// </summary>
         /// <param name="config">Run configuration for monkey testing</param>
         /// <param name="cancellationToken">Cancellation token</param>

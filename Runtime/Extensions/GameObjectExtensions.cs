@@ -37,11 +37,11 @@ namespace TestHelper.Monkey.Extensions
 
         /// <summary>
         /// Returns an associated camera with <paramref name="gameObject"/>.
-        /// Or return <c cref="Camera.main" /> if there are no camera associated with.
+        /// Or return <c cref="Camera.main">Camera.main</c> if there are no camera associated with.
         /// </summary>
         /// <param name="gameObject"></param>
         /// <returns>
-        /// Camera associated with <paramref name="gameObject"/>, or return <c cref="Camera.main" /> if there are no camera associated with
+        /// Camera associated with <paramref name="gameObject"/>, or return <c cref="Camera.main">Camera.main</c> if there are no camera associated with
         /// </returns>
         public static Camera GetAssociatedCamera(this GameObject gameObject)
         {

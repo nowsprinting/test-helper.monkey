@@ -15,10 +15,10 @@ namespace TestHelper.Monkey.ScreenPointStrategies
         /// <summary>
         /// Default screen point strategy that care 4 position annotations in the order (upper one has higher priority):
         /// <list type="number">
-        /// <item><description><c cref="ScreenPositionAnnotation" /></description></item>
-        /// <item><description><c cref="WorldPositionAnnotation" /></description></item>
-        /// <item><description><c cref="ScreenOffsetAnnotation" /></description></item>
-        /// <item><description><c cref="WorldOffsetAnnotation" /></description></item>
+        /// <item><description><c cref="ScreenPositionAnnotation">ScreenPositionAnnotation</c></description></item>
+        /// <item><description><c cref="WorldPositionAnnotation">WorldPositionAnnotation</c></description></item>
+        /// <item><description><c cref="ScreenOffsetAnnotation">ScreenOffsetAnnotation</c></description></item>
+        /// <item><description><c cref="WorldOffsetAnnotation">WorldOffsetAnnotation</c></description></item>
         /// </list>
         /// Returns the transform position if no annotations specified.
         ///

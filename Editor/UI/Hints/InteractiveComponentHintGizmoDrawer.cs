@@ -9,7 +9,7 @@ using UnityEngine;
 namespace TestHelper.Monkey.Editor.UI.Hints
 {
     /// <summary>
-    /// Gizmo Drawer for <c cref="InteractiveComponentHint" />
+    /// Gizmo Drawer for <c cref="InteractiveComponentHint">InteractiveComponentHint</c>.
     /// </summary>
     public static class InteractiveComponentHintGizmoDrawer
     {

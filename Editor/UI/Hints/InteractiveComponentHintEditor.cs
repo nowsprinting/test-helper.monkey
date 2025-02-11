@@ -8,7 +8,7 @@ using UnityEngine;
 namespace TestHelper.Monkey.Editor.UI.Hints
 {
     /// <summary>
-    /// Custom editor for <c cref="InteractiveComponentHint" />
+    /// Custom editor for <c cref="InteractiveComponentHint">InteractiveComponentHint</c>.
     /// </summary>
     [CustomEditor(typeof(InteractiveComponentHint))]
     public class InteractiveComponentHintEditor : UnityEditor.Editor
