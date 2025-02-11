@@ -102,9 +102,13 @@ namespace TestHelper.Monkey.DefaultStrategies
             private readonly GameObjectFinder _finder = new GameObjectFinder(0.1d);
 
             [Test]
-            [LoadScene("../../Scenes/NoEventSystem.unity")]
+            [CreateScene(camera: true, unloadOthers: true)]
             public async Task IsReachable_NoEventSystem_ReturnsFalseAndLogWarning()
             {
+                var cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                cube.name = "Cube";
+                cube.transform.position = new Vector3(0, 0, 0);
+
                 var gameObject = await _finder.FindByNameAsync("Cube", reachable: false);
                 Assert.That(DefaultReachableStrategy.IsReachable(gameObject), Is.False);
                 LogAssert.Expect(LogType.Warning, "EventSystem is not found.");
