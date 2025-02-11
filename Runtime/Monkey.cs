@@ -56,7 +56,7 @@ namespace TestHelper.Monkey
             {
                 while (Time.realtimeSinceStartup < endTime)
                 {
-                    var didAct = await RunStep(
+                    var didAction = await RunStep(
                         config.Random,
                         config.Logger,
                         config.Screenshots,
@@ -65,7 +65,7 @@ namespace TestHelper.Monkey
                         interactableComponentCollector,
                         config.Verbose,
                         cancellationToken);
-                    if (didAct)
+                    if (didAction)
                     {
                         lastOperationTime = Time.realtimeSinceStartup;
                     }

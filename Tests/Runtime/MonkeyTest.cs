@@ -48,7 +48,7 @@ namespace TestHelper.Monkey
         public async Task RunStep_finish()
         {
             var config = new MonkeyConfig();
-            var didAct = await Monkey.RunStep(
+            var didAction = await Monkey.RunStep(
                 config.Random,
                 config.Logger,
                 config.Screenshots,
@@ -56,20 +56,21 @@ namespace TestHelper.Monkey
                 config.IsIgnored,
                 _interactiveComponentCollector);
 
-            Assert.That(didAct, Is.EqualTo(true));
+            Assert.That(didAction, Is.EqualTo(true));
         }
 
         [Test]
         [LoadScene(TestScene)]
-        public async Task RunStep_noInteractiveComponent_abort()
+        public async Task RunStep_noInteractiveComponent_DoNoAction()
         {
+            // Make to no interactable objects
             foreach (var component in _interactiveComponentCollector.FindInteractableComponents())
             {
                 component.gameObject.SetActive(false);
             }
 
             var config = new MonkeyConfig();
-            var didAct = await Monkey.RunStep(
+            var didAction = await Monkey.RunStep(
                 config.Random,
                 config.Logger,
                 config.Screenshots,
@@ -77,7 +78,7 @@ namespace TestHelper.Monkey
                 config.IsIgnored,
                 _interactiveComponentCollector);
 
-            Assert.That(didAct, Is.EqualTo(false));
+            Assert.That(didAction, Is.EqualTo(false));
         }
 
         [Test]
@@ -120,6 +121,7 @@ namespace TestHelper.Monkey
         [LoadScene(TestScene)]
         public async Task Run_noInteractiveComponent_throwTimeoutException()
         {
+            // Make to no interactable objects
             foreach (var component in _interactiveComponentCollector.FindInteractableComponents())
             {
                 component.gameObject.SetActive(false);
@@ -146,6 +148,7 @@ namespace TestHelper.Monkey
         [LoadScene(TestScene)]
         public async Task Run_noInteractiveComponentAndSecondsToErrorForNoInteractiveComponentIsZero_finish()
         {
+            // Make to no interactable objects
             foreach (var component in _interactiveComponentCollector.FindInteractableComponents())
             {
                 component.gameObject.SetActive(false);
@@ -207,7 +210,8 @@ namespace TestHelper.Monkey
         [LoadScene(TestScene)]
         public void GetLotteryEntries_GotAllInteractableComponentAndOperators()
         {
-            var lotteryEntries = Monkey.GetLotteryEntries(_interactiveComponentCollector, DefaultIgnoreStrategy.IsIgnored);
+            var lotteryEntries =
+                Monkey.GetLotteryEntries(_interactiveComponentCollector, DefaultIgnoreStrategy.IsIgnored);
             var actual = new List<string>();
             foreach (var (component, @operator) in lotteryEntries)
             {
@@ -238,7 +242,8 @@ namespace TestHelper.Monkey
         {
             GameObject.Find("UsingOnPointerClickHandler").AddComponent<IgnoreAnnotation>();
 
-            var lotteryEntries = Monkey.GetLotteryEntries(_interactiveComponentCollector, DefaultIgnoreStrategy.IsIgnored);
+            var lotteryEntries =
+                Monkey.GetLotteryEntries(_interactiveComponentCollector, DefaultIgnoreStrategy.IsIgnored);
             var actual = new List<string>();
             foreach (var (component, _) in lotteryEntries)
             {
@@ -289,7 +294,7 @@ namespace TestHelper.Monkey
                 (clickable, clickOperator),
                 (null, null), // dummy
             };
-            var random = new StubRandom(new int[] { 1 });
+            var random = new StubRandom(new[] { 1 });
             var actual = Monkey.LotteryOperator(operators, random, DefaultReachableStrategy.IsReachable);
 
             Assert.That(actual.Item1, Is.EqualTo(clickable));
@@ -355,7 +360,8 @@ namespace TestHelper.Monkey
             [LoadScene(TestScene)]
             public async Task RunStep_withScreenshots_specifyPath_takeScreenshotsAndSaveToSpecifiedPath()
             {
-                var relativeDirectory = Path.Combine(Application.temporaryCachePath, TestContext.CurrentContext.Test.ClassName);
+                var relativeDirectory = Path.Combine(Application.temporaryCachePath,
+                    TestContext.CurrentContext.Test.ClassName);
                 if (Directory.Exists(relativeDirectory))
                 {
                     Directory.Delete(relativeDirectory, true);
@@ -448,8 +454,8 @@ namespace TestHelper.Monkey
             [LoadScene(TestScene)]
             public async Task Run_withScreenshots_noInteractiveComponent_takeScreenshot()
             {
-                var interactiveComponentCollector = new InteractiveComponentCollector();
-                foreach (var component in interactiveComponentCollector.FindInteractableComponents())
+                // Make to no interactable objects
+                foreach (var component in _interactiveComponentCollector.FindInteractableComponents())
                 {
                     component.gameObject.SetActive(false);
                 }
@@ -497,7 +503,8 @@ namespace TestHelper.Monkey
             [LoadScene(TestScene)]
             public void GetLotteryEntriesWithoutVerbose_NotOutputLog()
             {
-                var lotteryEntries = Monkey.GetLotteryEntries(_interactiveComponentCollector, DefaultIgnoreStrategy.IsIgnored);
+                var lotteryEntries =
+                    Monkey.GetLotteryEntries(_interactiveComponentCollector, DefaultIgnoreStrategy.IsIgnored);
                 Assume.That(lotteryEntries.Count, Is.GreaterThan(0));
 
                 LogAssert.NoUnexpectedReceived();
@@ -510,7 +517,8 @@ namespace TestHelper.Monkey
                 GameObject.Find("UsingOnPointerClickHandler").AddComponent<IgnoreAnnotation>();
 
                 var spyLogger = new SpyLogger();
-                var lotteryEntries = Monkey.GetLotteryEntries(_interactiveComponentCollector, DefaultIgnoreStrategy.IsIgnored, verboseLogger: spyLogger);
+                var lotteryEntries = Monkey.GetLotteryEntries(_interactiveComponentCollector,
+                    DefaultIgnoreStrategy.IsIgnored, verboseLogger: spyLogger);
                 Assume.That(lotteryEntries.Count, Is.GreaterThan(0));
 
                 Assert.That(spyLogger.Messages.Count, Is.EqualTo(1));
@@ -529,7 +537,8 @@ namespace TestHelper.Monkey
             public void GetLotteryEntriesWithVerbose_NoInteractableObject_LogNoLotteryEntries()
             {
                 var spyLogger = new SpyLogger();
-                var lotteryEntries = Monkey.GetLotteryEntries(_interactiveComponentCollector, DefaultIgnoreStrategy.IsIgnored, verboseLogger: spyLogger);
+                var lotteryEntries = Monkey.GetLotteryEntries(_interactiveComponentCollector,
+                    DefaultIgnoreStrategy.IsIgnored, verboseLogger: spyLogger);
                 Assume.That(lotteryEntries, Is.Empty);
 
                 Assert.That(spyLogger.Messages.Count, Is.EqualTo(1));
@@ -541,7 +550,8 @@ namespace TestHelper.Monkey
             public void LotteryOperatorWithVerbose_NotReachableComponentOnly_LogNoLotteryEntries()
             {
                 var spyLogger = new SpyLogger();
-                var lotteryEntries = Monkey.GetLotteryEntries(_interactiveComponentCollector, DefaultIgnoreStrategy.IsIgnored).ToList();
+                var lotteryEntries =
+                    Monkey.GetLotteryEntries(_interactiveComponentCollector, DefaultIgnoreStrategy.IsIgnored).ToList();
                 var random = new RandomWrapper();
                 Monkey.LotteryOperator(lotteryEntries, random, DefaultReachableStrategy.IsReachable, spyLogger);
 
