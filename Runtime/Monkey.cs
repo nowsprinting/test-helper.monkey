@@ -18,17 +18,19 @@ namespace TestHelper.Monkey
     /// <summary>
     /// Reference implementation of the monkey testing.
     ///
-    /// - Can specific lifetime and delay time
-    /// - Can specific random number generator
-    /// - Can lottery and operation only clickable objects
-    /// - Can throw assert exception if Interactive component not found in 5 sec
+    /// <list type="bullet">
+    ///   <item>Can specify lifetime and delay time</item>
+    ///   <item>Can specify random number generator</item>
+    ///   <item>Only clickable objects can be selected or operated</item>
+    ///   <item>Throw assert exception if Interactive component not found in 5 sec</item>
+    /// </list>
     /// </summary>
     public static class Monkey
     {
         private static MonoBehaviour s_coroutineRunner; // for take screenshots
 
         /// <summary>
-        /// Run monkey testing by repeating to call <c cref="RunStep" /> and wait.
+        /// Run monkey testing by repeating to call <c cref="RunStep">RunStep</c> and wait.
         /// </summary>
         /// <param name="config">Run configuration for monkey testing</param>
         /// <param name="cancellationToken">Cancellation token</param>
@@ -98,6 +100,7 @@ namespace TestHelper.Monkey
 
         /// <summary>
         /// Run a step of monkey testing.
+        /// This method is called from <c cref="Run">Run</c> method.
         /// </summary>
         /// <param name="random">Random number generator from <c>MonkeyConfig</c></param>
         /// <param name="logger">Logger from <c>MonkeyConfig</c></param>

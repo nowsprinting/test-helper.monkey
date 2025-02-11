@@ -38,10 +38,13 @@ namespace TestHelper.Monkey.Extensions
 
         /// <summary>
         /// Make sure the <c>Component</c> is interactable.
+        ///
         /// If any of the following is true:
-        /// 1. Type is <c>Selectable</c> and <c>interactable</c> property is true.
-        /// 2. Type is <c>EventTrigger</c> component.
-        /// 3. Implements <c>IEventSystemHandler</c> interface.
+        /// <list type="number">
+        ///   <item>Type is <c>Selectable</c> and <c>interactable</c> property is true</item>
+        ///   <item>Type is <c>EventTrigger</c> component</item>
+        ///   <item>Implements <c>IEventSystemHandler</c> interface</item>
+        /// </list>
         /// </summary>
         /// <param name="component"></param>
         /// <returns>True if this Component is interactable</returns>

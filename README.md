@@ -50,7 +50,7 @@ Configurations in `MonkeyConfig`:
 - **Lifetime**: Running time
 - **DelayMillis**: Delay time between operations
 - **SecondsToErrorForNoInteractiveComponent**: Seconds to determine that an error has occurred when an object that can be interacted with does not exist
-- **Random**: Random generator
+- **Random**: Pseudo-random number generator
 - **Logger**: Logger
 - **Verbose**: Output verbose log if true
 - **Gizmos**: Show Gizmos on `GameView` during running monkey test if true
@@ -62,8 +62,9 @@ Configurations in `MonkeyConfig`:
 
 More customize for your project:
 
-- **IsReachable**: Function returns the `GameObject` is reachable from user or not. Default implementation is using Raycaster and includes ScreenPointStrategy (GetScreenPoint function).
 - **IsInteractable**: Function returns the `Component` is interactable or not. The default implementation is support for standard Unity UI (uGUI) components.
+- **IsIgnored**: Function returns the `GameObject` is ignored or not.
+- **IsReachable**: Function returns the `GameObject` is reachable from user or not. Default implementation is using Raycaster and includes ScreenPointStrategy (GetScreenPoint function).
 - **Operators**: Operators that the monkey invokes. Default is ClickOperator, ClickAndHoldOperator, and TextInputOperator. There is support for standard Unity UI (uGUI) components.
 
 
