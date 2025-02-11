@@ -21,8 +21,8 @@ namespace TestHelper.Monkey
     /// <list type="bullet">
     ///   <item>Can specify lifetime and delay time</item>
     ///   <item>Can specify random number generator</item>
-    ///   <item>Can lottery and operation only clickable objects</item>
-    ///   <item>Can throw assert exception if Interactive component not found in 5 sec</item>
+    ///   <item>Only clickable objects can be selected or operated</item>
+    ///   <item>Throw assert exception if Interactive component not found in 5 sec</item>
     /// </list>
     /// </summary>
     public static class Monkey
