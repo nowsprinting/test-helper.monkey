@@ -86,7 +86,7 @@ namespace TestHelper.Monkey
         }
 
         private async UniTask<GameObject> FindByNameAsync(string name, string path, bool reachable, bool interactable,
-            CancellationToken token)
+            CancellationToken cancellationToken)
         {
             var timeoutTime = Time.realtimeSinceStartup + (float)_timeoutSeconds;
             var delaySeconds = MinTimeoutSeconds;
@@ -103,7 +103,7 @@ namespace TestHelper.Monkey
 
                 delaySeconds = Math.Min(delaySeconds * 2, MaxPollingIntervalSeconds);
                 await UniTask.Delay(TimeSpan.FromSeconds(delaySeconds), ignoreTimeScale: true,
-                    cancellationToken: token);
+                    cancellationToken: cancellationToken);
             }
 
             switch (reason)
@@ -128,13 +128,13 @@ namespace TestHelper.Monkey
         /// <param name="name">Find GameObject name</param>
         /// <param name="reachable">Find only reachable object</param>
         /// <param name="interactable">Find only interactable object</param>
-        /// <param name="token">CancellationToken</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Found GameObject</returns>
         /// <exception cref="TimeoutException">Throws if GameObject is not found</exception>
         public async UniTask<GameObject> FindByNameAsync(string name, bool reachable = true, bool interactable = false,
-            CancellationToken token = default)
+            CancellationToken cancellationToken = default)
         {
-            return await FindByNameAsync(name, null, reachable, interactable, token);
+            return await FindByNameAsync(name, null, reachable, interactable, cancellationToken);
         }
 
         /// <summary>
@@ -144,14 +144,14 @@ namespace TestHelper.Monkey
         /// <param name="path">Find GameObject hierarchy path separated by `/`. Can specify glob pattern</param>
         /// <param name="reachable">Find only reachable object</param>
         /// <param name="interactable">Find only interactable object</param>
-        /// <param name="token">CancellationToken</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Found GameObject</returns>
         /// <exception cref="TimeoutException">Throws if GameObject is not found</exception>
         public async UniTask<GameObject> FindByPathAsync(string path, bool reachable = true, bool interactable = false,
-            CancellationToken token = default)
+            CancellationToken cancellationToken = default)
         {
             var name = path.Split('/').Last();
-            return await FindByNameAsync(name, path, reachable, interactable, token);
+            return await FindByNameAsync(name, path, reachable, interactable, cancellationToken);
         }
     }
 }
