@@ -5,7 +5,6 @@ using System.Linq;
 using NUnit.Framework;
 using TestHelper.Attributes;
 using TestHelper.Monkey.DefaultStrategies;
-using TestHelper.Monkey.Extensions;
 
 namespace TestHelper.Monkey.Annotations
 {
@@ -26,7 +25,7 @@ namespace TestHelper.Monkey.Annotations
             string name
         )
         {
-            var target = new InteractiveComponentCollector()
+            var target = new InteractableComponentsFinder()
                 .FindInteractableComponents()
                 .First(x => x.gameObject.name == name);
 

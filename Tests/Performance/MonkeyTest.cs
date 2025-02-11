@@ -21,12 +21,12 @@ namespace TestHelper.Monkey
         public void GetLotteryEntries_GotAllInteractableComponentAndOperators()
         {
             var config = new MonkeyConfig();
-            var interactableComponentCollector = new InteractiveComponentCollector(config);
+            var interactableComponentsFinder = new InteractableComponentsFinder(config);
 
             Measure.Method(() =>
                 {
                     // ReSharper disable once IteratorMethodResultIsIgnored
-                    Monkey.GetLotteryEntries(interactableComponentCollector, config.IsIgnored);
+                    Monkey.GetLotteryEntries(interactableComponentsFinder, config.IsIgnored);
                 })
                 .WarmupCount(5)
                 .MeasurementCount(20)
@@ -40,8 +40,8 @@ namespace TestHelper.Monkey
         public void LotteryOperator_BingoReachableComponent()
         {
             var config = new MonkeyConfig();
-            var interactableComponentCollector = new InteractiveComponentCollector(config);
-            var operators = Monkey.GetLotteryEntries(interactableComponentCollector, config.IsIgnored);
+            var interactableComponentsFinder = new InteractableComponentsFinder(config);
+            var operators = Monkey.GetLotteryEntries(interactableComponentsFinder, config.IsIgnored);
 
             Measure.Method(() =>
                 {
@@ -59,7 +59,7 @@ namespace TestHelper.Monkey
         public IEnumerator RunStep_finish()
         {
             var config = new MonkeyConfig();
-            var interactableComponentCollector = new InteractiveComponentCollector(config);
+            var interactableComponentsFinder = new InteractableComponentsFinder(config);
 
             using (Measure.Frames().Scope())
             {
@@ -69,7 +69,7 @@ namespace TestHelper.Monkey
                         config.Screenshots,
                         config.IsReachable,
                         config.IsIgnored,
-                        interactableComponentCollector)
+                        interactableComponentsFinder)
                     .ToCoroutine();
             }
         }
