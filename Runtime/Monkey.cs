@@ -19,8 +19,8 @@ namespace TestHelper.Monkey
     /// Reference implementation of the monkey testing.
     ///
     /// <list type="bullet">
-    ///   <item>Can specific lifetime and delay time</item>
-    ///   <item>Can specific random number generator</item>
+    ///   <item>Can specify lifetime and delay time</item>
+    ///   <item>Can specify random number generator</item>
     ///   <item>Can lottery and operation only clickable objects</item>
     ///   <item>Can throw assert exception if Interactive component not found in 5 sec</item>
     /// </list>
