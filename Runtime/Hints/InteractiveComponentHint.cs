@@ -99,7 +99,7 @@ namespace TestHelper.Monkey.Hints
         {
             Clear();
 
-            var interactiveComponentCollector = new InteractiveComponentCollector();
+            var interactiveComponentCollector = new InteractableComponentsFinder();
             foreach (var component in interactiveComponentCollector.FindInteractableComponents())
             {
                 var dst = DefaultReachableStrategy.IsReachable(component.gameObject)

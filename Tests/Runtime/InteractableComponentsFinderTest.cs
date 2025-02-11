@@ -1,25 +1,23 @@
-﻿// Copyright (c) 2023 Koji Hasegawa.
+﻿// Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
 
 namespace TestHelper.Monkey
 {
     [TestFixture]
-    public class InteractiveComponentCollectorTest
+    public class InteractableComponentsFinderTest
     {
         /// <summary>
-        /// InteractiveComponentCollector test cases using 3D objects
+        /// InteractableComponentsFinder test cases using 3D objects
         /// </summary>
         [TestFixture]
         public class ThreeD
         {
-            private const string TestScene =
-                "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/MonkeyThreeD.unity";
+            private const string TestScene = "../Scenes/MonkeyThreeD.unity";
 
             private static readonly string[] s_reachableObjects =
             {
@@ -43,31 +41,20 @@ namespace TestHelper.Monkey
             [LoadScene(TestScene)]
             public void FindInteractiveObjects_findAllInteractiveObjects()
             {
-                var actual = new InteractiveComponentCollector().FindInteractableComponents()
+                var actual = new InteractableComponentsFinder().FindInteractableComponents()
                     .Select(x => x.gameObject.name)
                     .ToArray();
                 Assert.That(actual, Is.EquivalentTo(s_interactiveObjects()));
-            }
-
-            [Test]
-            [LoadScene(TestScene)]
-            public void FindInteractiveObjects_reallyInteractiveOnly_findReachableObjects()
-            {
-                var actual = new InteractiveComponentCollector().FindReachableInteractableComponents()
-                    .Select(x => x.gameObject.name)
-                    .ToArray();
-                Assert.That(actual, Is.EquivalentTo(s_reachableObjects));
             }
         }
 
         /// <summary>
-        /// InteractiveComponentCollector test cases using 2D objects
+        /// InteractableComponentsFinder test cases using 2D objects
         /// </summary>
         [TestFixture]
         public class TwoD
         {
-            private const string TestScene =
-                "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/MonkeyTwoD.unity";
+            private const string TestScene = "../Scenes/MonkeyTwoD.unity";
 
             private static readonly string[] s_reachableObjects =
             {
@@ -91,22 +78,10 @@ namespace TestHelper.Monkey
             [LoadScene(TestScene)]
             public void FindInteractiveObjects_findAllInteractiveObjects()
             {
-                var actual = new InteractiveComponentCollector().FindInteractableComponents()
+                var actual = new InteractableComponentsFinder().FindInteractableComponents()
                     .Select(x => x.gameObject.name)
                     .ToArray();
                 Assert.That(actual, Is.EquivalentTo(s_interactiveObjects()));
-            }
-
-            [Test]
-            [LoadScene(TestScene)]
-            public async Task FindInteractiveObjects_reallyInteractiveOnly_findReachableObjects()
-            {
-                await Task.Yield(); // wait for GraphicRaycaster initialization
-
-                var actual = new InteractiveComponentCollector().FindReachableInteractableComponents()
-                    .Select(x => x.gameObject.name)
-                    .ToArray();
-                Assert.That(actual, Is.EquivalentTo(s_reachableObjects));
             }
         }
 
@@ -134,13 +109,12 @@ namespace TestHelper.Monkey
             }
 
             /// <summary>
-            /// InteractiveComponentCollector test cases using UI elements on screen-space-overlay canvas
+            /// InteractableComponentsFinder test cases using UI elements on screen-space-overlay canvas
             /// </summary>
             [TestFixture]
             public class ScreenSpaceOverlay
             {
-                private const string TestScene =
-                    "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/MonkeyUiScreenSpaceOverlay.unity";
+                private const string TestScene = "../Scenes/MonkeyUiScreenSpaceOverlay.unity";
 
                 private static readonly string[] s_unreachableUiObjectsInOverlayCanvas =
                 {
@@ -157,86 +131,48 @@ namespace TestHelper.Monkey
                 [LoadScene(TestScene)]
                 public void FindInteractiveObjects_findAllInteractiveObjects()
                 {
-                    var actual = new InteractiveComponentCollector().FindInteractableComponents()
+                    var actual = new InteractableComponentsFinder().FindInteractableComponents()
                         .Select(x => x.gameObject.name)
                         .ToArray();
                     Assert.That(actual, Is.EquivalentTo(s_interactiveUiObjectsInOverlayCanvas()));
                 }
-
-                [Test]
-                [LoadScene(TestScene)]
-                public async Task FindInteractiveObjects_reallyInteractiveOnly_findReachableObjects()
-                {
-                    await Task.Yield(); // wait for GraphicRaycaster initialization
-
-                    var actual = new InteractiveComponentCollector().FindReachableInteractableComponents()
-                        .Select(x => x.gameObject.name)
-                        .ToArray();
-                    Assert.That(actual, Is.EquivalentTo(s_reachableUiObjects));
-                }
             }
 
             /// <summary>
-            /// InteractiveComponentCollector test cases using UI elements on screen-space-camera canvas
+            /// InteractableComponentsFinder test cases using UI elements on screen-space-camera canvas
             /// </summary>
             [TestFixture]
             public class ScreenSpaceCamera
             {
-                private const string TestScene =
-                    "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/MonkeyUiScreenSpaceCamera.unity";
+                private const string TestScene = "../Scenes/MonkeyUiScreenSpaceCamera.unity";
 
                 [Test]
                 [LoadScene(TestScene)]
                 public void FindInteractiveObjects_findAllInteractiveObjects()
                 {
-                    var actual = new InteractiveComponentCollector().FindInteractableComponents()
+                    var actual = new InteractableComponentsFinder().FindInteractableComponents()
                         .Select(x => x.gameObject.name)
                         .ToArray();
                     Assert.That(actual, Is.EquivalentTo(s_interactiveUiObjects()));
-                }
-
-                [Test]
-                [LoadScene(TestScene)]
-                public async Task FindInteractiveObjects_reallyInteractiveOnly_findReachableObjects()
-                {
-                    await Task.Yield(); // wait for GraphicRaycaster initialization
-
-                    var actual = new InteractiveComponentCollector().FindReachableInteractableComponents()
-                        .Select(x => x.gameObject.name)
-                        .ToArray();
-                    Assert.That(actual, Is.EquivalentTo(s_reachableUiObjects));
                 }
             }
 
             /// <summary>
-            /// InteractiveComponentCollector test cases using UI elements on world space canvas
+            /// InteractableComponentsFinder test cases using UI elements on world space canvas
             /// </summary>
             [TestFixture]
             public class WorldSpace
             {
-                private const string TestScene =
-                    "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/MonkeyUiWorldSpace.unity";
+                private const string TestScene = "../Scenes/MonkeyUiWorldSpace.unity";
 
                 [Test]
                 [LoadScene(TestScene)]
                 public void FindInteractiveObjects_findAllInteractiveObjects()
                 {
-                    var actual = new InteractiveComponentCollector().FindInteractableComponents()
+                    var actual = new InteractableComponentsFinder().FindInteractableComponents()
                         .Select(x => x.gameObject.name)
                         .ToArray();
                     Assert.That(actual, Is.EquivalentTo(s_interactiveUiObjects()));
-                }
-
-                [Test]
-                [LoadScene(TestScene)]
-                public async Task FindInteractiveObjects_reallyInteractiveOnly_findReachableObjects()
-                {
-                    await Task.Yield(); // wait for GraphicRaycaster initialization
-
-                    var actual = new InteractiveComponentCollector().FindReachableInteractableComponents()
-                        .Select(x => x.gameObject.name)
-                        .ToArray();
-                    Assert.That(actual, Is.EquivalentTo(s_reachableUiObjects));
                 }
             }
         }

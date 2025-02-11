@@ -29,7 +29,7 @@ namespace TestHelper.Monkey
         private const string TestScene = "../Scenes/Operators.unity";
 
         private IEnumerable<IOperator> _operators;
-        private InteractiveComponentCollector _interactiveComponentCollector;
+        private InteractableComponentsFinder _interactableComponentsFinder;
 
         [SetUp]
         public void SetUp()
@@ -40,7 +40,7 @@ namespace TestHelper.Monkey
                 new UGUIClickAndHoldOperator(1), // click and hold 1ms
                 new UGUITextInputOperator()
             };
-            _interactiveComponentCollector = new InteractiveComponentCollector(operators: _operators);
+            _interactableComponentsFinder = new InteractableComponentsFinder(operators: _operators);
         }
 
         [Test]
@@ -54,7 +54,7 @@ namespace TestHelper.Monkey
                 config.Screenshots,
                 config.IsReachable,
                 config.IsIgnored,
-                _interactiveComponentCollector);
+                _interactableComponentsFinder);
 
             Assert.That(didAction, Is.EqualTo(true));
         }
@@ -64,7 +64,7 @@ namespace TestHelper.Monkey
         public async Task RunStep_noInteractiveComponent_DoNoAction()
         {
             // Make to no interactable objects
-            foreach (var component in _interactiveComponentCollector.FindInteractableComponents())
+            foreach (var component in _interactableComponentsFinder.FindInteractableComponents())
             {
                 component.gameObject.SetActive(false);
             }
@@ -76,7 +76,7 @@ namespace TestHelper.Monkey
                 config.Screenshots,
                 config.IsReachable,
                 config.IsIgnored,
-                _interactiveComponentCollector);
+                _interactableComponentsFinder);
 
             Assert.That(didAction, Is.EqualTo(false));
         }
@@ -122,7 +122,7 @@ namespace TestHelper.Monkey
         public async Task Run_noInteractiveComponent_throwTimeoutException()
         {
             // Make to no interactable objects
-            foreach (var component in _interactiveComponentCollector.FindInteractableComponents())
+            foreach (var component in _interactableComponentsFinder.FindInteractableComponents())
             {
                 component.gameObject.SetActive(false);
             }
@@ -149,7 +149,7 @@ namespace TestHelper.Monkey
         public async Task Run_noInteractiveComponentAndSecondsToErrorForNoInteractiveComponentIsZero_finish()
         {
             // Make to no interactable objects
-            foreach (var component in _interactiveComponentCollector.FindInteractableComponents())
+            foreach (var component in _interactableComponentsFinder.FindInteractableComponents())
             {
                 component.gameObject.SetActive(false);
             }
@@ -211,7 +211,7 @@ namespace TestHelper.Monkey
         public void GetLotteryEntries_GotAllInteractableComponentAndOperators()
         {
             var lotteryEntries =
-                Monkey.GetLotteryEntries(_interactiveComponentCollector, DefaultIgnoreStrategy.IsIgnored);
+                Monkey.GetLotteryEntries(_interactableComponentsFinder, DefaultIgnoreStrategy.IsIgnored);
             var actual = new List<string>();
             foreach (var (component, @operator) in lotteryEntries)
             {
@@ -243,7 +243,7 @@ namespace TestHelper.Monkey
             GameObject.Find("UsingOnPointerClickHandler").AddComponent<IgnoreAnnotation>();
 
             var lotteryEntries =
-                Monkey.GetLotteryEntries(_interactiveComponentCollector, DefaultIgnoreStrategy.IsIgnored);
+                Monkey.GetLotteryEntries(_interactableComponentsFinder, DefaultIgnoreStrategy.IsIgnored);
             var actual = new List<string>();
             foreach (var (component, _) in lotteryEntries)
             {
@@ -307,7 +307,7 @@ namespace TestHelper.Monkey
         public class Screenshots
         {
             private IEnumerable<IOperator> _operators;
-            private InteractiveComponentCollector _interactiveComponentCollector;
+            private InteractableComponentsFinder _interactableComponentsFinder;
 
             private const int FileSizeThreshold = 5441; // VGA size solid color file size
             private const int FileSizeThreshold2X = 100 * 1024; // Normal size is 80 to 90KB
@@ -324,7 +324,7 @@ namespace TestHelper.Monkey
                     new UGUIClickAndHoldOperator(1), // click and hold 1ms
                     new UGUITextInputOperator()
                 };
-                _interactiveComponentCollector = new InteractiveComponentCollector(operators: _operators);
+                _interactableComponentsFinder = new InteractableComponentsFinder(operators: _operators);
 
                 _filename = $"{TestContext.CurrentContext.Test.Name}_0001.png";
                 _path = Path.Combine(_defaultOutputDirectory, _filename);
@@ -350,7 +350,7 @@ namespace TestHelper.Monkey
                     config.Screenshots,
                     config.IsReachable,
                     config.IsIgnored,
-                    _interactiveComponentCollector);
+                    _interactableComponentsFinder);
 
                 Assert.That(_path, Does.Exist);
                 Assert.That(new FileInfo(_path), Has.Length.GreaterThan(FileSizeThreshold));
@@ -387,7 +387,7 @@ namespace TestHelper.Monkey
                     config.Screenshots,
                     config.IsReachable,
                     config.IsIgnored,
-                    _interactiveComponentCollector);
+                    _interactableComponentsFinder);
 
                 Assert.That(path, Does.Exist);
                 Assert.That(new FileInfo(path), Has.Length.GreaterThan(FileSizeThreshold));
@@ -414,7 +414,7 @@ namespace TestHelper.Monkey
                     config.Screenshots,
                     config.IsReachable,
                     config.IsIgnored,
-                    _interactiveComponentCollector);
+                    _interactableComponentsFinder);
 
                 Assert.That(_path, Does.Exist);
                 Assert.That(new FileInfo(_path), Has.Length.GreaterThan(FileSizeThreshold2X));
@@ -443,7 +443,7 @@ namespace TestHelper.Monkey
                     config.Screenshots,
                     config.IsReachable,
                     config.IsIgnored,
-                    _interactiveComponentCollector);
+                    _interactableComponentsFinder);
 
                 Assert.That(_path, Does.Exist);
                 // Note: Require stereo rendering settings.
@@ -455,7 +455,7 @@ namespace TestHelper.Monkey
             public async Task Run_withScreenshots_noInteractiveComponent_takeScreenshot()
             {
                 // Make to no interactable objects
-                foreach (var component in _interactiveComponentCollector.FindInteractableComponents())
+                foreach (var component in _interactableComponentsFinder.FindInteractableComponents())
                 {
                     component.gameObject.SetActive(false);
                 }
@@ -485,7 +485,7 @@ namespace TestHelper.Monkey
         public class Verbose
         {
             private IEnumerable<IOperator> _operators;
-            private InteractiveComponentCollector _interactiveComponentCollector;
+            private InteractableComponentsFinder _interactableComponentsFinder;
 
             [SetUp]
             public void SetUp()
@@ -496,7 +496,7 @@ namespace TestHelper.Monkey
                     new UGUIClickAndHoldOperator(1), // click and hold 1ms
                     new UGUITextInputOperator()
                 };
-                _interactiveComponentCollector = new InteractiveComponentCollector(operators: _operators);
+                _interactableComponentsFinder = new InteractableComponentsFinder(operators: _operators);
             }
 
             [Test]
@@ -504,7 +504,7 @@ namespace TestHelper.Monkey
             public void GetLotteryEntriesWithoutVerbose_NotOutputLog()
             {
                 var lotteryEntries =
-                    Monkey.GetLotteryEntries(_interactiveComponentCollector, DefaultIgnoreStrategy.IsIgnored);
+                    Monkey.GetLotteryEntries(_interactableComponentsFinder, DefaultIgnoreStrategy.IsIgnored);
                 Assume.That(lotteryEntries.Count, Is.GreaterThan(0));
 
                 LogAssert.NoUnexpectedReceived();
@@ -517,7 +517,7 @@ namespace TestHelper.Monkey
                 GameObject.Find("UsingOnPointerClickHandler").AddComponent<IgnoreAnnotation>();
 
                 var spyLogger = new SpyLogger();
-                var lotteryEntries = Monkey.GetLotteryEntries(_interactiveComponentCollector,
+                var lotteryEntries = Monkey.GetLotteryEntries(_interactableComponentsFinder,
                     DefaultIgnoreStrategy.IsIgnored, verboseLogger: spyLogger);
                 Assume.That(lotteryEntries.Count, Is.GreaterThan(0));
 
@@ -537,7 +537,7 @@ namespace TestHelper.Monkey
             public void GetLotteryEntriesWithVerbose_NoInteractableObject_LogNoLotteryEntries()
             {
                 var spyLogger = new SpyLogger();
-                var lotteryEntries = Monkey.GetLotteryEntries(_interactiveComponentCollector,
+                var lotteryEntries = Monkey.GetLotteryEntries(_interactableComponentsFinder,
                     DefaultIgnoreStrategy.IsIgnored, verboseLogger: spyLogger);
                 Assume.That(lotteryEntries, Is.Empty);
 
@@ -551,7 +551,7 @@ namespace TestHelper.Monkey
             {
                 var spyLogger = new SpyLogger();
                 var lotteryEntries =
-                    Monkey.GetLotteryEntries(_interactiveComponentCollector, DefaultIgnoreStrategy.IsIgnored).ToList();
+                    Monkey.GetLotteryEntries(_interactableComponentsFinder, DefaultIgnoreStrategy.IsIgnored).ToList();
                 var random = new RandomWrapper();
                 Monkey.LotteryOperator(lotteryEntries, random, DefaultReachableStrategy.IsReachable, spyLogger);
 

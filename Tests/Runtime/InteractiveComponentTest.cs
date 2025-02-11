@@ -66,7 +66,7 @@ namespace TestHelper.Monkey
             [LoadScene(TestScene)]
             public void IsReachable_reachableObjects_returnTrue(string targetName)
             {
-                var target = new InteractiveComponentCollector().FindInteractableComponents()
+                var target = new InteractableComponentsFinder().FindInteractableComponents()
                     .First(x => x.gameObject.name == targetName);
 
                 Assert.That(target.gameObject.IsReachable(DefaultReachableStrategy.IsReachable), Is.True);
@@ -77,7 +77,7 @@ namespace TestHelper.Monkey
             [LoadScene(TestScene)]
             public void IsReachable_unreachableObjects_returnFalse(string targetName)
             {
-                var target = new InteractiveComponentCollector().FindInteractableComponents()
+                var target = new InteractableComponentsFinder().FindInteractableComponents()
                     .First(x => x.gameObject.name == targetName);
 
                 Assert.That(target.gameObject.IsReachable(DefaultReachableStrategy.IsReachable), Is.False);
@@ -101,7 +101,7 @@ namespace TestHelper.Monkey
             {
                 await Task.Yield(); // wait for GraphicRaycaster initialization
 
-                var target = new InteractiveComponentCollector().FindInteractableComponents()
+                var target = new InteractableComponentsFinder().FindInteractableComponents()
                     .First(x => x.gameObject.name == targetName);
 
                 Assert.That(target.gameObject.IsReachable(DefaultReachableStrategy.IsReachable), Is.True);
@@ -116,7 +116,7 @@ namespace TestHelper.Monkey
             {
                 await Task.Yield(); // wait for GraphicRaycaster initialization
 
-                var target = new InteractiveComponentCollector().FindInteractableComponents()
+                var target = new InteractableComponentsFinder().FindInteractableComponents()
                     .First(x => x.gameObject.name == targetName);
 
                 Assert.That(target.gameObject.IsReachable(DefaultReachableStrategy.IsReachable), Is.False);

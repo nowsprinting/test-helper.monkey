@@ -48,7 +48,7 @@ namespace TestHelper.Monkey
                 GameViewControlHelper.SetGizmos(true);
             }
 
-            var interactableComponentCollector = new InteractiveComponentCollector(config);
+            var interactableComponentsFinder = new InteractableComponentsFinder(config);
 
             config.Logger.Log($"Using {config.Random}");
 
@@ -62,7 +62,7 @@ namespace TestHelper.Monkey
                         config.Screenshots,
                         config.IsReachable,
                         config.IsIgnored,
-                        interactableComponentCollector,
+                        interactableComponentsFinder,
                         config.Verbose,
                         cancellationToken);
                     if (didAction)
@@ -107,7 +107,7 @@ namespace TestHelper.Monkey
         /// <param name="screenshotOptions">Take screenshots options from <c>MonkeyConfig</c></param>
         /// <param name="isReachable">Function returns the <c>GameObject</c> is reachable from user or not. from <c>MonkeyConfig</c></param>
         /// <param name="isIgnored">Function returns the <c>GameObject</c> is ignored or not. from <c>MonkeyConfig</c></param>
-        /// <param name="interactableComponentCollector">InteractableComponentCollector instance includes isReachable, isInteractable, and operators</param>
+        /// <param name="interactableComponentsFinder">InteractableComponentsFinder instance includes isInteractable and operators</param>
         /// <param name="verbose">Output verbose logs</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>True if any operator was executed</returns>
@@ -117,11 +117,11 @@ namespace TestHelper.Monkey
             ScreenshotOptions screenshotOptions,
             Func<GameObject, PointerEventData, List<RaycastResult>, ILogger, bool> isReachable,
             Func<GameObject, bool> isIgnored,
-            InteractiveComponentCollector interactableComponentCollector,
+            InteractableComponentsFinder interactableComponentsFinder,
             bool verbose = false,
             CancellationToken cancellationToken = default)
         {
-            var lotteryEntries = GetLotteryEntries(interactableComponentCollector, isIgnored, verbose ? logger : null);
+            var lotteryEntries = GetLotteryEntries(interactableComponentsFinder, isIgnored, verbose ? logger : null);
             var (selectedComponent, selectedOperator) = LotteryOperator(lotteryEntries.ToList(), random, isReachable,
                 verbose ? logger : null);
             if (selectedComponent == null || selectedOperator == null)
@@ -144,13 +144,14 @@ namespace TestHelper.Monkey
         }
 
         internal static IEnumerable<(Component, IOperator)> GetLotteryEntries(
-            InteractiveComponentCollector collector,
+            InteractableComponentsFinder interactableComponentsFinder,
             Func<GameObject, bool> isIgnored,
             ILogger verboseLogger = null)
         {
             var dictionary = verboseLogger != null ? new Dictionary<GameObject, string>() : null;
 
-            foreach (var (component, iOperator) in collector.FindInteractableComponentsAndOperators())
+            foreach (var (component, iOperator) in
+                     interactableComponentsFinder.FindInteractableComponentsAndOperators())
             {
                 if (isIgnored(component.gameObject))
                 {

@@ -191,7 +191,7 @@ public class MyIntegrationTest
 }
 ```
 
-#### InteractiveComponentCollector.FindInteractableComponents
+#### Find interactable components on the scene
 
 Returns interactable uGUI components.
 
@@ -209,39 +209,11 @@ public class MyIntegrationTest
     [Test]
     public void MyTestMethod()
     {
-        var components = InteractiveComponentCollector.FindInteractableComponents();
+        var components = new InteractableComponentsFinder().FindInteractableComponents();
 
         var firstComponent = components.First();
         var clickAndHoldOperator = firstComponent.SelectOperators<IClickAndHoldOperator>(_operators).First();
         await clickAndHoldOperator.OperateAsync(firstComponent);
-    }
-}
-```
-
-#### InteractiveComponentCollector.FindReachableInteractableComponents
-
-Returns interactable uGUI components.
-Return only user-really reachable components (using the `IsReachable` method).
-
-Usage:
-
-```csharp
-using System.Linq;
-using NUnit.Framework;
-using TestHelper.Monkey;
-using TestHelper.Monkey.Operators;
-
-[TestFixture]
-public class MyIntegrationTest
-{
-    [Test]
-    public void MyTestMethod()
-    {
-        var components = InteractiveComponentCollector.FindReachableInteractableComponents();
-
-        var firstComponent = components.First();
-        var textInputOperator = firstComponent.SelectOperators<ITextInputOperator>(_operators).First();
-        textInputOperator.OperateAsync(firstComponent);   // input random text
     }
 }
 ```
