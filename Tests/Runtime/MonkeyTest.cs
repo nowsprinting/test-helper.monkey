@@ -235,6 +235,16 @@ namespace TestHelper.Monkey
         }
 
         [Test]
+        [LoadScene(TestScene)]
+        public void GetLotteryEntries_NoOperators_ReturnsEmpty()
+        {
+            var notHasOperatorFinder = new InteractableComponentsFinder();
+            var actual = Monkey.GetLotteryEntries(notHasOperatorFinder);
+
+            Assert.That(actual, Is.Not.Null.And.Empty);
+        }
+
+        [Test]
         public void LotteryOperator_NothingOperators_ReturnNull()
         {
             var operators = new List<(Component, IOperator)>();
@@ -522,16 +532,19 @@ namespace TestHelper.Monkey
                 Assume.That(lotteryEntries.Count, Is.GreaterThan(0));
 
                 Assert.That(spyLogger.Messages, Has.Count.EqualTo(1));
+                // @formatter:off
                 Assert.That(spyLogger.Messages[0], Does.StartWith("Lottery entries: "));
-                Assert.That(spyLogger.Messages[0], Does.Match(@"UsingPointerClickEventTrigger\(\d+\)"));
-                Assert.That(spyLogger.Messages[0], Does.Match(@"UsingOnPointerDownUpHandler\(\d+\)"));
-                Assert.That(spyLogger.Messages[0], Does.Match(@"UsingPointerDownUpEventTrigger\(\d+\)"));
-                Assert.That(spyLogger.Messages[0], Does.Match(@"UsingMultipleEventTriggers\(\d+\)"));
-                Assert.That(spyLogger.Messages[0], Does.Match(@"DestroyItselfIfPointerDown\(\d+\)"));
-                Assert.That(spyLogger.Messages[0], Does.Match(@"InputField\(\d+\)"));
-
-                // includes ignored objects
-                Assert.That(spyLogger.Messages[0], Does.Match(@"UsingOnPointerClickHandler\(\d+\)"));
+                Assert.That(spyLogger.Messages[0], Does.Match(@"UsingPointerClickEventTrigger\(\d+\):EventTrigger:UGUIClickOperator"));
+                Assert.That(spyLogger.Messages[0], Does.Match(@"UsingOnPointerDownUpHandler\(\d+\):SpyOnPointerDownUpHandler:UGUIClickAndHoldOperator"));
+                Assert.That(spyLogger.Messages[0], Does.Match(@"UsingPointerDownUpEventTrigger\(\d+\):EventTrigger:UGUIClickAndHoldOperator"));
+                Assert.That(spyLogger.Messages[0], Does.Match(@"UsingOnPointerClickHandler\(\d+\):SpyOnPointerClickHandler:UGUIClickOperator")); // includes ignored objects
+                Assert.That(spyLogger.Messages[0], Does.Match(@"UsingMultipleEventTriggers\(\d+\):EventTrigger:UGUIClickOperator"));
+                Assert.That(spyLogger.Messages[0], Does.Match(@"UsingMultipleEventTriggers\(\d+\):EventTrigger:UGUIClickAndHoldOperator"));
+                Assert.That(spyLogger.Messages[0], Does.Match(@"DestroyItselfIfPointerDown\(\d+\):StubDestroyingItselfWhenPointerDown:UGUIClickAndHoldOperator"));
+                Assert.That(spyLogger.Messages[0], Does.Match(@"InputField\(\d+\):InputField:UGUIClickOperator"));
+                Assert.That(spyLogger.Messages[0], Does.Match(@"InputField\(\d+\):InputField:UGUIClickAndHoldOperator"));
+                Assert.That(spyLogger.Messages[0], Does.Match(@"InputField\(\d+\):InputField:UGUITextInputOperator"));
+                // @formatter:on
             }
 
             [Test]
