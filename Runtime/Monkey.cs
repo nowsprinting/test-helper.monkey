@@ -129,7 +129,8 @@ namespace TestHelper.Monkey
                 return false;
             }
 
-            var message = new StringBuilder($"{selectedOperator} operates to {selectedComponent.gameObject.name}");
+            var message = new StringBuilder();
+            message.Append($"{selectedOperator.GetType().Name} operates to {selectedComponent.gameObject.name}");
             if (screenshotOptions != null)
             {
                 var filename = screenshotOptions.FilenameStrategy.GetFilename();

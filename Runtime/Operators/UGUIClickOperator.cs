@@ -52,11 +52,5 @@ namespace TestHelper.Monkey.Operators
             _eventData.position = _getScreenPoint(component.gameObject);
             handler.OnPointerClick(_eventData);
         }
-
-        /// <inheritdoc />
-        public override string ToString()
-        {
-            return nameof(UGUIClickOperator);
-        }
     }
 }
