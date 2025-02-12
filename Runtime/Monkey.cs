@@ -147,36 +147,35 @@ namespace TestHelper.Monkey
             InteractableComponentsFinder interactableComponentsFinder,
             ILogger verboseLogger = null)
         {
-            var dictionary = verboseLogger != null ? new Dictionary<GameObject, string>() : null;
+            var lotteryEntries = verboseLogger != null ? new StringBuilder() : null;
 
             foreach (var (component, iOperator) in
                      interactableComponentsFinder.FindInteractableComponentsAndOperators())
             {
-                if (dictionary != null && !dictionary.Keys.Contains(component.gameObject))
+                if (verboseLogger != null)
                 {
-                    dictionary.Add(component.gameObject, null);
+                    lotteryEntries.Append(
+                        $"{component.gameObject.name}({component.gameObject.GetInstanceID()}):{component.GetType().Name}:{iOperator.GetType().Name}, ");
                 }
 
                 yield return (component, iOperator);
             }
 
-            if (verboseLogger != null)
+            if (verboseLogger == null)
             {
-                if (dictionary.Count == 0)
-                {
-                    verboseLogger.Log("No lottery entries.");
-                }
-                else
-                {
-                    var builder = new StringBuilder("Lottery entries: ");
-                    foreach (var gameObject in dictionary.Keys)
-                    {
-                        builder.Append($"{gameObject.name}({gameObject.GetInstanceID()}), ");
-                    }
-
-                    verboseLogger.Log(builder.ToString(0, builder.Length - 2));
-                }
+                yield break;
             }
+
+            if (lotteryEntries.Length == 0)
+            {
+                verboseLogger.Log("No lottery entries.");
+                yield break;
+            }
+
+            lotteryEntries.Insert(0, "Lottery entries: {");
+            lotteryEntries.Remove(lotteryEntries.Length - 2, 2);
+            lotteryEntries.Append("}");
+            verboseLogger.Log(lotteryEntries.ToString());
         }
 
         internal static (Component, IOperator) LotteryOperator(
