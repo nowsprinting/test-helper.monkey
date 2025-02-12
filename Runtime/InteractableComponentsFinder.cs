@@ -31,7 +31,7 @@ namespace TestHelper.Monkey
             IEnumerable<IOperator> operators = null)
         {
             _isInteractable = isInteractable ?? DefaultComponentInteractableStrategy.IsInteractable;
-            _operators = operators;
+            _operators = operators ?? Array.Empty<IOperator>();
         }
 
         /// <summary>

@@ -235,6 +235,16 @@ namespace TestHelper.Monkey
         }
 
         [Test]
+        [LoadScene(TestScene)]
+        public void GetLotteryEntries_NoOperators_ReturnsEmpty()
+        {
+            var notHasOperatorFinder = new InteractableComponentsFinder();
+            var actual = Monkey.GetLotteryEntries(notHasOperatorFinder);
+
+            Assert.That(actual, Is.Not.Null.And.Empty);
+        }
+
+        [Test]
         public void LotteryOperator_NothingOperators_ReturnNull()
         {
             var operators = new List<(Component, IOperator)>();
