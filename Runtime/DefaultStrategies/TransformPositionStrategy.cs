@@ -7,12 +7,12 @@ using UnityEngine;
 namespace TestHelper.Monkey.DefaultStrategies
 {
     /// <summary>
-    /// Screen point strategy that dont care any annotations
+    /// Screen point strategy that don't care any annotations.
     /// </summary>
     public static class TransformPositionStrategy
     {
         /// <summary>
-        /// Screen point strategy that dont care any annotations
+        /// Screen point strategy that don't care any annotations.
         /// </summary>
         /// <param name="gameObject">GameObject that monkey operators operate</param>
         /// <returns>The screen point of the <paramref name="gameObject"/> transform position</returns>
@@ -20,7 +20,7 @@ namespace TestHelper.Monkey.DefaultStrategies
             GetScreenPointByWorldPosition(gameObject, gameObject.transform.position);
 
         /// <summary>
-        /// Returns 
+        /// Returns screen point of the <paramref name="pos"/>.
         /// </summary>
         /// <param name="gameObject">GameObject that monkey operators operate</param>
         /// <param name="pos">The world position where monkey operators operate on</param>

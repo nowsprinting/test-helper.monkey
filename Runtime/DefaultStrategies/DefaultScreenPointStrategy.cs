@@ -12,7 +12,7 @@ namespace TestHelper.Monkey.DefaultStrategies
     public static class DefaultScreenPointStrategy
     {
         /// <summary>
-        /// Default screen point strategy that care 4 position annotations in the order (upper one has higher priority):
+        /// Default screen point strategy that cares about four position annotations in the order (upper one has higher priority):
         /// <list type="number">
         ///   <item><c cref="ScreenPositionAnnotation">ScreenPositionAnnotation</c></item>
         ///   <item><c cref="WorldPositionAnnotation">WorldPositionAnnotation</c></item>
