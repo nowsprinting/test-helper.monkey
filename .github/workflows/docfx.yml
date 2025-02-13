@@ -4,11 +4,11 @@
 name: docfx
 
 on:
-  push:
-    tags:
-      - 'v*'
-  release:
-    types: [ published ]
+  workflow_run:
+    workflows:
+      - Release if bump version number
+    types:
+      - completed
   workflow_dispatch:
 
 concurrency:
