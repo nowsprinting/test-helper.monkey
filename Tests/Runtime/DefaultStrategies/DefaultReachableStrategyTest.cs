@@ -146,6 +146,7 @@ namespace TestHelper.Monkey.DefaultStrategies
                 Assert.That(spyLogger.Messages.Count, Is.EqualTo(1));
                 Assert.That(spyLogger.Messages[0], Does.Match(
                     @"Not reachable to OutOfSight\(\d+\), position=\(\d+,\d+\)\. Raycast is not hit\."));
+                // Note: No camera when ScreenSpaceOverlay canvas.
             }
 
             [Test]
@@ -160,6 +161,7 @@ namespace TestHelper.Monkey.DefaultStrategies
                 Assert.That(spyLogger.Messages.Count, Is.EqualTo(1));
                 Assert.That(spyLogger.Messages[0], Does.Match(
                     @"Not reachable to BehindTheWall\(\d+\), position=\(\d+,\d+\)\. Raycast hit other objects: {Wall, BehindTheWall}"));
+                // Note: No camera when ScreenSpaceOverlay canvas.
             }
         }
     }

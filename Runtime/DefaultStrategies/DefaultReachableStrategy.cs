@@ -4,9 +4,9 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using TestHelper.Monkey.Extensions;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using Object = UnityEngine.Object;
 
 namespace TestHelper.Monkey.DefaultStrategies
 {
@@ -90,11 +90,21 @@ namespace TestHelper.Monkey.DefaultStrategies
             return false;
         }
 
-        private static string CreateMessage(Object gameObject, Vector2 position)
+        private static string CreateMessage(GameObject gameObject, Vector2 position)
         {
             var x = (int)position.x;
             var y = (int)position.y;
-            return $"Not reachable to {gameObject.name}({gameObject.GetInstanceID()}), position=({x},{y}).";
+            var builder = new StringBuilder();
+            builder.Append($"Not reachable to {gameObject.name}({gameObject.GetInstanceID()}), position=({x},{y})");
+
+            var camera = gameObject.GetAssociatedCamera();
+            if (camera != null)
+            {
+                builder.Append($", camera={camera.name}({camera.GetInstanceID()})");
+            }
+
+            builder.Append(".");
+            return builder.ToString();
         }
     }
 }
