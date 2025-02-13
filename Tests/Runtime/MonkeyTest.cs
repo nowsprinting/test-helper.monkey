@@ -588,7 +588,7 @@ namespace TestHelper.Monkey
                     DefaultIgnoreStrategy.IsIgnored, DefaultReachableStrategy.IsReachable, spyLogger);
 
                 Assert.That(spyLogger.Messages, Has.Count.EqualTo(2));
-                Assert.That(spyLogger.Messages[0], Does.Match(@"Cube\(\d+\) is ignored."));
+                Assert.That(spyLogger.Messages[0], Does.Match(@"Ignored Cube\(\d+\)."));
                 Assert.That(spyLogger.Messages[1], Is.EqualTo("Lottery entries are empty or all of not reachable."));
             }
 

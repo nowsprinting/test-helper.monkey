@@ -60,14 +60,16 @@ namespace TestHelper.Monkey.DefaultStrategies
             if (!isSameOrChildObject && verboseLogger != null)
             {
                 var message = new StringBuilder(CreateMessage(gameObject, eventData.position));
-                message.Append(" Raycast hit other objects: ");
+                message.Append(" Raycast hit other objects: {");
                 foreach (var result in results)
                 {
                     message.Append(result.gameObject.name);
                     message.Append(", ");
                 }
 
-                verboseLogger.Log(message.ToString(0, message.Length - 2));
+                message.Remove(message.Length - 2, 2);
+                message.Append("}");
+                verboseLogger.Log(message.ToString());
             }
 
             return isSameOrChildObject;

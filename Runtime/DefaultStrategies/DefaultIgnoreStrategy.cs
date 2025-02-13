@@ -23,7 +23,7 @@ namespace TestHelper.Monkey.DefaultStrategies
             var hasIgnoreAnnotation = gameObject.TryGetComponent(typeof(IgnoreAnnotation), out _);
             if (hasIgnoreAnnotation && verboseLogger != null)
             {
-                verboseLogger.Log($"{gameObject.name}({gameObject.GetInstanceID()}) is ignored.");
+                verboseLogger.Log($"Ignored {gameObject.name}({gameObject.GetInstanceID()}).");
             }
 
             return hasIgnoreAnnotation;
