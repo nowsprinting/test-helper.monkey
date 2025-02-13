@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Text;
 using TestHelper.Monkey.DefaultStrategies;
 using TestHelper.Monkey.Extensions;
-using TestHelper.Monkey.ScreenPointStrategies;
 using UnityEngine;
 
 namespace TestHelper.Monkey.Hints

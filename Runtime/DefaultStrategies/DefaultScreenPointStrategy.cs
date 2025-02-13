@@ -1,16 +1,14 @@
 // Copyright (c) 2023 Koji Hasegawa.
 // This software is released under the MIT License.
 
-using System;
 using TestHelper.Monkey.Annotations;
 using UnityEngine;
 
-namespace TestHelper.Monkey.ScreenPointStrategies
+namespace TestHelper.Monkey.DefaultStrategies
 {
     /// <summary>
     /// Default screen point strategy.
     /// </summary>
-    [Obsolete("Use DefaultStrategies.DefaultScreenPointStrategy instead.")]
     public static class DefaultScreenPointStrategy
     {
         /// <summary>
@@ -34,7 +32,6 @@ namespace TestHelper.Monkey.ScreenPointStrategies
         /// </summary>
         /// <param name="gameObject">GameObject that monkey operators operate</param>
         /// <returns>The screen point where monkey operators operate on</returns>
-        [Obsolete("Use DefaultStrategies.DefaultScreenPointStrategy.GetScreenPoint instead.")]
         public static Vector2 GetScreenPoint(GameObject gameObject)
         {
             if (gameObject.TryGetComponent<ScreenPositionAnnotation>(out var screenPositionAnnotation))

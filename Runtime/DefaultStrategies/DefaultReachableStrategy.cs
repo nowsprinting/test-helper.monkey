@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using TestHelper.Monkey.ScreenPointStrategies;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using Object = UnityEngine.Object;
