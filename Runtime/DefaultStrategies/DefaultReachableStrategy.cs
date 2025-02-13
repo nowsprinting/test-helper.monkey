@@ -4,9 +4,9 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using TestHelper.Monkey.Extensions;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using Object = UnityEngine.Object;
 
 namespace TestHelper.Monkey.DefaultStrategies
 {
@@ -60,14 +60,16 @@ namespace TestHelper.Monkey.DefaultStrategies
             if (!isSameOrChildObject && verboseLogger != null)
             {
                 var message = new StringBuilder(CreateMessage(gameObject, eventData.position));
-                message.Append(" Raycast hit other objects: ");
+                message.Append(" Raycast hit other objects: {");
                 foreach (var result in results)
                 {
                     message.Append(result.gameObject.name);
                     message.Append(", ");
                 }
 
-                verboseLogger.Log(message.ToString(0, message.Length - 2));
+                message.Remove(message.Length - 2, 2);
+                message.Append("}");
+                verboseLogger.Log(message.ToString());
             }
 
             return isSameOrChildObject;
@@ -88,11 +90,21 @@ namespace TestHelper.Monkey.DefaultStrategies
             return false;
         }
 
-        private static string CreateMessage(Object gameObject, Vector2 position)
+        private static string CreateMessage(GameObject gameObject, Vector2 position)
         {
             var x = (int)position.x;
             var y = (int)position.y;
-            return $"Not reachable to {gameObject.name}({gameObject.GetInstanceID()}), position=({x},{y}).";
+            var builder = new StringBuilder();
+            builder.Append($"Not reachable to {gameObject.name}({gameObject.GetInstanceID()}), position=({x},{y})");
+
+            var camera = gameObject.GetAssociatedCamera();
+            if (camera != null)
+            {
+                builder.Append($", camera={camera.name}({camera.GetInstanceID()})");
+            }
+
+            builder.Append(".");
+            return builder.ToString();
         }
     }
 }
