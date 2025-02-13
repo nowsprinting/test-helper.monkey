@@ -5,7 +5,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using TestHelper.Monkey.ScreenPointStrategies;
+using TestHelper.Monkey.DefaultStrategies;
 using UnityEngine;
 using UnityEngine.EventSystems;
 

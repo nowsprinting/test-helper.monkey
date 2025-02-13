@@ -1,20 +1,18 @@
 // Copyright (c) 2023 Koji Hasegawa.
 // This software is released under the MIT License.
 
-using System;
 using TestHelper.Monkey.Annotations;
 using UnityEngine;
 
-namespace TestHelper.Monkey.ScreenPointStrategies
+namespace TestHelper.Monkey.DefaultStrategies
 {
     /// <summary>
     /// Default screen point strategy.
     /// </summary>
-    [Obsolete("Use DefaultStrategies.DefaultScreenPointStrategy instead.")]
     public static class DefaultScreenPointStrategy
     {
         /// <summary>
-        /// Default screen point strategy that care 4 position annotations in the order (upper one has higher priority):
+        /// Default screen point strategy that cares about four position annotations in the order (upper one has higher priority):
         /// <list type="number">
         ///   <item><c cref="ScreenPositionAnnotation">ScreenPositionAnnotation</c></item>
         ///   <item><c cref="WorldPositionAnnotation">WorldPositionAnnotation</c></item>
@@ -34,7 +32,6 @@ namespace TestHelper.Monkey.ScreenPointStrategies
         /// </summary>
         /// <param name="gameObject">GameObject that monkey operators operate</param>
         /// <returns>The screen point where monkey operators operate on</returns>
-        [Obsolete("Use DefaultStrategies.DefaultScreenPointStrategy.GetScreenPoint instead.")]
         public static Vector2 GetScreenPoint(GameObject gameObject)
         {
             if (gameObject.TryGetComponent<ScreenPositionAnnotation>(out var screenPositionAnnotation))

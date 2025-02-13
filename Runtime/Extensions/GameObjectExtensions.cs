@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using TestHelper.Monkey.DefaultStrategies;
-using TestHelper.Monkey.ScreenPointStrategies;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.EventSystems;
