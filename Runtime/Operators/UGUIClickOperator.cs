@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2023-2024 Koji Hasegawa.
+﻿// Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System;
@@ -19,7 +19,6 @@ namespace TestHelper.Monkey.Operators
     public class UGUIClickOperator : IClickOperator
     {
         private readonly Func<GameObject, Vector2> _getScreenPoint;
-        private readonly PointerEventData _eventData = new PointerEventData(EventSystem.current);
 
         /// <summary>
         /// Constructor.
@@ -49,8 +48,13 @@ namespace TestHelper.Monkey.Operators
                 throw new ArgumentException("Component must implement IPointerClickHandler.");
             }
 
-            _eventData.position = _getScreenPoint(component.gameObject);
-            handler.OnPointerClick(_eventData);
+            var eventData = new PointerEventData(EventSystem.current)
+            {
+                position = _getScreenPoint(component.gameObject),
+                clickCount = 1,
+                button = PointerEventData.InputButton.Left,
+            };
+            handler.OnPointerClick(eventData);
         }
     }
 }

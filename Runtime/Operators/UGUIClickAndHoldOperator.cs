@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2023-2024 Koji Hasegawa.
+﻿// Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System;
@@ -19,7 +19,6 @@ namespace TestHelper.Monkey.Operators
     {
         private readonly int _holdMillis;
         private readonly Func<GameObject, Vector2> _getScreenPoint;
-        private readonly PointerEventData _eventData = new PointerEventData(EventSystem.current);
 
         /// <summary>
         /// Constructor.
@@ -53,8 +52,14 @@ namespace TestHelper.Monkey.Operators
                 throw new ArgumentException("Component must implement IPointerDownHandler and IPointerUpHandler.");
             }
 
-            _eventData.position = _getScreenPoint(component.gameObject);
-            downHandler.OnPointerDown(_eventData);
+            var eventData = new PointerEventData(EventSystem.current)
+            {
+                position = _getScreenPoint(component.gameObject),
+                clickCount = 1,
+                button = PointerEventData.InputButton.Left,
+            };
+            downHandler.OnPointerDown(eventData);
+
             await UniTask.Delay(TimeSpan.FromMilliseconds(_holdMillis), ignoreTimeScale: true,
                 cancellationToken: cancellationToken);
 
@@ -63,7 +68,7 @@ namespace TestHelper.Monkey.Operators
                 return;
             }
 
-            upHandler.OnPointerUp(_eventData);
+            upHandler.OnPointerUp(eventData);
         }
     }
 }
