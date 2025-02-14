@@ -1,4 +1,4 @@
-// Copyright (c) 2023-2024 Koji Hasegawa.
+// Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System;
@@ -9,6 +9,9 @@ using TestHelper.Monkey.Random;
 using TestHelper.Random;
 using UnityEngine;
 using UnityEngine.UI;
+#if ENABLE_TMP
+using TMPro;
+#endif
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 
@@ -38,15 +41,19 @@ namespace TestHelper.Monkey.Operators
         /// <inheritdoc />
         public bool CanOperate(Component component)
         {
+#if ENABLE_TMP
+            return component is InputField || component is TMP_InputField;
+#else
             return component is InputField;
+#endif
         }
 
         /// <inheritdoc />
         public async UniTask OperateAsync(Component component, CancellationToken cancellationToken = default)
         {
-            if (!(component is InputField inputField))
+            if (!CanOperate(component))
             {
-                throw new ArgumentException("Component must be InputField class.");
+                throw new ArgumentException("Component must be InputField or TMP_InputField class.");
             }
 
             Func<GameObject, RandomStringParameters> randomStringParams;
@@ -64,19 +71,37 @@ namespace TestHelper.Monkey.Operators
                 randomStringParams = _randomStringParams;
             }
 
-            inputField.text = _randomString.Next(randomStringParams(component.gameObject));
+            if (component is InputField inputField)
+            {
+                inputField.text = _randomString.Next(randomStringParams(component.gameObject));
+            }
+#if ENABLE_TMP
+            if (component is TMP_InputField tmpInputField)
+            {
+                tmpInputField.text = _randomString.Next(randomStringParams(component.gameObject));
+            }
+#endif
         }
 
         /// <inheritdoc />
         public async UniTask OperateAsync(Component component, string text,
             CancellationToken cancellationToken = default)
         {
-            if (!(component is InputField inputField))
+            if (!CanOperate(component))
             {
-                throw new ArgumentException("Component must be InputField class.");
+                throw new ArgumentException("Component must be InputField or TMP_InputField class.");
             }
 
-            inputField.text = text;
+            if (component is InputField inputField)
+            {
+                inputField.text = text;
+            }
+#if ENABLE_TMP
+            if (component is TMP_InputField tmpInputField)
+            {
+                tmpInputField.text = text;
+            }
+#endif
         }
     }
 }

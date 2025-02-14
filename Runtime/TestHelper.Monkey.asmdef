@@ -5,7 +5,8 @@
         "TestHelper.Monkey.Annotations",
         "TestHelper.RuntimeInternals",
         "TestHelper.Random",
-        "UniTask"
+        "UniTask",
+        "Unity.TextMeshPro"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
