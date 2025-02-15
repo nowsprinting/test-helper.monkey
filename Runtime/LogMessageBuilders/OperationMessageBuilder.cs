@@ -50,7 +50,6 @@ namespace TestHelper.Monkey.LogMessageBuilders
                 builder.Append(")");
             }
 
-            builder.Append(".");
             return builder.ToString();
         }
     }

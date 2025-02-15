@@ -135,7 +135,7 @@ namespace TestHelper.Monkey
             {
                 var filename = screenshotOptions.FilenameStrategy.GetFilename();
                 await TakeScreenshotAsync(screenshotOptions, filename);
-                builder.AddComment($" ({filename})");
+                builder.AddComment(filename);
             }
 
             logger.Log(builder.ToString());
