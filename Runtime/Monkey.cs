@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using TestHelper.Monkey.LogMessageBuilders;
 using TestHelper.Monkey.Operators;
 using TestHelper.Random;
 using TestHelper.RuntimeInternals;
@@ -129,16 +130,15 @@ namespace TestHelper.Monkey
                 return false;
             }
 
-            var message = new StringBuilder();
-            message.Append($"{selectedOperator.GetType().Name} operates to {selectedComponent.gameObject.name}");
+            var builder = new OperationMessageBuilder(selectedComponent, selectedOperator);
             if (screenshotOptions != null)
             {
                 var filename = screenshotOptions.FilenameStrategy.GetFilename();
                 await TakeScreenshotAsync(screenshotOptions, filename);
-                message.Append($" ({filename})");
+                builder.AddComment(filename);
             }
 
-            logger.Log(message.ToString());
+            logger.Log(builder.ToString());
 
             await selectedOperator.OperateAsync(selectedComponent, cancellationToken);
             return true;
