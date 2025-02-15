@@ -298,7 +298,7 @@ git submodule add git@github.com:nowsprinting/test-helper.monkey.git Packages/co
 ```
 
 > [!WARNING]  
-> Required install packages for running tests (when adding to the `testables` in package.json), as follows:
+> Required installation packages for running tests (when embedded package or adding to the `testables` in manifest.json), as follows:
 > - [Unity Test Framework](https://docs.unity3d.com/Packages/com.unity.test-framework@latest) package v1.3.4 or later
 > - TextMesh Pro package or Unity UI package v2.0.0 or later
 
@@ -311,6 +311,9 @@ Generate a temporary project and run tests on each Unity version from the comman
 make create_project
 UNITY_VERSION=2019.4.40f1 make -k test
 ```
+
+> [!WARNING]  
+> You must select "Input Manager (Old)" or "Both" in the **Project Settings > Player > Active Input Handling** for running tests.
 
 
 ### Release workflow
