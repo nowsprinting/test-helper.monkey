@@ -53,7 +53,7 @@ namespace TestHelper.Monkey.Operators
         {
             if (!CanOperate(component))
             {
-                throw new ArgumentException("Component must be InputField or TMP_InputField class.");
+                throw new ArgumentException("Component must be of type InputField or TMP_InputField.");
             }
 
             Func<GameObject, RandomStringParameters> randomStringParams;
@@ -89,7 +89,7 @@ namespace TestHelper.Monkey.Operators
         {
             if (!CanOperate(component))
             {
-                throw new ArgumentException("Component must be InputField or TMP_InputField class.");
+                throw new ArgumentException("Component must be of type InputField or TMP_InputField.");
             }
 
             if (component is InputField inputField)

@@ -29,7 +29,7 @@ namespace TestHelper.Monkey.Operators
         }
 
         [Test]
-        public void OperateAsync_InputText_InputRandomText()
+        public void OperateAsync_InputText_SetsRandomText()
         {
             var component = new GameObject().AddComponent<InputField>();
 
@@ -40,7 +40,7 @@ namespace TestHelper.Monkey.Operators
         }
 
         [Test]
-        public void OperateAsync_InputTextWithText_InputSpecifiedText()
+        public void OperateAsync_InputTextWithText_SetsSpecifiedText()
         {
             var component = new GameObject().AddComponent<InputField>();
 
@@ -51,7 +51,7 @@ namespace TestHelper.Monkey.Operators
         }
 
         [Test]
-        public void OperateAsync_TmpInputText_InputRandomText()
+        public void OperateAsync_TmpInputText_SetsRandomText()
         {
             var component = new GameObject().AddComponent<TMP_InputField>();
 
@@ -62,7 +62,7 @@ namespace TestHelper.Monkey.Operators
         }
 
         [Test]
-        public void OperateAsync_TmpInputTextWithText_InputSpecifiedText()
+        public void OperateAsync_TmpInputTextWithText_SetsSpecifiedText()
         {
             var component = new GameObject().AddComponent<TMP_InputField>();
 
