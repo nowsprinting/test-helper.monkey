@@ -12,8 +12,13 @@ namespace TestHelper.Monkey.Operators
     [TestFixture]
     public class UGUITextInputOperatorTest
     {
-        private readonly ITextInputOperator _sut = new UGUITextInputOperator(
-            randomString: new StubRandomString("RANDOM"));
+        private ITextInputOperator _sut;
+
+        [SetUp]
+        public void SetUp()
+        {
+            _sut = new UGUITextInputOperator(randomString: new StubRandomString("RANDOM"));
+        }
 
         [Test]
         public void CanOperate_NotInputText_ReturnFalse()
