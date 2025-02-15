@@ -1,9 +1,9 @@
-// Copyright (c) 2023-2024 Koji Hasegawa.
+// Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using NUnit.Framework;
-using TestHelper.Monkey.Random;
 using TestHelper.Monkey.TestDoubles;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,12 +12,16 @@ namespace TestHelper.Monkey.Operators
     [TestFixture]
     public class UGUITextInputOperatorTest
     {
-        private readonly ITextInputOperator _sut = new UGUITextInputOperator(
-            _ => RandomStringParameters.Default,
-            new StubRandomString("RANDOM"));
+        private ITextInputOperator _sut;
+
+        [SetUp]
+        public void SetUp()
+        {
+            _sut = new UGUITextInputOperator(randomString: new StubRandomString("RANDOM"));
+        }
 
         [Test]
-        public void CanOperate_CanNotInputText_ReturnFalse()
+        public void CanOperate_NotInputText_ReturnFalse()
         {
             var component = new GameObject().AddComponent<Button>();
 
@@ -25,7 +29,7 @@ namespace TestHelper.Monkey.Operators
         }
 
         [Test]
-        public void OperateAsync_InputText()
+        public void OperateAsync_InputText_SetsRandomText()
         {
             var component = new GameObject().AddComponent<InputField>();
 
@@ -36,9 +40,31 @@ namespace TestHelper.Monkey.Operators
         }
 
         [Test]
-        public void OperateAsync_InputSpecifiedText()
+        public void OperateAsync_InputTextWithText_SetsSpecifiedText()
         {
             var component = new GameObject().AddComponent<InputField>();
+
+            Assume.That(_sut.CanOperate(component), Is.True);
+            _sut.OperateAsync(component, "SPECIFIED");
+
+            Assert.That(component.text, Is.EqualTo("SPECIFIED"));
+        }
+
+        [Test]
+        public void OperateAsync_TmpInputText_SetsRandomText()
+        {
+            var component = new GameObject().AddComponent<TMP_InputField>();
+
+            Assume.That(_sut.CanOperate(component), Is.True);
+            _sut.OperateAsync(component);
+
+            Assert.That(component.text, Is.EqualTo("RANDOM"));
+        }
+
+        [Test]
+        public void OperateAsync_TmpInputTextWithText_SetsSpecifiedText()
+        {
+            var component = new GameObject().AddComponent<TMP_InputField>();
 
             Assume.That(_sut.CanOperate(component), Is.True);
             _sut.OperateAsync(component, "SPECIFIED");

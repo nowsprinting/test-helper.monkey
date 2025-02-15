@@ -4,9 +4,10 @@
     "references": [
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
+        "Unity.TextMeshPro",
+        "UniTask",
         "TestHelper.Monkey",
         "TestHelper.Monkey.Annotations",
-        "UniTask",
         "TestHelper",
         "TestHelper.RuntimeInternals",
         "TestHelper.Random"
