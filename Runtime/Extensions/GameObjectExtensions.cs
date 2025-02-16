@@ -1,4 +1,4 @@
-// Copyright (c) 2023-2024 Koji Hasegawa.
+// Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System;
@@ -157,6 +157,19 @@ namespace TestHelper.Monkey.Extensions
         public static bool IsInteractable(this GameObject gameObject)
         {
             return gameObject.GetComponents<MonoBehaviour>().Any(x => x.IsInteractable());
+        }
+
+        /// <summary>
+        /// Try to get a component exclude disabled component.
+        /// </summary>
+        /// <param name="gameObject"></param>
+        /// <param name="component">A component of the matching type, if found.</param>
+        /// <typeparam name="T">The type of Component to search for</typeparam>
+        /// <returns>True if found and active and enabled component</returns>
+        public static bool TryGetEnabledComponent<T>(this GameObject gameObject, out T component)
+        {
+            component = gameObject.GetComponent<T>();
+            return component != null && (component is not Behaviour behaviour || behaviour.isActiveAndEnabled);
         }
     }
 }
