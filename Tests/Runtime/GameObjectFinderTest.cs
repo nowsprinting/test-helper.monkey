@@ -192,6 +192,8 @@ namespace TestHelper.Monkey
 
         [TestFixture("2D")]
         [TestFixture("3D")]
+        [BuildScene("../Scenes/GameObjectFinder2D.unity")]
+        [BuildScene("../Scenes/GameObjectFinder3D.unity")]
         public class Object
         {
             private readonly GameObjectFinder _sut = new GameObjectFinder(0.1d);
