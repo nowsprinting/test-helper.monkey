@@ -22,7 +22,6 @@ namespace TestHelper.Monkey
         private readonly double _timeoutSeconds;
         private readonly Func<GameObject, PointerEventData, List<RaycastResult>, ILogger, bool> _isReachable;
         private readonly Func<Component, bool> _isComponentInteractable;
-        private readonly PointerEventData _eventData = new PointerEventData(EventSystem.current);
         private readonly List<RaycastResult> _results = new List<RaycastResult>();
 
         private const double MinTimeoutSeconds = 0.01d;
@@ -72,7 +71,7 @@ namespace TestHelper.Monkey
                 return (null, Reason.NotMatchPath);
             }
 
-            if (reachable && !_isReachable.Invoke(foundObject, _eventData, _results, null))
+            if (reachable && !_isReachable.Invoke(foundObject, null, _results, null))
             {
                 return (null, Reason.NotReachable);
             }
