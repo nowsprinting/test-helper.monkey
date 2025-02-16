@@ -143,7 +143,7 @@ namespace TestHelper.Monkey.DefaultStrategies
                 var actual = DefaultReachableStrategy.IsReachable(gameObject, verboseLogger: spyLogger);
                 Assume.That(actual, Is.False);
 
-                Assert.That(spyLogger.Messages.Count, Is.EqualTo(1));
+                Assert.That(spyLogger.Messages, Has.Count.EqualTo(1));
                 Assert.That(spyLogger.Messages[0], Does.Match(
                     @"Not reachable to OutOfSight\(\d+\), position=\(\d+,\d+\)\. Raycast is not hit\."));
                 // Note: No camera when ScreenSpaceOverlay canvas.
@@ -158,10 +158,28 @@ namespace TestHelper.Monkey.DefaultStrategies
                 var actual = DefaultReachableStrategy.IsReachable(gameObject, verboseLogger: spyLogger);
                 Assume.That(actual, Is.False);
 
-                Assert.That(spyLogger.Messages.Count, Is.EqualTo(1));
+                Assert.That(spyLogger.Messages, Has.Count.EqualTo(1));
                 Assert.That(spyLogger.Messages[0], Does.Match(
                     @"Not reachable to BehindTheWall\(\d+\), position=\(\d+,\d+\)\. Raycast hit other objects: {Wall, BehindTheWall}"));
                 // Note: No camera when ScreenSpaceOverlay canvas.
+            }
+
+            [Test]
+            [LoadScene(TestScenePath)]
+            public async Task IsReachableWithVerbose_WorldSpace_LogVerboseWithCamera()
+            {
+                var canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
+                canvas.renderMode = RenderMode.WorldSpace;
+                canvas.worldCamera = Camera.main;
+
+                var gameObject = await _finder.FindByNameAsync("OutOfSight", reachable: false);
+                var spyLogger = new SpyLogger();
+                var actual = DefaultReachableStrategy.IsReachable(gameObject, verboseLogger: spyLogger);
+                Assume.That(actual, Is.False);
+
+                Assert.That(spyLogger.Messages, Has.Count.EqualTo(1));
+                Assert.That(spyLogger.Messages[0], Does.Match(
+                    @"Not reachable to OutOfSight\(\d+\), position=\(\d+,\d+\), camera=Main Camera\(\d+\)\. Raycast is not hit\."));
             }
         }
     }

@@ -16,7 +16,7 @@ namespace TestHelper.Monkey.DefaultStrategies
         /// Default implementation is to check whether the GameObject has <c>IgnoreAnnotation</c> component.
         /// </summary>
         /// <param name="gameObject"></param>
-        /// <param name="verboseLogger">Output verbose log if need</param>
+        /// <param name="verboseLogger">Logger set if you need verbose output</param>
         /// <returns>True if GameObject is ignored</returns>
         public static bool IsIgnored(GameObject gameObject, ILogger verboseLogger = null)
         {

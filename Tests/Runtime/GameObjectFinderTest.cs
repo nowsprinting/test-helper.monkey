@@ -1,4 +1,4 @@
-// Copyright (c) 2023-2024 Koji Hasegawa.
+// Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System;
@@ -8,13 +8,10 @@ using Cysharp.Threading.Tasks; // Do not remove, required for Unity 2022 or earl
 using NUnit.Framework;
 using TestHelper.Attributes;
 using TestHelper.Monkey.Extensions;
+using TestHelper.Monkey.TestDoubles;
+using TestHelper.RuntimeInternals;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.TestTools;
 using UnityEngine.UI;
-#if UNITY_EDITOR
-using UnityEditor.SceneManagement;
-#endif
 
 namespace TestHelper.Monkey
 {
@@ -26,8 +23,7 @@ namespace TestHelper.Monkey
         [TestFixture(RenderMode.WorldSpace)]
         public class UI
         {
-            private const string TestScenePath =
-                "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/GameObjectFinderUI.unity";
+            private const string TestScenePath = "../Scenes/GameObjectFinderUI.unity";
 
             private readonly GameObjectFinder _sut = new GameObjectFinder(0.1d);
             private readonly RenderMode _canvasRenderMode;
@@ -97,6 +93,29 @@ namespace TestHelper.Monkey
                 {
                     Assert.That(e.Message, Is.EqualTo($"GameObject `{target}` is found, but not reachable."));
                 }
+            }
+
+            [TestCase("OutOfSight")]
+            [LoadScene(TestScenePath)]
+            public async Task FindByNameAsync_NotReachableWithVerbose(string target)
+            {
+                var spyLogger = new SpyLogger();
+                var sut = new GameObjectFinder(0.1d, verboseLogger: spyLogger);
+
+                try
+                {
+                    await sut.FindByNameAsync(target, reachable: true, interactable: false);
+                    Assert.Fail("Expected TimeoutException but was not thrown");
+                }
+                catch (TimeoutException e)
+                {
+                    Assert.That(e.Message, Is.EqualTo($"GameObject `{target}` is found, but not reachable."));
+                }
+
+                Assert.That(spyLogger.Messages, Is.Not.Empty);
+                Assert.That(spyLogger.Messages[0],
+                    Does.Match(@"Not reachable to OutOfSight\(\d+\), position=\(\d+,\d+\).*\. Raycast is not hit\."));
+                // Note: with or without camera
             }
 
             [TestCase("OutOfSight")]
@@ -173,7 +192,8 @@ namespace TestHelper.Monkey
 
         [TestFixture("2D")]
         [TestFixture("3D")]
-        [UnityPlatform(RuntimePlatform.OSXEditor, RuntimePlatform.WindowsEditor, RuntimePlatform.LinuxEditor)]
+        [BuildScene("../Scenes/GameObjectFinder2D.unity")]
+        [BuildScene("../Scenes/GameObjectFinder3D.unity")]
         public class Object
         {
             private readonly GameObjectFinder _sut = new GameObjectFinder(0.1d);
@@ -181,17 +201,13 @@ namespace TestHelper.Monkey
 
             public Object(string dimension)
             {
-                _testScenePath =
-                    $"Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/GameObjectFinder{dimension}.unity";
+                _testScenePath = $"../Scenes/GameObjectFinder{dimension}.unity";
             }
 
             [SetUp]
             public async Task SetUp()
             {
-#if UNITY_EDITOR
-                await EditorSceneManager.LoadSceneAsyncInPlayMode(_testScenePath,
-                    new LoadSceneParameters(LoadSceneMode.Single));
-#endif
+                await SceneManagerHelper.LoadSceneAsync(_testScenePath);
             }
 
             [TestCase("OutOfSight", false, false)]
