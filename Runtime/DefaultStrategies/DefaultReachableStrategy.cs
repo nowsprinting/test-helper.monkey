@@ -22,17 +22,17 @@ namespace TestHelper.Monkey.DefaultStrategies
         /// Hit test using raycaster
         /// </summary>
         /// <param name="gameObject"></param>
-        /// <param name="eventData">Specify if avoid GC memory allocation</param>
-        /// <param name="results">Specify if avoid GC memory allocation</param>
+        /// <param name="pointerEventData">Specify this if you want to avoid GC memory allocation. It contains an <c>EventSystem</c> instance, so don't cache it carelessly.</param>
+        /// <param name="results">Specify this if you want to avoid GC memory allocation</param>
         /// <param name="verboseLogger">Output verbose log if need</param>
         /// <returns>True if this GameObject is reachable from user</returns>
         public static bool IsReachable(GameObject gameObject,
-            PointerEventData eventData = null,
+            PointerEventData pointerEventData = null,
             List<RaycastResult> results = null,
             ILogger verboseLogger = null)
         {
-            eventData = eventData ?? new PointerEventData(EventSystem.current);
-            eventData.position = GetScreenPoint.Invoke(gameObject);
+            pointerEventData = pointerEventData ?? new PointerEventData(EventSystem.current);
+            pointerEventData.position = GetScreenPoint.Invoke(gameObject);
 
             results = results ?? new List<RaycastResult>();
             results.Clear();
@@ -43,12 +43,12 @@ namespace TestHelper.Monkey.DefaultStrategies
                 return false;
             }
 
-            EventSystem.current.RaycastAll(eventData, results);
+            EventSystem.current.RaycastAll(pointerEventData, results);
             if (results.Count == 0)
             {
                 if (verboseLogger != null)
                 {
-                    var message = new StringBuilder(CreateMessage(gameObject, eventData.position));
+                    var message = new StringBuilder(CreateMessage(gameObject, pointerEventData.position));
                     message.Append(" Raycast is not hit.");
                     verboseLogger.Log(message.ToString());
                 }
@@ -59,7 +59,7 @@ namespace TestHelper.Monkey.DefaultStrategies
             var isSameOrChildObject = IsSameOrChildObject(gameObject, results[0].gameObject.transform);
             if (!isSameOrChildObject && verboseLogger != null)
             {
-                var message = new StringBuilder(CreateMessage(gameObject, eventData.position));
+                var message = new StringBuilder(CreateMessage(gameObject, pointerEventData.position));
                 message.Append(" Raycast hit other objects: {");
                 foreach (var result in results)
                 {
