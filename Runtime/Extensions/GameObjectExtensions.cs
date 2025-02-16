@@ -128,7 +128,7 @@ namespace TestHelper.Monkey.Extensions
         }
 
         /// <summary>
-        /// 
+        /// Return interactable components.
         /// </summary>
         /// <param name="gameObject"></param>
         /// <param name="isComponentInteractable"></param>
