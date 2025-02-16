@@ -24,7 +24,7 @@ namespace TestHelper.Monkey.DefaultStrategies
         /// <param name="gameObject"></param>
         /// <param name="pointerEventData">Specify this if you want to avoid GC memory allocation. It contains an <c>EventSystem</c> instance, so don't cache it carelessly.</param>
         /// <param name="results">Specify this if you want to avoid GC memory allocation</param>
-        /// <param name="verboseLogger">Output verbose log if need</param>
+        /// <param name="verboseLogger">Logger set if you need verbose output</param>
         /// <returns>True if this GameObject is reachable from user</returns>
         public static bool IsReachable(GameObject gameObject,
             PointerEventData pointerEventData = null,

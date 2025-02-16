@@ -392,6 +392,8 @@ If `GameObject` is found with the specified name or path but not reachable, thro
 GameObject `Target` is found, but not reachable.
 ```
 
+If you need detailed logs, pass an `ILogger` instance to the constructor of `GameObjectFinder`.
+
 ##### Not interactable
 
 If `GameObject` is found with the specified name or path but not interactable, throw `TimeoutException` with the following message:

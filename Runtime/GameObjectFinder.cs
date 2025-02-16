@@ -23,6 +23,7 @@ namespace TestHelper.Monkey
         private readonly Func<GameObject, PointerEventData, List<RaycastResult>, ILogger, bool> _isReachable;
         private readonly Func<Component, bool> _isComponentInteractable;
         private readonly List<RaycastResult> _results = new List<RaycastResult>();
+        private readonly ILogger _verboseLogger;
 
         private const double MinTimeoutSeconds = 0.01d;
         private const double MaxPollingIntervalSeconds = 1.0d;
@@ -35,9 +36,11 @@ namespace TestHelper.Monkey
         /// Default is <c>DefaultReachableStrategy.IsReachable</c>.</param>
         /// <param name="isComponentInteractable">The function returns the <c>Component</c> is interactable or not.
         /// Default is <c>DefaultComponentInteractableStrategy.IsInteractable</c>.</param>
+        /// <param name="verboseLogger">Logger used in <paramref name="isReachable"/>, set if you need output</param>
         public GameObjectFinder(double timeoutSeconds = 1.0d,
             Func<GameObject, PointerEventData, List<RaycastResult>, ILogger, bool> isReachable = null,
-            Func<Component, bool> isComponentInteractable = null)
+            Func<Component, bool> isComponentInteractable = null,
+            ILogger verboseLogger = null)
         {
             Assert.IsTrue(timeoutSeconds > MinTimeoutSeconds,
                 $"TimeoutSeconds must be greater than {MinTimeoutSeconds}.");
@@ -45,6 +48,7 @@ namespace TestHelper.Monkey
             _timeoutSeconds = timeoutSeconds;
             _isReachable = isReachable ?? DefaultReachableStrategy.IsReachable;
             _isComponentInteractable = isComponentInteractable ?? DefaultComponentInteractableStrategy.IsInteractable;
+            _verboseLogger = verboseLogger;
         }
 
         private enum Reason
@@ -71,7 +75,7 @@ namespace TestHelper.Monkey
                 return (null, Reason.NotMatchPath);
             }
 
-            if (reachable && !_isReachable.Invoke(foundObject, null, _results, null))
+            if (reachable && !_isReachable.Invoke(foundObject, null, _results, _verboseLogger))
             {
                 return (null, Reason.NotReachable);
             }
