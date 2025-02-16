@@ -32,7 +32,7 @@ namespace TestHelper.Monkey
         public int SecondsToErrorForNoInteractiveComponent { get; set; } = 5;
 
         /// <summary>
-        /// Random number generator
+        /// Pseudo-random number generator
         /// </summary>
         public IRandom Random { get; set; } = new RandomWrapper();
 
