@@ -169,7 +169,7 @@ namespace TestHelper.Monkey.Extensions
         public static bool TryGetEnabledComponent<T>(this GameObject gameObject, out T component)
         {
             component = gameObject.GetComponent<T>();
-            return component != null && (component is not Behaviour behaviour || behaviour.isActiveAndEnabled);
+            return component != null && (!(component is Behaviour) || (component as Behaviour).isActiveAndEnabled);
         }
     }
 }
