@@ -1,7 +1,8 @@
-// Copyright (c) 2023 Koji Hasegawa.
+// Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using TestHelper.Monkey.Annotations;
+using TestHelper.Monkey.Extensions;
 using UnityEngine;
 
 namespace TestHelper.Monkey.DefaultStrategies
@@ -34,12 +35,12 @@ namespace TestHelper.Monkey.DefaultStrategies
         /// <returns>The screen point where monkey operators operate on</returns>
         public static Vector2 GetScreenPoint(GameObject gameObject)
         {
-            if (gameObject.TryGetComponent<ScreenPositionAnnotation>(out var screenPositionAnnotation))
+            if (gameObject.TryGetEnabledComponent<ScreenPositionAnnotation>(out var screenPositionAnnotation))
             {
                 return screenPositionAnnotation.position;
             }
 
-            if (gameObject.TryGetComponent<WorldPositionAnnotation>(out var worldPositionAnnotation))
+            if (gameObject.TryGetEnabledComponent<WorldPositionAnnotation>(out var worldPositionAnnotation))
             {
                 return TransformPositionStrategy.GetScreenPointByWorldPosition(
                     gameObject,
@@ -47,12 +48,12 @@ namespace TestHelper.Monkey.DefaultStrategies
                 );
             }
 
-            if (gameObject.TryGetComponent<ScreenOffsetAnnotation>(out var screenOffsetAnnotation))
+            if (gameObject.TryGetEnabledComponent<ScreenOffsetAnnotation>(out var screenOffsetAnnotation))
             {
                 return TransformPositionStrategy.GetScreenPoint(gameObject) + screenOffsetAnnotation.offset;
             }
 
-            if (gameObject.TryGetComponent<WorldOffsetAnnotation>(out var worldOffsetAnnotation))
+            if (gameObject.TryGetEnabledComponent<WorldOffsetAnnotation>(out var worldOffsetAnnotation))
             {
                 return TransformPositionStrategy.GetScreenPointByWorldPosition(
                     gameObject,

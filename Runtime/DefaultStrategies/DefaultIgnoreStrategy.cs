@@ -2,6 +2,7 @@
 // This software is released under the MIT License.
 
 using TestHelper.Monkey.Annotations;
+using TestHelper.Monkey.Extensions;
 using UnityEngine;
 
 namespace TestHelper.Monkey.DefaultStrategies
@@ -20,7 +21,7 @@ namespace TestHelper.Monkey.DefaultStrategies
         /// <returns>True if GameObject is ignored</returns>
         public static bool IsIgnored(GameObject gameObject, ILogger verboseLogger = null)
         {
-            var hasIgnoreAnnotation = gameObject.TryGetComponent(typeof(IgnoreAnnotation), out _);
+            var hasIgnoreAnnotation = gameObject.TryGetEnabledComponent<IgnoreAnnotation>(out _);
             if (hasIgnoreAnnotation && verboseLogger != null)
             {
                 verboseLogger.Log($"Ignored {gameObject.name}({gameObject.GetInstanceID()}).");
