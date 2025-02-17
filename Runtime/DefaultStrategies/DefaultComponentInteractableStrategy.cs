@@ -1,4 +1,4 @@
-// Copyright (c) 2023-2024 Koji Hasegawa.
+// Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System.Linq;
@@ -27,6 +27,11 @@ namespace TestHelper.Monkey.DefaultStrategies
         /// <returns>True if this Component is interactable</returns>
         public static bool IsInteractable(Component component)
         {
+            if (component == null || (component is Behaviour behaviour && !behaviour.isActiveAndEnabled))
+            {
+                return false;
+            }
+
             // UI element
             var selectable = component as Selectable;
             if (selectable)
