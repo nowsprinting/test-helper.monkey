@@ -1,6 +1,7 @@
 // Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
+using System.Linq;
 using TestHelper.Monkey.Annotations;
 using TestHelper.Monkey.Extensions;
 using UnityEngine;
@@ -37,7 +38,7 @@ namespace TestHelper.Monkey.DefaultStrategies
         {
             if (gameObject.TryGetEnabledComponent<ScreenPositionAnnotation>(out var screenPositionAnnotation))
             {
-                return screenPositionAnnotation.position;
+                return screenPositionAnnotation.position * GetCanvasScale(gameObject);
             }
 
             if (gameObject.TryGetEnabledComponent<WorldPositionAnnotation>(out var worldPositionAnnotation))
@@ -50,7 +51,8 @@ namespace TestHelper.Monkey.DefaultStrategies
 
             if (gameObject.TryGetEnabledComponent<ScreenOffsetAnnotation>(out var screenOffsetAnnotation))
             {
-                return TransformPositionStrategy.GetScreenPoint(gameObject) + screenOffsetAnnotation.offset;
+                return TransformPositionStrategy.GetScreenPoint(gameObject) +
+                       screenOffsetAnnotation.offset * GetCanvasScale(gameObject);
             }
 
             if (gameObject.TryGetEnabledComponent<WorldOffsetAnnotation>(out var worldOffsetAnnotation))
@@ -62,6 +64,12 @@ namespace TestHelper.Monkey.DefaultStrategies
             }
 
             return TransformPositionStrategy.GetScreenPoint(gameObject);
+        }
+
+        private static float GetCanvasScale(GameObject gameObject)
+        {
+            var canvas = gameObject.GetComponentsInParent<Canvas>().FirstOrDefault(x => x.isRootCanvas);
+            return canvas == null ? 1f : canvas.scaleFactor;
         }
     }
 }
