@@ -404,11 +404,15 @@ GameObject `Target` is found, but not interactable.
 
 
 
-## Use in runtime code
+## Run on player build
 
-The "Define Constraints" is set to `UNITY_INCLUDE_TESTS || COM_NOWSPRINTING_TEST_HELPER_ENABLE` in this package's assembly definition files, so it is generally excluded from release builds.
+The "Define Constraints" is set to `UNITY_INCLUDE_TESTS || COM_NOWSPRINTING_TEST_HELPER_ENABLE` in this package's assembly definition files, so it is generally excluded from player builds.
 
-To use the feature in release builds, add `COM_NOWSPRINTING_TEST_HELPER_ENABLE` to the "Define Symbols" at build time.
+To use the feature in player builds, add `COM_NOWSPRINTING_TEST_HELPER_ENABLE` to the scripting symbols at build time.
+
+> [!TIP]  
+> How to set custom scripting symbols, see below:  
+> [Manual: Custom scripting symbols](https://docs.unity3d.com/Manual/custom-scripting-symbols.html)
 
 
 
