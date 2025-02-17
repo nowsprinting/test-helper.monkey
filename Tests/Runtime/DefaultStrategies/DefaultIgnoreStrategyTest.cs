@@ -15,7 +15,7 @@ namespace TestHelper.Monkey.DefaultStrategies
 
         [Test]
         [LoadScene(TestScene)]
-        public void IsIgnore_WithAnnotation_Ignored()
+        public void IsIgnored_WithAnnotation_Ignored()
         {
             var cube = GameObject.Find("Cube");
             cube.AddComponent<IgnoreAnnotation>();
@@ -25,7 +25,7 @@ namespace TestHelper.Monkey.DefaultStrategies
 
         [Test]
         [LoadScene(TestScene)]
-        public void IsIgnore_WithDisabledAnnotation_NotIgnored()
+        public void IsIgnored_WithDisabledAnnotation_NotIgnored()
         {
             var cube = GameObject.Find("Cube");
             var annotation = cube.AddComponent<IgnoreAnnotation>();
@@ -36,7 +36,7 @@ namespace TestHelper.Monkey.DefaultStrategies
 
         [Test]
         [LoadScene(TestScene)]
-        public void IsIgnore_WithoutAnnotation_NotIgnored()
+        public void IsIgnored_WithoutAnnotation_NotIgnored()
         {
             var cube = GameObject.Find("Cube");
             Assert.That(DefaultIgnoreStrategy.IsIgnored(cube), Is.False);
