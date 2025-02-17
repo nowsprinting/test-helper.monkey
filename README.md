@@ -91,19 +91,21 @@ Specify the character kind and length input into `InputField` with `InputFieldAn
 
 ##### ScreenOffsetAnnotation
 
-Specify the screen position offset on the screen space where Monkey operates.
+Specify the screen position offset where Monkey operators operates.
+Respects `CanvasScaler` but does not calculate the aspect ratio.
 
 ##### ScreenPositionAnnotation
 
-Specify the screen position where Monkey operates.
+Specify the screen position where Monkey operators operates.
+Respects `CanvasScaler` but does not calculate the aspect ratio.
 
 ##### WorldOffsetAnnotation
 
-Specify the screen position offset on world space where Monkey operates.
+Specify the world position offset where Monkey operators operates.
 
 ##### WorldPositionAnnotation
 
-Specify the world position where Monkey operates.
+Specify the world position where Monkey operators operates.
 
 
 
