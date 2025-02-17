@@ -5,6 +5,7 @@ using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using TestHelper.Monkey.Annotations;
+using TestHelper.Monkey.Extensions;
 using TestHelper.Monkey.Random;
 using TestHelper.Random;
 using UnityEngine;
@@ -57,8 +58,7 @@ namespace TestHelper.Monkey.Operators
             }
 
             Func<GameObject, RandomStringParameters> randomStringParams;
-            var annotation = component.gameObject.GetComponent<InputFieldAnnotation>();
-            if (annotation != null)
+            if (component.gameObject.TryGetEnabledComponent<InputFieldAnnotation>(out var annotation))
             {
                 // Overwrite rule if annotation is attached.
                 randomStringParams = _ => new RandomStringParameters(
