@@ -11,7 +11,7 @@ namespace TestHelper.Monkey.Annotations
     public sealed class ScreenPositionAnnotation : MonoBehaviour
     {
         /// <summary>
-        /// A screen position that where monkey operators operate on.
+        /// A screen position where monkey operators operate.
         /// It respects <c>CanvasScaler</c> but does not calculate the aspect ratio.
         /// </summary>
         [SerializeField]
