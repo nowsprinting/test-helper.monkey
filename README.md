@@ -65,9 +65,9 @@ Configurations in `MonkeyConfig`:
     - **SuperSize**: The factor to increase resolution with. Default is 1.
     - **StereoCaptureMode**: The eye texture to capture when stereo rendering is enabled. Default is `LeftEye`.
 - **IsInteractable**: Returns whether the `Component` is interactable or not. The default implementation returns true if the component is a uGUI compatible component and its `interactable` property is true.
-- **IsIgnored**: Returns whether the `GameObject` is ignored or not. The default implementation returns true if the `GameObject` has `IgnoreAnnotation` attached.
-- **IsReachable**: Returns whether the `GameObject` is reachable from the user or not. The default implementation returns true if it can raycast from `Camera.main` to the pivot position.
-- **Operators**: Collection of `IOperator` that the monkey invokes. Default is ClickOperator, ClickAndHoldOperator, and TextInputOperator. There is support for standard uGUI components.
+- **IgnoreStrategy**: Strategy to examine whether `GameObject` should be ignored. The default implementation returns true if the `GameObject` has `IgnoreAnnotation` attached.
+- **ReachableStrategy**: Strategy to examine whether `GameObject` is reachable from the user. The default implementation returns true if it can raycast from `Camera.main` to the pivot position.
+- **Operators**: Collection of `IOperator` that the monkey invokes. Default is `ClickOperator`, `ClickAndHoldOperator`, and `TextInputOperator`. There is support for standard uGUI components.
 
 
 #### Annotations for Monkey's behavior
@@ -256,17 +256,17 @@ Returns whether the `Component` is interactable or not.
 You should replace this when you want to control special components that comprise your game title.
 
 
-#### IsIgnored
+#### IgnoreStrategy
 
-Returns whether the `GameObject` is ignored or not.
+`IsIgnored()` method returns whether the `GameObject` is ignored or not.
 `DefaultIgnoreStrategy.IsIgnored()` returns true if the `GameObject` has `IgnoreAnnotation` attached.
 
 You should replace this when you want to ignore specific objects (e.g., by name and/or path) in your game title.
 
 
-#### IsReachable
+#### ReachableStrategy
 
-Returns whether the `GameObject` is reachable from the user or not.
+`IsReachable()` method returns whether the `GameObject` is reachable from the user or not.
 `DefaultReachableStrategy.IsReachable()` returns true if it can raycast from `Camera.main` to the pivot position.
 
 You should replace this when you want to customize the raycast point (e.g., randomize position, specify camera).

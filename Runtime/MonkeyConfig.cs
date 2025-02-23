@@ -7,7 +7,6 @@ using TestHelper.Monkey.DefaultStrategies;
 using TestHelper.Monkey.Operators;
 using TestHelper.Random;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace TestHelper.Monkey
 {
@@ -62,16 +61,16 @@ namespace TestHelper.Monkey
         public Func<Component, bool> IsInteractable { get; set; } = DefaultComponentInteractableStrategy.IsInteractable;
 
         /// <summary>
-        /// Function returns the <c>GameObject</c> is ignored or not.
+        /// Strategy to examine whether <c>GameObject</c> should be ignored.
+        /// <c>verboseLogger</c> will be overridden at runtime by the values of <c>Verbose</c> and <c>Logger</c>.
         /// </summary>
-        public Func<GameObject, ILogger, bool> IsIgnored { get; set; } = DefaultIgnoreStrategy.IsIgnored;
+        public IIgnoreStrategy IgnoreStrategy { get; set; } = new DefaultIgnoreStrategy();
 
         /// <summary>
-        /// Function returns the <c>GameObject</c> is reachable from user or not.
-        /// This function is include ScreenPointStrategy (GetScreenPoint function).
+        /// Strategy to examine whether <c>GameObject</c> is reachable from the user.
+        /// <c>verboseLogger</c> will be overridden at runtime by the values of <c>Verbose</c> and <c>Logger</c>.
         /// </summary>
-        public Func<GameObject, PointerEventData, List<RaycastResult>, ILogger, bool> IsReachable { get; set; } =
-            DefaultReachableStrategy.IsReachable;
+        public IReachableStrategy ReachableStrategy { get; set; } = new DefaultReachableStrategy();
 
         /// <summary>
         /// Operators that the monkey invokes.
@@ -82,5 +81,16 @@ namespace TestHelper.Monkey
             new UGUIClickAndHoldOperator(), // Specify screen click point strategy and hold millis, if necessary
             new UGUITextInputOperator(), // Specify random text input strategy, if necessary
         };
+
+        internal void ApplyVerboseLogger()
+        {
+            if (!Verbose)
+            {
+                return;
+            }
+
+            IgnoreStrategy.VerboseLogger = Logger;
+            ReachableStrategy.VerboseLogger = Logger;
+        }
     }
 }
