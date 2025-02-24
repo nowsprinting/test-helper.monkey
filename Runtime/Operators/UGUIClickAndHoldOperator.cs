@@ -5,7 +5,6 @@ using System;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using TestHelper.Monkey.DefaultStrategies;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -18,17 +17,14 @@ namespace TestHelper.Monkey.Operators
     public class UGUIClickAndHoldOperator : IClickAndHoldOperator
     {
         private readonly int _holdMillis;
-        private readonly Func<GameObject, Vector2> _getScreenPoint;
 
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="holdMillis">Hold time in milliseconds</param>
-        /// <param name="getScreenPoint">The function returns the screen click position. Default is <c>DefaultScreenPointStrategy.GetScreenPoint</c>.</param>
-        public UGUIClickAndHoldOperator(int holdMillis = 1000, Func<GameObject, Vector2> getScreenPoint = null)
+        public UGUIClickAndHoldOperator(int holdMillis = 1000)
         {
             this._holdMillis = holdMillis;
-            this._getScreenPoint = getScreenPoint ?? DefaultScreenPointStrategy.GetScreenPoint;
         }
 
         /// <inheritdoc />
@@ -45,7 +41,8 @@ namespace TestHelper.Monkey.Operators
         }
 
         /// <inheritdoc />
-        public async UniTask OperateAsync(Component component, CancellationToken cancellationToken = default)
+        public async UniTask OperateAsync(Component component, Vector2 position,
+            CancellationToken cancellationToken = default)
         {
             if (!(component is IPointerDownHandler downHandler) || !(component is IPointerUpHandler upHandler))
             {
@@ -54,7 +51,6 @@ namespace TestHelper.Monkey.Operators
 
             EventSystem.current.SetSelectedGameObject(component.gameObject);
 
-            var position = _getScreenPoint(component.gameObject);
             var eventData = new PointerEventData(EventSystem.current)
             {
                 pointerEnter = component.gameObject,

@@ -81,16 +81,5 @@ namespace TestHelper.Monkey
             new UGUIClickAndHoldOperator(), // Specify screen click point strategy and hold millis, if necessary
             new UGUITextInputOperator(), // Specify random text input strategy, if necessary
         };
-
-        internal void ApplyVerboseLogger()
-        {
-            if (!Verbose)
-            {
-                return;
-            }
-
-            IgnoreStrategy.VerboseLogger = Logger;
-            ReachableStrategy.VerboseLogger = Logger;
-        }
     }
 }

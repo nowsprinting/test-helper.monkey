@@ -53,8 +53,6 @@ namespace TestHelper.Monkey
 
             config.Logger.Log($"Using {config.Random}");
 
-            config.ApplyVerboseLogger();
-
             try
             {
                 while (Time.realtimeSinceStartup < endTime)
@@ -125,9 +123,8 @@ namespace TestHelper.Monkey
             CancellationToken cancellationToken = default)
         {
             var lotteryEntries = GetLotteryEntries(interactableComponentsFinder, verbose ? logger : null);
-            var (selectedComponent, selectedOperator) =
-                LotteryOperator(lotteryEntries.ToList(), random, ignoreStrategy, reachableStrategy,
-                    verbose ? logger : null);
+            var (selectedComponent, selectedOperator, position) =
+                LotteryOperator(lotteryEntries, random, ignoreStrategy, reachableStrategy, verbose ? logger : null);
             if (selectedComponent == null || selectedOperator == null)
             {
                 return false;
@@ -143,7 +140,7 @@ namespace TestHelper.Monkey
 
             logger.Log(builder.ToString());
 
-            await selectedOperator.OperateAsync(selectedComponent, cancellationToken);
+            await selectedOperator.OperateAsync(selectedComponent, position, cancellationToken);
             return true;
         }
 
@@ -182,7 +179,7 @@ namespace TestHelper.Monkey
             verboseLogger.Log(lotteryEntries.ToString());
         }
 
-        internal static (Component, IOperator) LotteryOperator(
+        internal static (Component, IOperator, Vector2) LotteryOperator(
             IEnumerable<(Component, IOperator)> operators,
             IRandom random,
             IIgnoreStrategy ignoreStrategy,
@@ -190,22 +187,21 @@ namespace TestHelper.Monkey
             ILogger verboseLogger = null)
         {
             var operatorList = operators.ToList();
-            reachableStrategy.ResetPointerEventData(); // Reset the EventSystem.current since it may be changing.
 
             while (operatorList.Count > 0)
             {
                 var (selectedComponent, selectedOperator) = operatorList[random.Next(operatorList.Count)];
-                if (!ignoreStrategy.IsIgnored(selectedComponent.gameObject) &&
-                    reachableStrategy.IsReachable(selectedComponent.gameObject))
+                if (!ignoreStrategy.IsIgnored(selectedComponent.gameObject, verboseLogger) &&
+                    reachableStrategy.IsReachable(selectedComponent.gameObject, out var position, verboseLogger))
                 {
-                    return (selectedComponent, selectedOperator);
+                    return (selectedComponent, selectedOperator, position);
                 }
 
                 operatorList.Remove((selectedComponent, selectedOperator));
             }
 
             verboseLogger?.Log("Lottery entries are empty or all of not reachable.");
-            return (null, null);
+            return (null, null, default);
         }
 
         private static async UniTask TakeScreenshotAsync(ScreenshotOptions screenshotOptions, string filename)

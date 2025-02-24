@@ -36,7 +36,7 @@ namespace TestHelper.Monkey.Annotations
                 // Without no position annotations, IsReachable() is always false because
                 // gameObject.transform.position is not in the mesh. So IsReachable() is true means
                 // the position annotation work well
-                Assert.That(new DefaultReachableStrategy().IsReachable(target), Is.True);
+                Assert.That(new DefaultReachableStrategy().IsReachable(target, out _), Is.True);
             }
 
             [TestCaseSource(nameof(s_annotations))]
@@ -47,7 +47,7 @@ namespace TestHelper.Monkey.Annotations
                 var annotation = target.GetComponents<MonoBehaviour>().First(x => x.GetType().Name.Equals(name));
                 annotation.enabled = false;
 
-                Assert.That(new DefaultReachableStrategy().IsReachable(target), Is.False);
+                Assert.That(new DefaultReachableStrategy().IsReachable(target, out _), Is.False);
             }
         }
 
@@ -71,7 +71,7 @@ namespace TestHelper.Monkey.Annotations
                 var target = GameObject.Find(name);
 
                 var sut = new DefaultReachableStrategy(verboseLogger: Debug.unityLogger);
-                Assert.That(sut.IsReachable(target), Is.True);
+                Assert.That(sut.IsReachable(target, out _), Is.True);
                 // The offset/position is within the GameObject's rect on XGA display.
                 // If the annotation's properties don't consider CanvasScaler, the specified position will be outside the GameObject's rect on VGA display.
                 // Then IsReachable will return false.

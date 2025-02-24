@@ -32,8 +32,9 @@ namespace TestHelper.Monkey.Operators
         /// If you want to add parameters for execution outside of monkey tests, define a sub-interface (e.g., <c>ITextInputOperator</c>).
         /// </remarks>
         /// <param name="component">Target component</param>
+        /// <param name="position">Screen position of starting operation. Usually, this is the position through which the raycast passes.</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        UniTask OperateAsync(Component component, CancellationToken cancellationToken = default);
+        UniTask OperateAsync(Component component, Vector2 position, CancellationToken cancellationToken = default);
     }
 }

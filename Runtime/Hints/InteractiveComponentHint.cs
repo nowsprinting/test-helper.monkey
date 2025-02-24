@@ -81,6 +81,8 @@ namespace TestHelper.Monkey.Hints
         private readonly Dictionary<(Vector3, Vector3), HashSet<GameObject>> _tmpReallyInteractives =
             new Dictionary<(Vector3, Vector3), HashSet<GameObject>>();
 
+        private readonly IReachableStrategy _reachableStrategy = new DefaultReachableStrategy();
+
         private void Start()
         {
             Refresh();
@@ -101,7 +103,7 @@ namespace TestHelper.Monkey.Hints
             var interactiveComponentCollector = new InteractableComponentsFinder();
             foreach (var component in interactiveComponentCollector.FindInteractableComponents())
             {
-                var dst = DefaultReachableStrategy.IsReachable(component.gameObject)
+                var dst = _reachableStrategy.IsReachable(component.gameObject, out _)
                     ? _tmpReallyInteractives
                     : _tmpNotReallyInteractives;
 

@@ -1,8 +1,7 @@
-// Copyright (c) 2023-2024 Koji Hasegawa.
+// Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -10,7 +9,6 @@ using TestHelper.Monkey.DefaultStrategies;
 using TestHelper.Monkey.Extensions;
 using UnityEngine;
 using UnityEngine.Assertions;
-using UnityEngine.EventSystems;
 
 namespace TestHelper.Monkey
 {
@@ -20,10 +18,8 @@ namespace TestHelper.Monkey
     public class GameObjectFinder
     {
         private readonly double _timeoutSeconds;
-        private readonly Func<GameObject, PointerEventData, List<RaycastResult>, ILogger, bool> _isReachable;
+        private readonly IReachableStrategy _reachableStrategy;
         private readonly Func<Component, bool> _isComponentInteractable;
-        private readonly List<RaycastResult> _results = new List<RaycastResult>();
-        private readonly ILogger _verboseLogger;
 
         private const double MinTimeoutSeconds = 0.01d;
         private const double MaxPollingIntervalSeconds = 1.0d;
@@ -32,23 +28,18 @@ namespace TestHelper.Monkey
         /// Constructor.
         /// </summary>
         /// <param name="timeoutSeconds">Seconds to wait until <c>GameObject</c> appear.</param>
-        /// <param name="isReachable">The function returns the <c>GameObject</c> is reachable from user or not.
-        /// Default is <c>DefaultReachableStrategy.IsReachable</c>.</param>
-        /// <param name="isComponentInteractable">The function returns the <c>Component</c> is interactable or not.
-        /// Default is <c>DefaultComponentInteractableStrategy.IsInteractable</c>.</param>
-        /// <param name="verboseLogger">Logger used in <paramref name="isReachable"/>, set if you need output</param>
+        /// <param name="reachableStrategy">Strategy to examine whether <c>GameObject</c> is reachable from the user. Default is <c>DefaultReachableStrategy</c>.</param>
+        /// <param name="isComponentInteractable">The function returns the <c>Component</c> is interactable or not. Default is <c>DefaultComponentInteractableStrategy.IsInteractable</c>.</param>
         public GameObjectFinder(double timeoutSeconds = 1.0d,
-            Func<GameObject, PointerEventData, List<RaycastResult>, ILogger, bool> isReachable = null,
-            Func<Component, bool> isComponentInteractable = null,
-            ILogger verboseLogger = null)
+            IReachableStrategy reachableStrategy = null,
+            Func<Component, bool> isComponentInteractable = null)
         {
             Assert.IsTrue(timeoutSeconds > MinTimeoutSeconds,
                 $"TimeoutSeconds must be greater than {MinTimeoutSeconds}.");
 
             _timeoutSeconds = timeoutSeconds;
-            _isReachable = isReachable ?? DefaultReachableStrategy.IsReachable;
+            _reachableStrategy = reachableStrategy ?? new DefaultReachableStrategy();
             _isComponentInteractable = isComponentInteractable ?? DefaultComponentInteractableStrategy.IsInteractable;
-            _verboseLogger = verboseLogger;
         }
 
         private enum Reason
@@ -75,7 +66,7 @@ namespace TestHelper.Monkey
                 return (null, Reason.NotMatchPath);
             }
 
-            if (reachable && !_isReachable.Invoke(foundObject, null, _results, _verboseLogger))
+            if (reachable && !_reachableStrategy.IsReachable(foundObject, out _))
             {
                 return (null, Reason.NotReachable);
             }
@@ -126,14 +117,14 @@ namespace TestHelper.Monkey
         }
 
         /// <summary>
-        /// Find GameObject by name (wait until they appear).
+        /// Find <c>GameObject</c> by name (wait until they appear).
         /// </summary>
-        /// <param name="name">Find GameObject name</param>
+        /// <param name="name">Find <c>GameObject</c> name</param>
         /// <param name="reachable">Find only reachable object</param>
         /// <param name="interactable">Find only interactable object</param>
         /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Found GameObject</returns>
-        /// <exception cref="TimeoutException">Throws if GameObject is not found</exception>
+        /// <returns>Found <c>GameObject</c></returns>
+        /// <exception cref="TimeoutException">Throws if <c>GameObject</c> is not found</exception>
         public async UniTask<GameObject> FindByNameAsync(string name, bool reachable = true, bool interactable = false,
             CancellationToken cancellationToken = default)
         {
@@ -141,15 +132,15 @@ namespace TestHelper.Monkey
         }
 
         /// <summary>
-        /// Find GameObject by path (wait until they appear).
+        /// Find <c>GameObject</c> by path (wait until they appear).
         /// </summary>
-        /// <seealso href="https://en.wikipedia.org/wiki/Glob_(programming)"/>
-        /// <param name="path">Find GameObject hierarchy path separated by `/`. Can specify glob pattern</param>
+        /// <param name="path">Find <c>GameObject</c> hierarchy path separated by `/`. Can specify glob pattern</param>
         /// <param name="reachable">Find only reachable object</param>
         /// <param name="interactable">Find only interactable object</param>
         /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Found GameObject</returns>
-        /// <exception cref="TimeoutException">Throws if GameObject is not found</exception>
+        /// <returns>Found <c>GameObject</c></returns>
+        /// <exception cref="TimeoutException">Throws if <c>GameObject</c> is not found</exception>
+        /// <seealso href="https://en.wikipedia.org/wiki/Glob_(programming)"/>
         public async UniTask<GameObject> FindByPathAsync(string path, bool reachable = true, bool interactable = false,
             CancellationToken cancellationToken = default)
         {

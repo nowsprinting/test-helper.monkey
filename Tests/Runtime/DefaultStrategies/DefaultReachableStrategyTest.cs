@@ -48,7 +48,7 @@ namespace TestHelper.Monkey.DefaultStrategies
             public async Task IsReachable_Reachable(string target)
             {
                 var gameObject = await _finder.FindByNameAsync(target, reachable: false);
-                Assert.That(new DefaultReachableStrategy().IsReachable(gameObject), Is.True);
+                Assert.That(new DefaultReachableStrategy().IsReachable(gameObject, out _), Is.True);
             }
 
             [TestCase("OutOfSight")]
@@ -57,7 +57,7 @@ namespace TestHelper.Monkey.DefaultStrategies
             public async Task IsReachable_NotReachable(string target)
             {
                 var gameObject = await _finder.FindByNameAsync(target, reachable: false);
-                Assert.That(new DefaultReachableStrategy().IsReachable(gameObject), Is.False);
+                Assert.That(new DefaultReachableStrategy().IsReachable(gameObject, out _), Is.False);
             }
         }
 
@@ -84,7 +84,7 @@ namespace TestHelper.Monkey.DefaultStrategies
             public async Task IsReachable_Reachable(string target)
             {
                 var gameObject = await _finder.FindByNameAsync(target, reachable: false);
-                Assert.That(new DefaultReachableStrategy().IsReachable(gameObject), Is.True);
+                Assert.That(new DefaultReachableStrategy().IsReachable(gameObject, out _), Is.True);
             }
 
             [TestCase("OutOfSight")]
@@ -92,7 +92,7 @@ namespace TestHelper.Monkey.DefaultStrategies
             public async Task IsReachable_NotReachable(string target)
             {
                 var gameObject = await _finder.FindByNameAsync(target, reachable: false);
-                Assert.That(new DefaultReachableStrategy().IsReachable(gameObject), Is.False);
+                Assert.That(new DefaultReachableStrategy().IsReachable(gameObject, out _), Is.False);
             }
         }
 
@@ -110,7 +110,7 @@ namespace TestHelper.Monkey.DefaultStrategies
                 cube.transform.position = new Vector3(0, 0, 0);
 
                 var gameObject = await _finder.FindByNameAsync("Cube", reachable: false);
-                Assert.That(new DefaultReachableStrategy().IsReachable(gameObject), Is.False);
+                Assert.That(new DefaultReachableStrategy().IsReachable(gameObject, out _), Is.False);
                 LogAssert.Expect(LogType.Error, "EventSystem is not found.");
             }
         }
@@ -129,7 +129,7 @@ namespace TestHelper.Monkey.DefaultStrategies
                 var gameObject = await _finder.FindByNameAsync(target, reachable: false);
                 var spyLogger = new SpyLogger();
                 var sut = new DefaultReachableStrategy(verboseLogger: spyLogger);
-                var actual = sut.IsReachable(gameObject);
+                var actual = sut.IsReachable(gameObject, out _);
                 Assume.That(actual, Is.True);
 
                 Assert.That(spyLogger.Messages, Is.Empty);
@@ -142,7 +142,7 @@ namespace TestHelper.Monkey.DefaultStrategies
                 var gameObject = await _finder.FindByNameAsync("OutOfSight", reachable: false);
                 var spyLogger = new SpyLogger();
                 var sut = new DefaultReachableStrategy(verboseLogger: spyLogger);
-                var actual = sut.IsReachable(gameObject);
+                var actual = sut.IsReachable(gameObject, out _);
                 Assume.That(actual, Is.False);
 
                 Assert.That(spyLogger.Messages, Has.Count.EqualTo(1));
@@ -158,7 +158,7 @@ namespace TestHelper.Monkey.DefaultStrategies
                 var gameObject = await _finder.FindByNameAsync("BehindTheWall", reachable: false);
                 var spyLogger = new SpyLogger();
                 var sut = new DefaultReachableStrategy(verboseLogger: spyLogger);
-                var actual = sut.IsReachable(gameObject);
+                var actual = sut.IsReachable(gameObject, out _);
                 Assume.That(actual, Is.False);
 
                 Assert.That(spyLogger.Messages, Has.Count.EqualTo(1));
@@ -178,7 +178,7 @@ namespace TestHelper.Monkey.DefaultStrategies
                 var gameObject = await _finder.FindByNameAsync("OutOfSight", reachable: false);
                 var spyLogger = new SpyLogger();
                 var sut = new DefaultReachableStrategy(verboseLogger: spyLogger);
-                var actual = sut.IsReachable(gameObject);
+                var actual = sut.IsReachable(gameObject, out _);
                 Assume.That(actual, Is.False);
 
                 Assert.That(spyLogger.Messages, Has.Count.EqualTo(1));

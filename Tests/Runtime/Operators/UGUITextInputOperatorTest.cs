@@ -34,7 +34,7 @@ namespace TestHelper.Monkey.Operators
             var component = new GameObject().AddComponent<InputField>();
 
             Assume.That(_sut.CanOperate(component), Is.True);
-            _sut.OperateAsync(component);
+            _sut.OperateAsync(component, default(Vector2));
 
             Assert.That(component.text, Is.EqualTo("RANDOM"));
         }
@@ -56,7 +56,7 @@ namespace TestHelper.Monkey.Operators
             var component = new GameObject().AddComponent<TMP_InputField>();
 
             Assume.That(_sut.CanOperate(component), Is.True);
-            _sut.OperateAsync(component);
+            _sut.OperateAsync(component, default(Vector2));
 
             Assert.That(component.text, Is.EqualTo("RANDOM"));
         }

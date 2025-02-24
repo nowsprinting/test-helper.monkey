@@ -7,33 +7,17 @@ namespace TestHelper.Monkey.DefaultStrategies
 {
     /// <summary>
     /// Strategy to examine whether <c>GameObject</c> is reachable from the user.
-    /// You should replace this when you want to customize the raycast point (e.g., randomize position, specify camera).
+    /// You should implement this when you want to customize the raycast point (e.g., randomize position, specify camera).
     /// </summary>
     public interface IReachableStrategy
     {
         /// <summary>
-        /// Logger set if you need verbose output.
-        /// </summary>
-        ILogger VerboseLogger { set; }
-
-        /// <summary>
-        /// Resets the <c>PointerEventData</c> instance it holds, including the <c>EventSystem</c> instance.
-        /// </summary>
-        void ResetPointerEventData();
-
-        /// <summary>
         /// Returns whether the <c>GameObject</c> is reachable from the user or not and screen position.
         /// </summary>
-        /// <param name="gameObject"></param>
-        /// <returns>True if <c>GameObject</c> is reachable from user, Raycast screen position</returns>
-        (bool, Vector2) IsReachableScreenPosition(GameObject gameObject);
-
-        /// <summary>
-        /// Returns whether the <c>GameObject</c> is reachable from the user or not.
-        /// (without screen position)
-        /// </summary>
-        /// <param name="gameObject"></param>
-        /// <returns>True if <c>GameObject</c> is reachable from user</returns>
-        bool IsReachable(GameObject gameObject);
+        /// <param name="gameObject">Target <c>GameObject</c></param>
+        /// <param name="position">Returns raycast screen position</param>
+        /// <param name="verboseLogger">Logger set if you need verbose output</param>
+        /// <returns>True if <c>GameObject</c> is reachable from user, and set <c>position</c></returns>
+        bool IsReachable(GameObject gameObject, out Vector2 position, ILogger verboseLogger = null);
     }
 }

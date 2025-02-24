@@ -15,35 +15,20 @@ namespace TestHelper.Monkey.DefaultStrategies
     /// </summary>
     public class DefaultReachableStrategy : IReachableStrategy
     {
-        private static Func<GameObject, Vector2> GetScreenPoint => DefaultScreenPointStrategy.GetScreenPoint;
+        [Obsolete] private static Func<GameObject, Vector2> GetScreenPoint => DefaultScreenPointStrategy.GetScreenPoint;
 
-        private PointerEventData _pointerEventData;
-        private readonly List<RaycastResult> _results;
-        private ILogger _verboseLogger;
-
-        /// <inheritdoc/>
-        public ILogger VerboseLogger
-        {
-            set
-            {
-                _verboseLogger = value;
-            }
-        }
-
-        /// <inheritdoc/>
-        public void ResetPointerEventData()
-        {
-            _pointerEventData = new PointerEventData(EventSystem.current);
-        }
+        private readonly Func<GameObject, Vector2> _getScreenPoint;
+        private readonly ILogger _verboseLogger;
+        private readonly List<RaycastResult> _results = new List<RaycastResult>();
 
         /// <summary>
         /// Constructor.
         /// </summary>
+        /// <param name="getScreenPoint">Function returns the screen position of <c>GameObject</c></param>
         /// <param name="verboseLogger">Logger set if you need verbose output</param>
-        public DefaultReachableStrategy(ILogger verboseLogger = null)
+        public DefaultReachableStrategy(Func<GameObject, Vector2> getScreenPoint = null, ILogger verboseLogger = null)
         {
-            ResetPointerEventData();
-            _results = new List<RaycastResult>();
+            _getScreenPoint = getScreenPoint ?? DefaultScreenPointStrategy.GetScreenPoint;
             _verboseLogger = verboseLogger;
         }
 
@@ -51,35 +36,41 @@ namespace TestHelper.Monkey.DefaultStrategies
         /// Returns whether the <c>GameObject</c> is reachable from the user or not and screen position.
         /// Default implementation uses <c>DefaultScreenPointStrategy</c>, checks whether a raycast from <c>Camera.main</c> to the pivot position passes through.
         /// </summary>
-        /// <param name="gameObject"></param>
+        /// <param name="gameObject">Target <c>GameObject</c></param>
+        /// <param name="position">Returns raycast screen position</param>
+        /// <param name="verboseLogger">Logger set if you need verbose output</param>
         /// <returns>True if <c>GameObject</c> is reachable from user, Raycast screen position</returns>
-        public (bool, Vector2) IsReachableScreenPosition(GameObject gameObject)
+        public bool IsReachable(GameObject gameObject, out Vector2 position, ILogger verboseLogger = null)
         {
+            verboseLogger = verboseLogger ?? _verboseLogger; // If null, use the specified in the constructor.
+
             if (EventSystem.current == null)
             {
                 Debug.LogError("EventSystem is not found.");
-                return (false, _pointerEventData.position);
+                position = default;
+                return false;
             }
 
-            _pointerEventData.position = GetScreenPoint.Invoke(gameObject);
-            _results.Clear();
-            EventSystem.current.RaycastAll(_pointerEventData, _results);
+            position = _getScreenPoint.Invoke(gameObject);
+
+            var pointerEventData = new PointerEventData(EventSystem.current) { position = position };
+            EventSystem.current.RaycastAll(pointerEventData, _results);
             if (_results.Count == 0)
             {
-                if (_verboseLogger != null)
+                if (verboseLogger != null)
                 {
-                    var message = new StringBuilder(CreateMessage(gameObject, _pointerEventData.position));
+                    var message = new StringBuilder(CreateMessage(gameObject, pointerEventData.position));
                     message.Append(" Raycast is not hit.");
-                    _verboseLogger.Log(message.ToString());
+                    verboseLogger.Log(message.ToString());
                 }
 
-                return (false, _pointerEventData.position);
+                return false;
             }
 
             var isSameOrChildObject = IsSameOrChildObject(gameObject, _results[0].gameObject.transform);
-            if (!isSameOrChildObject && _verboseLogger != null)
+            if (!isSameOrChildObject && verboseLogger != null)
             {
-                var message = new StringBuilder(CreateMessage(gameObject, _pointerEventData.position));
+                var message = new StringBuilder(CreateMessage(gameObject, pointerEventData.position));
                 message.Append(" Raycast hit other objects: {");
                 foreach (var result in _results)
                 {
@@ -89,17 +80,10 @@ namespace TestHelper.Monkey.DefaultStrategies
 
                 message.Remove(message.Length - 2, 2);
                 message.Append("}");
-                _verboseLogger.Log(message.ToString());
+                verboseLogger.Log(message.ToString());
             }
 
-            return (isSameOrChildObject, _pointerEventData.position);
-        }
-
-        /// <inheritdoc/>
-        public bool IsReachable(GameObject gameObject)
-        {
-            var (reachable, _) = IsReachableScreenPosition(gameObject);
-            return reachable;
+            return isSameOrChildObject;
         }
 
         /// <summary>
