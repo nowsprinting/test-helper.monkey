@@ -229,6 +229,18 @@ public class MyIntegrationTest
 
 
 
+### Editor Extensions
+
+#### Copy Hierarchy Path to Clipboard
+
+Select any `GameObject` in the Hierarchy window and right-click to open the context menu, then select **Copy to Clipboard > Hierarchy Path**.
+
+#### Copy Instance ID to Clipboard
+
+Select any `GameObject` in the Hierarchy window and right-click to open the context menu, then select **Copy to Clipboard > Instance ID**.
+
+
+
 ## Customization
 
 ### Functions for the strategy pattern
