@@ -48,11 +48,19 @@ namespace TestHelper.Monkey.Operators
                 throw new ArgumentException("Component must implement IPointerClickHandler.");
             }
 
+            EventSystem.current.SetSelectedGameObject(component.gameObject);
+
+            var position = _getScreenPoint(component.gameObject);
             var eventData = new PointerEventData(EventSystem.current)
             {
-                position = _getScreenPoint(component.gameObject),
+                pointerEnter = component.gameObject,
+                pointerPress = component.gameObject,
+                pointerClick = component.gameObject,
+                position = position,
+                pressPosition = position,
                 clickCount = 1,
                 button = PointerEventData.InputButton.Left,
+                // Note: Strictly, set rawPointerPress, pointerCurrentRaycast, and pointerPressRaycast to RaycastResults[0]
             };
             handler.OnPointerClick(eventData);
         }

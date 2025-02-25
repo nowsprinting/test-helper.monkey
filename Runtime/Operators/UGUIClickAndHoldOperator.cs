@@ -52,22 +52,31 @@ namespace TestHelper.Monkey.Operators
                 throw new ArgumentException("Component must implement IPointerDownHandler and IPointerUpHandler.");
             }
 
+            EventSystem.current.SetSelectedGameObject(component.gameObject);
+
+            var position = _getScreenPoint(component.gameObject);
             var eventData = new PointerEventData(EventSystem.current)
             {
-                position = _getScreenPoint(component.gameObject),
-                clickCount = 1,
-                button = PointerEventData.InputButton.Left,
+                pointerEnter = component.gameObject,
+                pointerPress = component.gameObject,
+                position = position,
+                pressPosition = position,
+                clickCount = 0,
+                // Note: Strictly, set rawPointerPress, pointerCurrentRaycast, and pointerPressRaycast to raycastResults[0]
             };
             downHandler.OnPointerDown(eventData);
 
             await UniTask.Delay(TimeSpan.FromMilliseconds(_holdMillis), ignoreTimeScale: true,
                 cancellationToken: cancellationToken);
 
-            if (component == null || component.gameObject == null)
+            if (component == null || CanOperate(component) == false)
             {
                 return;
             }
 
+            eventData.pointerClick = component.gameObject;
+            eventData.clickCount = 1;
+            eventData.button = PointerEventData.InputButton.Left;
             upHandler.OnPointerUp(eventData);
         }
     }
