@@ -203,7 +203,7 @@ namespace TestHelper.Monkey
         /// </summary>
         [Obsolete]
         public void TextInput() => GetOperatorsByType<ITextInputOperator>().First()
-            .OperateAsync(component, default(Vector2));
+            .OperateAsync(component, default(RaycastResult));
 
         /// <summary>
         /// Input specified text.

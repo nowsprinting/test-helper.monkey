@@ -29,7 +29,7 @@ namespace TestHelper.Monkey.Operators
         }
 
         /// <inheritdoc />
-        public async UniTask OperateAsync(Component component, Vector2 position,
+        public async UniTask OperateAsync(Component component, RaycastResult raycastResult,
             CancellationToken cancellationToken = default)
         {
             if (!(component is IPointerClickHandler handler))
@@ -41,16 +41,23 @@ namespace TestHelper.Monkey.Operators
 
             var eventData = new PointerEventData(EventSystem.current)
             {
-                pointerEnter = component.gameObject,
+                pointerCurrentRaycast = raycastResult,
+                pointerPressRaycast = raycastResult,
+                rawPointerPress = raycastResult.gameObject,
+                displayIndex = raycastResult.displayIndex,
+                position = raycastResult.screenPosition,
+                pressPosition = raycastResult.screenPosition,
                 pointerPress = component.gameObject,
 #if UNITY_2020_3_OR_NEWER
                 pointerClick = component.gameObject,
 #endif
-                position = position,
-                pressPosition = position,
-                clickCount = 1,
+#if !UNITY_EDITOR && (UNITY_IOS || UNITY_ANDROID)
+                pointerId = 0, // Touchscreen touches go from 0
+#else
+                pointerId = -1, // Mouse left button
+#endif
                 button = PointerEventData.InputButton.Left,
-                // Note: Strictly, set rawPointerPress, pointerCurrentRaycast, and pointerPressRaycast to RaycastResults[0]
+                clickCount = 1,
             };
             handler.OnPointerClick(eventData);
         }

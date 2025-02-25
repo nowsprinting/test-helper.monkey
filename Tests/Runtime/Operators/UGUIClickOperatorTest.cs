@@ -28,9 +28,10 @@ namespace TestHelper.Monkey.Operators
         {
             var component = new GameObject("ClickTarget").AddComponent<SpyOnPointerClickHandler>();
             var position = TransformPositionStrategy.GetScreenPoint(component.gameObject);
+            var raycastResult = new RaycastResult { screenPosition = position };
 
             Assume.That(_sut.CanOperate(component), Is.True);
-            _sut.OperateAsync(component, position);
+            _sut.OperateAsync(component, raycastResult);
 
             LogAssert.Expect(LogType.Log, "ClickTarget.OnPointerClick");
         }
@@ -41,9 +42,10 @@ namespace TestHelper.Monkey.Operators
             var receiver = new GameObject("ClickTarget").AddComponent<SpyPointerClickEventReceiver>();
             var component = receiver.gameObject.GetComponent<EventTrigger>();
             var position = TransformPositionStrategy.GetScreenPoint(component.gameObject);
+            var raycastResult = new RaycastResult { screenPosition = position };
 
             Assume.That(_sut.CanOperate(component), Is.True);
-            _sut.OperateAsync(component, position);
+            _sut.OperateAsync(component, raycastResult);
 
             LogAssert.Expect(LogType.Log, "ClickTarget.ReceivePointerClick");
         }

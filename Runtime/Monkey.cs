@@ -13,6 +13,7 @@ using TestHelper.Monkey.Operators;
 using TestHelper.Random;
 using TestHelper.RuntimeInternals;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace TestHelper.Monkey
 {
@@ -123,7 +124,7 @@ namespace TestHelper.Monkey
             CancellationToken cancellationToken = default)
         {
             var lotteryEntries = GetLotteryEntries(interactableComponentsFinder, verbose ? logger : null);
-            var (selectedComponent, selectedOperator, position) =
+            var (selectedComponent, selectedOperator, raycastResult) =
                 LotteryOperator(lotteryEntries, random, ignoreStrategy, reachableStrategy, verbose ? logger : null);
             if (selectedComponent == null || selectedOperator == null)
             {
@@ -140,7 +141,7 @@ namespace TestHelper.Monkey
 
             logger.Log(builder.ToString());
 
-            await selectedOperator.OperateAsync(selectedComponent, position, cancellationToken);
+            await selectedOperator.OperateAsync(selectedComponent, raycastResult, cancellationToken);
             return true;
         }
 
@@ -179,7 +180,7 @@ namespace TestHelper.Monkey
             verboseLogger.Log(lotteryEntries.ToString());
         }
 
-        internal static (Component, IOperator, Vector2) LotteryOperator(
+        internal static (Component, IOperator, RaycastResult) LotteryOperator(
             IEnumerable<(Component, IOperator)> operators,
             IRandom random,
             IIgnoreStrategy ignoreStrategy,
@@ -192,9 +193,9 @@ namespace TestHelper.Monkey
             {
                 var (selectedComponent, selectedOperator) = operatorList[random.Next(operatorList.Count)];
                 if (!ignoreStrategy.IsIgnored(selectedComponent.gameObject, verboseLogger) &&
-                    reachableStrategy.IsReachable(selectedComponent.gameObject, out var position, verboseLogger))
+                    reachableStrategy.IsReachable(selectedComponent.gameObject, out var raycastResult, verboseLogger))
                 {
-                    return (selectedComponent, selectedOperator, position);
+                    return (selectedComponent, selectedOperator, raycastResult);
                 }
 
                 operatorList.Remove((selectedComponent, selectedOperator));

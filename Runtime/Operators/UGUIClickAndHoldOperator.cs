@@ -41,7 +41,7 @@ namespace TestHelper.Monkey.Operators
         }
 
         /// <inheritdoc />
-        public async UniTask OperateAsync(Component component, Vector2 position,
+        public async UniTask OperateAsync(Component component, RaycastResult raycastResult,
             CancellationToken cancellationToken = default)
         {
             if (!(component is IPointerDownHandler downHandler) || !(component is IPointerUpHandler upHandler))
@@ -53,12 +53,21 @@ namespace TestHelper.Monkey.Operators
 
             var eventData = new PointerEventData(EventSystem.current)
             {
-                pointerEnter = component.gameObject,
+                pointerCurrentRaycast = raycastResult,
+                pointerPressRaycast = raycastResult,
+                rawPointerPress = raycastResult.gameObject,
+                displayIndex = raycastResult.displayIndex,
+                position = raycastResult.screenPosition,
+                pressPosition = raycastResult.screenPosition,
                 pointerPress = component.gameObject,
-                position = position,
-                pressPosition = position,
-                clickCount = 0,
-                // Note: Strictly, set rawPointerPress, pointerCurrentRaycast, and pointerPressRaycast to raycastResults[0]
+                // Note: pointerClick is not set here because it is not yet clicked
+#if !UNITY_EDITOR && (UNITY_IOS || UNITY_ANDROID)
+                pointerId = 0, // Touchscreen touches go from 0
+#else
+                pointerId = -1, // Mouse left button
+#endif
+                button = PointerEventData.InputButton.Left,
+                clickCount = 0, // Note: not yet clicked
             };
             downHandler.OnPointerDown(eventData);
 
@@ -74,7 +83,6 @@ namespace TestHelper.Monkey.Operators
             eventData.pointerClick = component.gameObject;
 #endif
             eventData.clickCount = 1;
-            eventData.button = PointerEventData.InputButton.Left;
             upHandler.OnPointerUp(eventData);
         }
     }

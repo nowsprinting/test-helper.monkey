@@ -21,6 +21,9 @@ namespace TestHelper.Monkey.DefaultStrategies
         private readonly ILogger _verboseLogger;
         private readonly List<RaycastResult> _results = new List<RaycastResult>();
 
+        private PointerEventData _cachedPointerEventData;
+        private int _cachedFrameCount;
+
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -37,23 +40,23 @@ namespace TestHelper.Monkey.DefaultStrategies
         /// Default implementation uses <c>DefaultScreenPointStrategy</c>, checks whether a raycast from <c>Camera.main</c> to the pivot position passes through.
         /// </summary>
         /// <param name="gameObject">Target <c>GameObject</c></param>
-        /// <param name="position">Returns raycast screen position</param>
+        /// <param name="raycastResult">Returns the front-most raycast hit result, even if it can not handle the press event</param>
         /// <param name="verboseLogger">Logger set if you need verbose output</param>
         /// <returns>True if <c>GameObject</c> is reachable from user, Raycast screen position</returns>
-        public bool IsReachable(GameObject gameObject, out Vector2 position, ILogger verboseLogger = null)
+        public bool IsReachable(GameObject gameObject, out RaycastResult raycastResult, ILogger verboseLogger = null)
         {
             verboseLogger = verboseLogger ?? _verboseLogger; // If null, use the specified in the constructor.
 
             if (EventSystem.current == null)
             {
                 Debug.LogError("EventSystem is not found.");
-                position = default;
+                raycastResult = default;
                 return false;
             }
 
-            position = _getScreenPoint.Invoke(gameObject);
+            var pointerEventData = GetCachedPointerEventData();
+            pointerEventData.position = _getScreenPoint.Invoke(gameObject);
 
-            var pointerEventData = new PointerEventData(EventSystem.current) { position = position };
             EventSystem.current.RaycastAll(pointerEventData, _results);
             if (_results.Count == 0)
             {
@@ -64,6 +67,7 @@ namespace TestHelper.Monkey.DefaultStrategies
                     verboseLogger.Log(message.ToString());
                 }
 
+                raycastResult = default;
                 return false;
             }
 
@@ -74,7 +78,7 @@ namespace TestHelper.Monkey.DefaultStrategies
                 message.Append(" Raycast hit other objects: {");
                 foreach (var result in _results)
                 {
-                    message.Append(result.gameObject.name);
+                    message.Append($"{result.gameObject.name}({result.gameObject.GetInstanceID()})");
                     message.Append(", ");
                 }
 
@@ -83,7 +87,19 @@ namespace TestHelper.Monkey.DefaultStrategies
                 verboseLogger.Log(message.ToString());
             }
 
+            raycastResult = _results[0];
             return isSameOrChildObject;
+        }
+
+        private PointerEventData GetCachedPointerEventData()
+        {
+            if (_cachedPointerEventData == null || _cachedFrameCount != Time.frameCount)
+            {
+                _cachedPointerEventData = new PointerEventData(EventSystem.current);
+                _cachedFrameCount = Time.frameCount;
+            }
+
+            return _cachedPointerEventData;
         }
 
         /// <summary>

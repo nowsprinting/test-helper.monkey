@@ -5,6 +5,7 @@ using NUnit.Framework;
 using TestHelper.Monkey.TestDoubles;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace TestHelper.Monkey.Operators
@@ -34,7 +35,7 @@ namespace TestHelper.Monkey.Operators
             var component = new GameObject().AddComponent<InputField>();
 
             Assume.That(_sut.CanOperate(component), Is.True);
-            _sut.OperateAsync(component, default(Vector2));
+            _sut.OperateAsync(component, default(RaycastResult));
 
             Assert.That(component.text, Is.EqualTo("RANDOM"));
         }
@@ -56,7 +57,7 @@ namespace TestHelper.Monkey.Operators
             var component = new GameObject().AddComponent<TMP_InputField>();
 
             Assume.That(_sut.CanOperate(component), Is.True);
-            _sut.OperateAsync(component, default(Vector2));
+            _sut.OperateAsync(component, default(RaycastResult));
 
             Assert.That(component.text, Is.EqualTo("RANDOM"));
         }

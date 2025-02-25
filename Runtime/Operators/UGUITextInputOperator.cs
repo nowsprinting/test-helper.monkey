@@ -51,7 +51,8 @@ namespace TestHelper.Monkey.Operators
         }
 
         /// <inheritdoc />
-        public async UniTask OperateAsync(Component component, Vector2 _, CancellationToken cancellationToken = default)
+        public async UniTask OperateAsync(Component component, RaycastResult _,
+            CancellationToken cancellationToken = default)
         {
             if (!CanOperate(component))
             {
