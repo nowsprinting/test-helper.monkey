@@ -8,7 +8,6 @@ using System.Text;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using TestHelper.Monkey.DefaultStrategies;
-using TestHelper.Monkey.LogMessageBuilders;
 using TestHelper.Monkey.Operators;
 using TestHelper.Random;
 using TestHelper.RuntimeInternals;
@@ -131,17 +130,9 @@ namespace TestHelper.Monkey
                 return false;
             }
 
-            var builder = new OperationMessageBuilder(selectedComponent, selectedOperator);
-            if (screenshotOptions != null)
-            {
-                var filename = screenshotOptions.FilenameStrategy.GetFilename();
-                await TakeScreenshotAsync(screenshotOptions, filename);
-                builder.AddComment(filename);
-            }
+            await selectedOperator.OperateAsync(selectedComponent, raycastResult, screenshotOptions, logger,
+                cancellationToken);
 
-            logger.Log(builder.ToString());
-
-            await selectedOperator.OperateAsync(selectedComponent, raycastResult, cancellationToken);
             return true;
         }
 

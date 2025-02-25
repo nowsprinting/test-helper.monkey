@@ -307,7 +307,7 @@ The waiting seconds can be specified in the `MonkeyConfig.SecondsToErrorForNoInt
 #### Operation log message
 
 ```
-UGUIClickOperator operates to StartButton (UGUIMonkeyAgent01_0001.png)
+UGUIClickOperator operates to StartButton(-12345), screenshot=UGUIMonkeyAgent01_0001.png
 ```
 
 This log message is output just before the operator `UGUIClickOperator` operates on the `GameObject` named `StartButton`.

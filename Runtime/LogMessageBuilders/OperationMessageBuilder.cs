@@ -1,6 +1,7 @@
 // Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
+using System;
 using System.Collections.Generic;
 using System.Text;
 using TestHelper.Monkey.Operators;
@@ -11,6 +12,7 @@ namespace TestHelper.Monkey.LogMessageBuilders
     /// <summary>
     /// Build log message for operation.
     /// </summary>
+    [Obsolete("Use OperationRecorder instead.")]
     public class OperationMessageBuilder
     {
         private readonly Component _component;

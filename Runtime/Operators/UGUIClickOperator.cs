@@ -5,8 +5,10 @@ using System;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using TestHelper.Monkey.Operators.Utils;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 
@@ -17,6 +19,20 @@ namespace TestHelper.Monkey.Operators
     /// </summary>
     public class UGUIClickOperator : IClickOperator
     {
+        private readonly ScreenshotOptions _screenshotOptions;
+        private readonly ILogger _logger;
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="screenshotOptions">Take screenshot options set if you need</param>
+        /// <param name="logger">Logger, if omitted, use Debug.unityLogger (output to console)</param>
+        public UGUIClickOperator(ScreenshotOptions screenshotOptions = null, ILogger logger = null)
+        {
+            _screenshotOptions = screenshotOptions;
+            _logger = logger ?? Debug.unityLogger;
+        }
+
         /// <inheritdoc />
         public bool CanOperate(Component component)
         {
@@ -30,6 +46,7 @@ namespace TestHelper.Monkey.Operators
 
         /// <inheritdoc />
         public async UniTask OperateAsync(Component component, RaycastResult raycastResult,
+            ScreenshotOptions screenshotOptions = null, ILogger logger = null,
             CancellationToken cancellationToken = default)
         {
             if (!(component is IPointerClickHandler handler))
@@ -37,8 +54,19 @@ namespace TestHelper.Monkey.Operators
                 throw new ArgumentException("Component must implement IPointerClickHandler.");
             }
 
-            EventSystem.current.SetSelectedGameObject(component.gameObject);
+            // Output log before the operation, after the shown effects
+            var operationLogger = new OperationLogger(component, this, logger ?? _logger,
+                screenshotOptions ?? _screenshotOptions);
+            operationLogger.Properties.Add("position", raycastResult.screenPosition);
+            await operationLogger.Log();
 
+            // Selected before operation
+            if (component is Selectable)
+            {
+                EventSystem.current.SetSelectedGameObject(component.gameObject);
+            }
+
+            // Pointer click
             var eventData = new PointerEventData(EventSystem.current)
             {
                 pointerCurrentRaycast = raycastResult,

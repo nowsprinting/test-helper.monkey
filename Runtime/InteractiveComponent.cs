@@ -182,7 +182,7 @@ namespace TestHelper.Monkey
         public async UniTask ClickAndHold(CancellationToken cancellationToken = default)
         {
             var clickAndHoldOperator = GetOperatorsByType<IClickAndHoldOperator>().First();
-            await clickAndHoldOperator.OperateAsync(component, default, cancellationToken);
+            await clickAndHoldOperator.OperateAsync(component, default, null, null, cancellationToken);
         }
 
         [Obsolete]

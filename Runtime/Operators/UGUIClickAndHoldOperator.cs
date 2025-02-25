@@ -5,8 +5,10 @@ using System;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using TestHelper.Monkey.Operators.Utils;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace TestHelper.Monkey.Operators
 {
@@ -18,13 +20,21 @@ namespace TestHelper.Monkey.Operators
     {
         private readonly int _holdMillis;
 
+        private readonly ScreenshotOptions _screenshotOptions;
+        private readonly ILogger _logger;
+
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="holdMillis">Hold time in milliseconds</param>
-        public UGUIClickAndHoldOperator(int holdMillis = 1000)
+        /// <param name="screenshotOptions">Take screenshot options set if you need</param>
+        /// <param name="logger">Logger, if omitted, use Debug.unityLogger (output to console)</param>
+        public UGUIClickAndHoldOperator(int holdMillis = 1000,
+            ScreenshotOptions screenshotOptions = null, ILogger logger = null)
         {
-            this._holdMillis = holdMillis;
+            _holdMillis = holdMillis;
+            _screenshotOptions = screenshotOptions;
+            _logger = logger ?? Debug.unityLogger;
         }
 
         /// <inheritdoc />
@@ -42,6 +52,7 @@ namespace TestHelper.Monkey.Operators
 
         /// <inheritdoc />
         public async UniTask OperateAsync(Component component, RaycastResult raycastResult,
+            ScreenshotOptions screenshotOptions = null, ILogger logger = null,
             CancellationToken cancellationToken = default)
         {
             if (!(component is IPointerDownHandler downHandler) || !(component is IPointerUpHandler upHandler))
@@ -49,8 +60,19 @@ namespace TestHelper.Monkey.Operators
                 throw new ArgumentException("Component must implement IPointerDownHandler and IPointerUpHandler.");
             }
 
-            EventSystem.current.SetSelectedGameObject(component.gameObject);
+            // Output log before the operation, after the shown effects
+            var operationLogger = new OperationLogger(component, this, logger ?? _logger,
+                screenshotOptions ?? _screenshotOptions);
+            operationLogger.Properties.Add("position", raycastResult.screenPosition);
+            await operationLogger.Log();
 
+            // Selected before operation
+            if (component is Selectable)
+            {
+                EventSystem.current.SetSelectedGameObject(component.gameObject);
+            }
+
+            // Pointer down
             var eventData = new PointerEventData(EventSystem.current)
             {
                 pointerCurrentRaycast = raycastResult,
@@ -79,6 +101,7 @@ namespace TestHelper.Monkey.Operators
                 return;
             }
 
+            // Pointer up
 #if UNITY_2020_3_OR_NEWER
             eventData.pointerClick = component.gameObject;
 #endif

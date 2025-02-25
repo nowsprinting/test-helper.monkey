@@ -82,7 +82,7 @@ namespace TestHelper.Monkey.Operators
 
             using (var cancellationTokenSource = new CancellationTokenSource())
             {
-                _sut.OperateAsync(component, raycastResult, cancellationTokenSource.Token).Forget();
+                _sut.OperateAsync(component, raycastResult, null, null, cancellationTokenSource.Token).Forget();
                 await UniTask.NextFrame();
 
                 cancellationTokenSource.Cancel(); // Not output LogError from StubLogErrorWhenOnPointerUp
