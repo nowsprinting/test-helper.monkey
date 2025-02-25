@@ -9,6 +9,7 @@ using TestHelper.Monkey.Extensions;
 using TestHelper.Monkey.Random;
 using TestHelper.Random;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 #if ENABLE_TMP
 using TMPro;
@@ -71,16 +72,8 @@ namespace TestHelper.Monkey.Operators
                 randomStringParams = _randomStringParams;
             }
 
-            if (component is InputField inputField)
-            {
-                inputField.text = _randomString.Next(randomStringParams(component.gameObject));
-            }
-#if ENABLE_TMP
-            if (component is TMP_InputField tmpInputField)
-            {
-                tmpInputField.text = _randomString.Next(randomStringParams(component.gameObject));
-            }
-#endif
+            var text = _randomString.Next(randomStringParams(component.gameObject));
+            await OperateAsync(component, text, cancellationToken);
         }
 
         /// <inheritdoc />
@@ -91,6 +84,8 @@ namespace TestHelper.Monkey.Operators
             {
                 throw new ArgumentException("Component must be of type InputField or TMP_InputField.");
             }
+
+            EventSystem.current.SetSelectedGameObject(component.gameObject);
 
             if (component is InputField inputField)
             {
