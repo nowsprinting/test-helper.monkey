@@ -54,7 +54,7 @@ namespace TestHelper.Monkey.Extensions
             [LoadScene(TestScenePath)]
             public async Task IsReachable_Reachable(string target)
             {
-                var actual = await _sut.FindByNameAsync(target, reachable: false);
+                var (actual, _) = await _sut.FindByNameAsync(target, reachable: false);
                 Assert.That(actual.IsReachable(DefaultReachableStrategy.IsReachable), Is.True);
                 // TODO: Remove when remove obsolete method, Already copied to DefaultReachableStrategyTest.
             }
@@ -64,7 +64,7 @@ namespace TestHelper.Monkey.Extensions
             [LoadScene(TestScenePath)]
             public async Task IsReachable_NotReachable(string target)
             {
-                var actual = await _sut.FindByNameAsync(target, reachable: false);
+                var (actual, _) = await _sut.FindByNameAsync(target, reachable: false);
                 Assert.That(actual.IsReachable(DefaultReachableStrategy.IsReachable), Is.False);
                 // TODO: Remove when remove obsolete method, Already copied to DefaultReachableStrategyTest.
             }
@@ -96,7 +96,7 @@ namespace TestHelper.Monkey.Extensions
             [TestCase("NotInteractable")]
             public async Task IsReachable_Reachable(string target)
             {
-                var actual = await _sut.FindByNameAsync(target, reachable: false);
+                var (actual, _) = await _sut.FindByNameAsync(target, reachable: false);
                 Assert.That(actual.IsReachable(DefaultReachableStrategy.IsReachable), Is.True);
                 // TODO: Remove when remove obsolete method, Already copied to DefaultReachableStrategyTest.
             }
@@ -105,7 +105,7 @@ namespace TestHelper.Monkey.Extensions
             [TestCase("BehindTheWall")]
             public async Task IsReachable_NotReachable(string target)
             {
-                var actual = await _sut.FindByNameAsync(target, reachable: false);
+                var (actual, _) = await _sut.FindByNameAsync(target, reachable: false);
                 Assert.That(actual.IsReachable(DefaultReachableStrategy.IsReachable), Is.False);
                 // TODO: Remove when remove obsolete method, Already copied to DefaultReachableStrategyTest.
             }

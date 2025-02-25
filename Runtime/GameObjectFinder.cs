@@ -9,6 +9,7 @@ using TestHelper.Monkey.DefaultStrategies;
 using TestHelper.Monkey.Extensions;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.EventSystems;
 
 namespace TestHelper.Monkey
 {
@@ -51,36 +52,39 @@ namespace TestHelper.Monkey
             None
         }
 
-        private (GameObject, Reason) FindByName(string name, string path, bool reachable, bool interactable)
+        private (GameObject, RaycastResult, Reason) FindByName(string name, string path, bool reachable,
+            bool interactable)
         {
             var foundObject = GameObject.Find(name);
             // Note: Cases where there are multiple GameObjects with the same name are not considered.
 
+            RaycastResult raycastResult = default;
+
             if (foundObject == null)
             {
-                return (null, Reason.NotFound);
+                return (null, default, Reason.NotFound);
             }
 
             if (path != null && !foundObject.transform.MatchPath(path))
             {
-                return (null, Reason.NotMatchPath);
+                return (null, default, Reason.NotMatchPath);
             }
 
-            if (reachable && !_reachableStrategy.IsReachable(foundObject, out _))
+            if (reachable && !_reachableStrategy.IsReachable(foundObject, out raycastResult))
             {
-                return (null, Reason.NotReachable);
+                return (null, default, Reason.NotReachable);
             }
 
             if (interactable && !foundObject.GetComponents<Component>().Any(_isComponentInteractable))
             {
-                return (null, Reason.NotInteractable);
+                return (null, default, Reason.NotInteractable);
             }
 
-            return (foundObject, Reason.None);
+            return (foundObject, raycastResult, Reason.None);
         }
 
-        private async UniTask<GameObject> FindByNameAsync(string name, string path, bool reachable, bool interactable,
-            CancellationToken cancellationToken)
+        private async UniTask<(GameObject, RaycastResult)> FindByNameAsync(string name, string path,
+            bool reachable, bool interactable, CancellationToken cancellationToken)
         {
             var timeoutTime = Time.realtimeSinceStartup + (float)_timeoutSeconds;
             var delaySeconds = MinTimeoutSeconds;
@@ -89,10 +93,11 @@ namespace TestHelper.Monkey
             while (Time.realtimeSinceStartup < timeoutTime)
             {
                 GameObject foundObject;
-                (foundObject, reason) = FindByName(name, path, reachable, interactable);
+                RaycastResult raycastResult;
+                (foundObject, raycastResult, reason) = FindByName(name, path, reachable, interactable);
                 if (foundObject != null)
                 {
-                    return foundObject;
+                    return (foundObject, raycastResult);
                 }
 
                 delaySeconds = Math.Min(delaySeconds * 2, MaxPollingIntervalSeconds);
@@ -123,10 +128,10 @@ namespace TestHelper.Monkey
         /// <param name="reachable">Find only reachable object</param>
         /// <param name="interactable">Find only interactable object</param>
         /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Found <c>GameObject</c></returns>
+        /// <returns>Found <c>GameObject</c>, and the front-most raycast hit result, even if it can not handle the press event</returns>
         /// <exception cref="TimeoutException">Throws if <c>GameObject</c> is not found</exception>
-        public async UniTask<GameObject> FindByNameAsync(string name, bool reachable = true, bool interactable = false,
-            CancellationToken cancellationToken = default)
+        public async UniTask<(GameObject, RaycastResult)> FindByNameAsync(string name,
+            bool reachable = true, bool interactable = false, CancellationToken cancellationToken = default)
         {
             return await FindByNameAsync(name, null, reachable, interactable, cancellationToken);
         }
@@ -138,11 +143,11 @@ namespace TestHelper.Monkey
         /// <param name="reachable">Find only reachable object</param>
         /// <param name="interactable">Find only interactable object</param>
         /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>Found <c>GameObject</c></returns>
+        /// <returns>Found <c>GameObject</c>, and the front-most raycast hit result, even if it can not handle the press event</returns>
         /// <exception cref="TimeoutException">Throws if <c>GameObject</c> is not found</exception>
         /// <seealso href="https://en.wikipedia.org/wiki/Glob_(programming)"/>
-        public async UniTask<GameObject> FindByPathAsync(string path, bool reachable = true, bool interactable = false,
-            CancellationToken cancellationToken = default)
+        public async UniTask<(GameObject, RaycastResult)> FindByPathAsync(string path,
+            bool reachable = true, bool interactable = false, CancellationToken cancellationToken = default)
         {
             var name = path.Split('/').Last();
             return await FindByNameAsync(name, path, reachable, interactable, cancellationToken);
