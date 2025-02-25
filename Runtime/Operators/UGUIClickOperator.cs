@@ -55,7 +55,9 @@ namespace TestHelper.Monkey.Operators
             {
                 pointerEnter = component.gameObject,
                 pointerPress = component.gameObject,
+#if UNITY_2020_3_OR_NEWER
                 pointerClick = component.gameObject,
+#endif
                 position = position,
                 pressPosition = position,
                 clickCount = 1,

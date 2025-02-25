@@ -74,7 +74,9 @@ namespace TestHelper.Monkey.Operators
                 return;
             }
 
+#if UNITY_2020_3_OR_NEWER
             eventData.pointerClick = component.gameObject;
+#endif
             eventData.clickCount = 1;
             eventData.button = PointerEventData.InputButton.Left;
             upHandler.OnPointerUp(eventData);
