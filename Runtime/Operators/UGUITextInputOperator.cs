@@ -53,6 +53,11 @@ namespace TestHelper.Monkey.Operators
         /// <inheritdoc />
         public async UniTask OperateAsync(Component component, CancellationToken cancellationToken = default)
         {
+            if (!CanOperate(component))
+            {
+                throw new ArgumentException("Component must be of type InputField or TMP_InputField.");
+            }
+
             Func<GameObject, RandomStringParameters> randomStringParams;
             if (component.gameObject.TryGetEnabledComponent<InputFieldAnnotation>(out var annotation))
             {
