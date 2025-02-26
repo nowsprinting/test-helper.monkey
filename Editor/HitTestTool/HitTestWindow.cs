@@ -1,15 +1,16 @@
-// Copyright (c) 2023-2024 Koji Hasegawa.
+// Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using TestHelper.Monkey.DefaultStrategies;
-using TestHelper.Monkey.Extensions;
-using TestHelper.Monkey.Operators;
+using System.Text;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
 
 namespace TestHelper.Monkey.Editor.HitTestTool
 {
@@ -24,31 +25,16 @@ namespace TestHelper.Monkey.Editor.HitTestTool
     public class HitTestWindow : EditorWindow
     {
         /// <summary>
-        /// Select the criteria for determining a hit to GameObject.
+        /// Hotkey for the hit test.
         /// </summary>
-        public HitTestCriteria criteria = HitTestCriteria.Interactable;
+        public KeyCode hotkey = KeyCode.T;
 
         /// <summary>
-        /// Automatically select the hit object in the Hierarchy window when a hit is detected.
+        /// Raycast results.
         /// </summary>
-        public bool selectInHierarchy;
-
-        /// <summary>
-        /// Output verbose log to console.
-        /// </summary>
-        public bool verbose;
-
-        private string _hitGameObjectName;
-        private string _hitGameObjectPath;
-        private Vector2 _hitScreenPosition;
-        private float _hitDistance;
-        private Vector3 _hitWorldPosition;
+        public string results;
 
         private const float SpacerPixels = 10f;
-
-        private readonly Func<Component, bool> _isInteractable = DefaultComponentInteractableStrategy.IsInteractable;
-        private readonly IClickOperator _clickOperator = new UGUIClickOperator();
-        private readonly List<RaycastResult> _raycastResults = new List<RaycastResult>();
 
         [MenuItem("Window/Test Helper/Hit Test Tool")]
         private static void Init()
@@ -93,26 +79,63 @@ namespace TestHelper.Monkey.Editor.HitTestTool
 
             GUILayout.Space(SpacerPixels);
 
-            criteria = (HitTestCriteria)EditorGUILayout.EnumPopup(
-                new GUIContent("Hit Test Criteria", "Select the criteria for determining a hit to GameObject."),
-                criteria);
-
-            selectInHierarchy = EditorGUILayout.Toggle(
-                new GUIContent("Select In Hierarchy",
-                    "Automatically select the hit object in the Hierarchy window when a hit is detected."),
-                selectInHierarchy);
-
-            verbose = EditorGUILayout.Toggle(
-                new GUIContent("Verbose", "Output verbose log to console."),
-                verbose);
+            hotkey = (KeyCode)EditorGUILayout.EnumPopup(
+                new GUIContent("Hotkey", "Hotkey for the hit test."),
+                hotkey);
 
             GUILayout.Space(SpacerPixels);
             EditorGUILayout.LabelField("Hit GameObject and Position (readonly)", EditorStyles.boldLabel);
-            EditorGUILayout.TextField("GameObject Name", _hitGameObjectName);
-            EditorGUILayout.TextField("GameObject Path", _hitGameObjectPath); // TODO: Click to copy to clipboard using `EditorGUIUtility.systemCopyBuffer`
-            EditorGUILayout.TextField("World Position", ToStringOrEmpty(_hitWorldPosition));
-            EditorGUILayout.TextField("Screen Position", ToStringOrEmpty(_hitScreenPosition));
-            EditorGUILayout.TextField("Distance", ToStringOrEmpty(_hitDistance));
+            EditorGUILayout.TextArea(results, GUILayout.Height(400));
+        }
+
+        private void Update()
+        {
+            if (EventSystem.current == null)
+            {
+                return;
+            }
+
+            if (IsEnabledLegacyInputManager)
+            {
+                if (Input.GetKeyDown(hotkey))
+                {
+                    HitTest();
+                    Repaint();
+                }
+            }
+            else
+            {
+#if ENABLE_INPUT_SYSTEM
+                // Project Settings > Player > Active Input Handling is "Input System (New)" or "Both".
+                if (Keyboard.current[FromKeyCode(hotkey)].wasPressedThisFrame)
+                {
+                    HitTest();
+                    Repaint();
+                }
+#endif
+            }
+        }
+
+        private void HitTest()
+        {
+            var pointerEventData = new PointerEventData(EventSystem.current) { position = GetMousePosition() };
+            var raycastResults = new List<RaycastResult>();
+
+            EventSystem.current.RaycastAll(pointerEventData, raycastResults);
+            if (raycastResults.Count == 0)
+            {
+                results = $"No hit GameObject on {pointerEventData.position}";
+                return;
+            }
+
+            var builder = new StringBuilder();
+            foreach (var raycastResult in raycastResults)
+            {
+                builder.AppendLine(raycastResult.ToString());
+                builder.AppendLine("---");
+            }
+
+            results = builder.ToString(0, builder.Length - 3);
         }
 
         private static bool ExistsEventSystem()
@@ -135,107 +158,29 @@ namespace TestHelper.Monkey.Editor.HitTestTool
 #endif
         }
 
-        private static string ToStringOrEmpty<T>(T value)
-        {
-            if (value.Equals(default(T)))
-            {
-                return string.Empty;
-            }
+        private static bool IsEnabledLegacyInputManager =>
+            EventSystem.current.currentInputModule is StandaloneInputModule;
 
-            return value.ToString();
+#if ENABLE_INPUT_SYSTEM
+        // Project Settings > Player > Active Input Handling is "Input System (New)" or "Both".
+        private static Key FromKeyCode(KeyCode key)
+        {
+            return (Key)Enum.Parse(typeof(Key), key.ToString());
         }
+#endif
 
-        private void Update()
+        private static Vector2 GetMousePosition()
         {
-            if (EventSystem.current == null)
+            if (IsEnabledLegacyInputManager)
             {
-                return;
-            }
-
-            if (!Input.GetMouseButtonDown(0))
-            {
-                return;
-            }
-
-            var eventData = new PointerEventData(EventSystem.current) { position = Input.mousePosition };
-            _raycastResults.Clear();
-            EventSystem.current.RaycastAll(eventData, _raycastResults);
-
-            if (_raycastResults.Count == 0)
-            {
-                LoggingIfVerbose($"No hit GameObject on {eventData.position}");
-                ClearHitInformation();
-                Repaint();
-                return;
-            }
-
-            var hitResult = _raycastResults.FirstOrDefault(x => IsHit(x.gameObject));
-            if (hitResult.gameObject != null)
-            {
-                _hitGameObjectName = hitResult.gameObject.name;
-                _hitGameObjectPath = hitResult.gameObject.transform.GetPath();
-                _hitWorldPosition = hitResult.worldPosition;
-                _hitScreenPosition = hitResult.screenPosition;
-                _hitDistance = hitResult.distance;
-                if (selectInHierarchy)
-                {
-                    // TODO: Automatically select the hit object in the Hierarchy window.
-                }
-
-                // TODO: temporary
-                EditorGUIUtility.systemCopyBuffer = _hitGameObjectPath;
-                LoggingIfVerbose($"Hit object path: {_hitGameObjectPath}");
+                return (Vector2)Input.mousePosition;
             }
             else
             {
-                LoggingIfVerbose($"No GameObject meet the hit criteria on {eventData.position}");
-                ClearHitInformation();
-            }
-
-            Repaint();
-        }
-
-        private bool IsHit(GameObject gameObject)
-        {
-            if (criteria == HitTestCriteria.All)
-            {
-                LoggingIfVerbose($"Hit: {gameObject.name}");
-                return true;
-            }
-
-            foreach (var component in gameObject.GetComponents<Component>())
-            {
-                if (criteria == HitTestCriteria.Interactable && _isInteractable.Invoke(component))
-                {
-                    LoggingIfVerbose($"Hit interactable: {gameObject.name}<{component}>");
-                    return true;
-                }
-
-                if (criteria == HitTestCriteria.Clickable && _clickOperator.CanOperate(component))
-                {
-                    LoggingIfVerbose($"Hit clickable: {gameObject.name}<{component}>");
-                    return true;
-                }
-            }
-
-            LoggingIfVerbose($"Not hit criteria: {gameObject.name}");
-            return false;
-        }
-
-        private void ClearHitInformation()
-        {
-            _hitGameObjectName = default;
-            _hitGameObjectPath = default;
-            _hitWorldPosition = default;
-            _hitScreenPosition = default;
-            _hitDistance = default;
-        }
-
-        private void LoggingIfVerbose(string message)
-        {
-            if (verbose)
-            {
-                Debug.Log(message);
+#if ENABLE_INPUT_SYSTEM
+                // Project Settings > Player > Active Input Handling is "Input System (New)" or "Both".
+                return Mouse.current.position.value;
+#endif
             }
         }
     }

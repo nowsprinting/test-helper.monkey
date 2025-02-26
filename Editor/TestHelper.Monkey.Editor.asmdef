@@ -3,7 +3,8 @@
     "rootNamespace": "TestHelper.Monkey",
     "references": [
         "TestHelper.Monkey.Annotations",
-        "TestHelper.Monkey"
+        "TestHelper.Monkey",
+        "Unity.InputSystem"
     ],
     "includePlatforms": [
         "Editor"
