@@ -57,6 +57,7 @@ namespace TestHelper.Monkey.DefaultStrategies
             var pointerEventData = GetCachedPointerEventData();
             pointerEventData.position = _getScreenPoint.Invoke(gameObject);
 
+            _results.Clear();
             EventSystem.current.RaycastAll(pointerEventData, _results);
             if (_results.Count == 0)
             {
