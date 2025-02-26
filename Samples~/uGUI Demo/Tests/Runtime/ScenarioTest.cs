@@ -1,4 +1,4 @@
-// Copyright (c) 2023-2024 Koji Hasegawa.
+// Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System.Linq;
@@ -28,26 +28,26 @@ namespace TestHelper.Monkey.Samples.UGUIDemo
             await _finder.FindByNameAsync("Title");
 
             // When click Start button, then open Home screen.
-            var startButton = await _finder.FindByNameAsync("StartButton", interactable: true);
+            var (startButton, startRaycastResult) = await _finder.FindByNameAsync("StartButton", interactable: true);
             var startComponent = startButton.GetInteractableComponents().First();
             var startOperator = startComponent.SelectOperators<IClickOperator>(_config.Operators).First();
-            await startOperator.OperateAsync(startComponent);
+            await startOperator.OperateAsync(startComponent, startRaycastResult);
 
             await _finder.FindByNameAsync("Home");
 
             // When click target button, then open target screen.
-            var targetButton = await _finder.FindByNameAsync($"{target}Button", interactable: true);
+            var (targetButton, targetRaycastResult) = await _finder.FindByNameAsync($"{target}Button", interactable: true);
             var targetComponent = targetButton.GetInteractableComponents().First();
             var targetOperator = targetComponent.SelectOperators<IClickOperator>(_config.Operators).First();
-            await targetOperator.OperateAsync(targetComponent);
+            await targetOperator.OperateAsync(targetComponent, targetRaycastResult);
 
             await _finder.FindByNameAsync(target);
 
             // When click Back button, then return Home screen.
-            var backButton = await _finder.FindByPathAsync($"**/{target}/BackButton", interactable: true);
+            var (backButton, backRaycastResult) = await _finder.FindByPathAsync($"**/{target}/BackButton", interactable: true);
             var backComponent = backButton.GetInteractableComponents().First();
             var backOperator = backComponent.SelectOperators<IClickOperator>(_config.Operators).First();
-            await backOperator.OperateAsync(backComponent);
+            await backOperator.OperateAsync(backComponent, backRaycastResult);
 
             await _finder.FindByNameAsync("Home");
         }
