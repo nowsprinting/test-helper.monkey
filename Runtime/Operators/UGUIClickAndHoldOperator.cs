@@ -15,6 +15,8 @@ namespace TestHelper.Monkey.Operators
     /// <summary>
     /// Click and hold operator for Unity UI (uGUI) components.
     /// a.k.a. touch and hold, long press.
+    ///
+    /// This operator receives <c>RaycastResult</c>, but passing <c>default</c> may be OK, depending on the component being operated on.
     /// </summary>
     public class UGUIClickAndHoldOperator : IClickAndHoldOperator
     {
@@ -27,10 +29,10 @@ namespace TestHelper.Monkey.Operators
         /// Constructor.
         /// </summary>
         /// <param name="holdMillis">Hold time in milliseconds</param>
-        /// <param name="screenshotOptions">Take screenshot options set if you need</param>
         /// <param name="logger">Logger, if omitted, use Debug.unityLogger (output to console)</param>
+        /// <param name="screenshotOptions">Take screenshot options set if you need</param>
         public UGUIClickAndHoldOperator(int holdMillis = 1000,
-            ScreenshotOptions screenshotOptions = null, ILogger logger = null)
+            ILogger logger = null, ScreenshotOptions screenshotOptions = null)
         {
             _holdMillis = holdMillis;
             _screenshotOptions = screenshotOptions;
@@ -52,7 +54,7 @@ namespace TestHelper.Monkey.Operators
 
         /// <inheritdoc />
         public async UniTask OperateAsync(Component component, RaycastResult raycastResult,
-            ScreenshotOptions screenshotOptions = null, ILogger logger = null,
+            ILogger logger = null, ScreenshotOptions screenshotOptions = null,
             CancellationToken cancellationToken = default)
         {
             if (!(component is IPointerDownHandler downHandler) || !(component is IPointerUpHandler upHandler))

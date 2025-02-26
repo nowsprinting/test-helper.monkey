@@ -16,6 +16,7 @@ namespace TestHelper.Monkey.Operators
 {
     /// <summary>
     /// Click (tap) operator for Unity UI (uGUI) components.
+    /// This operator receives <c>RaycastResult</c>, but passing <c>default</c> may be OK, depending on the component being operated on.
     /// </summary>
     public class UGUIClickOperator : IClickOperator
     {
@@ -25,9 +26,9 @@ namespace TestHelper.Monkey.Operators
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="screenshotOptions">Take screenshot options set if you need</param>
         /// <param name="logger">Logger, if omitted, use Debug.unityLogger (output to console)</param>
-        public UGUIClickOperator(ScreenshotOptions screenshotOptions = null, ILogger logger = null)
+        /// <param name="screenshotOptions">Take screenshot options set if you need</param>
+        public UGUIClickOperator(ILogger logger = null, ScreenshotOptions screenshotOptions = null)
         {
             _screenshotOptions = screenshotOptions;
             _logger = logger ?? Debug.unityLogger;
@@ -46,7 +47,7 @@ namespace TestHelper.Monkey.Operators
 
         /// <inheritdoc />
         public async UniTask OperateAsync(Component component, RaycastResult raycastResult,
-            ScreenshotOptions screenshotOptions = null, ILogger logger = null,
+            ILogger logger = null, ScreenshotOptions screenshotOptions = null,
             CancellationToken cancellationToken = default)
         {
             if (!(component is IPointerClickHandler handler))

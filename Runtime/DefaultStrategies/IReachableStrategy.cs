@@ -8,7 +8,7 @@ namespace TestHelper.Monkey.DefaultStrategies
 {
     /// <summary>
     /// Strategy to examine whether <c>GameObject</c> is reachable from the user.
-    /// You should implement this when you want to customize the raycast point (e.g., randomize position, specify camera).
+    /// You should implement this when you want to customize the raycast point (e.g., randomize position, specify event camera for 2D/3D element).
     /// </summary>
     public interface IReachableStrategy
     {

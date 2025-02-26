@@ -123,15 +123,15 @@ namespace TestHelper.Monkey
             CancellationToken cancellationToken = default)
         {
             var lotteryEntries = GetLotteryEntries(interactableComponentsFinder, verbose ? logger : null);
-            var (selectedComponent, selectedOperator, raycastResult) =
-                LotteryOperator(lotteryEntries, random, ignoreStrategy, reachableStrategy, verbose ? logger : null);
+            var (selectedComponent, selectedOperator, raycastResult) = LotteryOperator(
+                lotteryEntries, random, ignoreStrategy, reachableStrategy, verbose ? logger : null);
             if (selectedComponent == null || selectedOperator == null)
             {
                 return false;
             }
 
-            await selectedOperator.OperateAsync(selectedComponent, raycastResult, screenshotOptions, logger,
-                cancellationToken);
+            await selectedOperator.OperateAsync(
+                selectedComponent, raycastResult, logger, screenshotOptions, cancellationToken);
 
             return true;
         }

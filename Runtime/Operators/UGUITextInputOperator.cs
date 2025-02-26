@@ -22,6 +22,7 @@ namespace TestHelper.Monkey.Operators
 {
     /// <summary>
     /// Text input operator for Unity UI (uGUI) <c>InputField</c> component.
+    /// This operator does not require a <c>RaycastResult</c>.
     /// </summary>
     public class UGUITextInputOperator : ITextInputOperator
     {
@@ -36,11 +37,11 @@ namespace TestHelper.Monkey.Operators
         /// </summary>
         /// <param name="randomStringParams">Random string generation parameters</param>
         /// <param name="randomString">Random string generator</param>
-        /// <param name="screenshotOptions">Take screenshot options set if you need</param>
         /// <param name="logger">Logger, if omitted, use Debug.unityLogger (output to console)</param>
+        /// <param name="screenshotOptions">Take screenshot options set if you need</param>
         public UGUITextInputOperator(
             Func<GameObject, RandomStringParameters> randomStringParams = null, IRandomString randomString = null,
-            ScreenshotOptions screenshotOptions = null, ILogger logger = null)
+            ILogger logger = null, ScreenshotOptions screenshotOptions = null)
         {
             _randomStringParams = randomStringParams ?? (_ => RandomStringParameters.Default);
             _randomString = randomString ?? new RandomStringImpl(new RandomWrapper());
@@ -60,7 +61,7 @@ namespace TestHelper.Monkey.Operators
 
         /// <inheritdoc />
         public async UniTask OperateAsync(Component component, RaycastResult _,
-            ScreenshotOptions screenshotOptions = null, ILogger logger = null,
+            ILogger logger = null, ScreenshotOptions screenshotOptions = null,
             CancellationToken cancellationToken = default)
         {
             if (!CanOperate(component))
@@ -83,12 +84,12 @@ namespace TestHelper.Monkey.Operators
             }
 
             var text = _randomString.Next(randomStringParams(component.gameObject));
-            await OperateAsync(component, text, screenshotOptions, logger, cancellationToken);
+            await OperateAsync(component, text, logger, screenshotOptions, cancellationToken);
         }
 
         /// <inheritdoc />
         public async UniTask OperateAsync(Component component, string text,
-            ScreenshotOptions screenshotOptions = null, ILogger logger = null,
+            ILogger logger = null, ScreenshotOptions screenshotOptions = null,
             CancellationToken cancellationToken = default)
         {
             if (!CanOperate(component))

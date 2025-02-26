@@ -21,7 +21,7 @@ namespace TestHelper.Monkey.Operators
         /// <summary>
         /// Returns if can operate target component this Operator.
         /// </summary>
-        /// <param name="component">Target component</param>
+        /// <param name="component">Operation target component</param>
         /// <returns>True if can operate component this Operator.</returns>
         bool CanOperate(Component component);
 
@@ -32,14 +32,14 @@ namespace TestHelper.Monkey.Operators
         /// If required parameters for the operation, such as hold time, input text strategy, etc., keep them in instance fields of the implementation class.
         /// If you want to add parameters for execution outside of monkey tests, define a sub-interface (e.g., <c>ITextInputOperator</c>).
         /// </remarks>
-        /// <param name="component">Target component</param>
-        /// <param name="raycastResult">RaycastResult with the screen position of the starting operation</param>
-        /// <param name="screenshotOptions">Take screenshot options set if you need</param>
+        /// <param name="component">Operation target component</param>
+        /// <param name="raycastResult"><c>RaycastResult</c> includes the screen position of the starting operation. Passing <c>default</c> may be OK, depending on the operator implementation.</param>
         /// <param name="logger">Logger set if you need</param>
+        /// <param name="screenshotOptions">Take screenshot options set if you need</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         UniTask OperateAsync(Component component, RaycastResult raycastResult,
-            ScreenshotOptions screenshotOptions = null, ILogger logger = null,
+            ILogger logger = null, ScreenshotOptions screenshotOptions = null,
             CancellationToken cancellationToken = default);
     }
 }

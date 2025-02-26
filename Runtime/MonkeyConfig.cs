@@ -62,18 +62,25 @@ namespace TestHelper.Monkey
 
         /// <summary>
         /// Strategy to examine whether <c>GameObject</c> should be ignored.
-        /// <c>verboseLogger</c> will be overridden at runtime by the values of <c>Verbose</c> and <c>Logger</c>.
+        /// <c>verboseLogger</c> will be overridden at runtime by the <c>Logger</c> if <c>Verbose</c> is true.
         /// </summary>
+        /// <remarks>
+        /// This strategy replaces the v0.14.0 or older <c>IsIgnore</c> function.
+        /// </remarks>
         public IIgnoreStrategy IgnoreStrategy { get; set; } = new DefaultIgnoreStrategy();
 
         /// <summary>
         /// Strategy to examine whether <c>GameObject</c> is reachable from the user.
-        /// <c>verboseLogger</c> will be overridden at runtime by the values of <c>Verbose</c> and <c>Logger</c>.
+        /// <c>verboseLogger</c> will be overridden at runtime by the <c>Logger</c> if <c>Verbose</c> is true.
         /// </summary>
+        /// <remarks>
+        /// This strategy replaces the v0.14.0 or older <c>IsReachable</c> function.
+        /// </remarks>
         public IReachableStrategy ReachableStrategy { get; set; } = new DefaultReachableStrategy();
 
         /// <summary>
         /// Operators that the monkey invokes.
+        /// <c>logger</c> and <c>screenshotOptions</c> will be overridden at runtime by the same name properties in this <c>MonkeyConfig</c> instance.
         /// </summary>
         public IEnumerable<IOperator> Operators { get; set; } = new IOperator[]
         {
