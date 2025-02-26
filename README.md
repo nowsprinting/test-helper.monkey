@@ -4,7 +4,7 @@
 [![Test](https://github.com/nowsprinting/test-helper.monkey/actions/workflows/test.yml/badge.svg)](https://github.com/nowsprinting/test-helper.monkey/actions/workflows/test.yml)
 [![openupm](https://img.shields.io/npm/v/com.nowsprinting.test-helper.monkey?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.nowsprinting.test-helper.monkey/)
 
-Reference implementation that performs object-based Unity UI (uGUI) monkey testing and API for custom implementation.
+Object-based Unity UI (uGUI) monkey testing and API for custom implementation.
 
 This library can be used in runtime code because it does not depend on the Unity Test Framework.
 
@@ -14,9 +14,9 @@ Required Unity 2019 LTS or later.
 
 ## Features
 
-### Monkey testing reference implementation
+### Monkey testing
 
-#### Monkey
+#### Monkey.Run
 
 Runs monkey tests for uGUI (2D, 3D, and UI) elements.
 `Monkey.Run` method operates on randomly selected objects. It does not use screen points.
@@ -137,7 +137,7 @@ public class MyIntegrationTest
     [Test]
     public void MyTestMethod()
     {
-        var finder = new GameObjectFinder(5d); // 5 seconds timeout
+        var finder = new GameObjectFinder(); // Default is 1 second timeout
         var dialog = await finder.FindByNameAsync("ConfirmDialog", reachable: true, interactable: false);
     }
 }
@@ -150,7 +150,7 @@ Find `GameObject` by path (wait until they appear).
 
 Arguments:
 
-- **path**: Find `GameObject` hierarchy path separated by `/`. Can specify ([glob](https://en.wikipedia.org/wiki/Glob_(programming))) pattern
+- **path**: Find `GameObject` hierarchy path separated by `/`. Can specify [glob](https://en.wikipedia.org/wiki/Glob_(programming)) pattern
 - **reachable**: Find only reachable object. Default is true
 - **interactable**: Find only interactable object. Default is false
 
@@ -166,7 +166,7 @@ public class MyIntegrationTest
     [Test]
     public void MyTestMethod()
     {
-        var finder = new GameObjectFinder(); // Default is 1 second timeout
+        var finder = new GameObjectFinder(5d); // 5 seconds timeout
         var button = await finder.FindByPathAsync("/**/Confirm/**/Cancel", reachable: true, interactable: true);
     }
 }
