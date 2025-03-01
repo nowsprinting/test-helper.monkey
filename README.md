@@ -111,13 +111,13 @@ Specify the world position where Monkey operators operate.
 
 ### Find and operate interactable components API
 
-`GameObjectFinder` is a class that finds `GameObject` by name or path ([glob](https://en.wikipedia.org/wiki/Glob_(programming))).
-Can specify the timeout seconds and the functions of **IsInteractable** and **IsReachable** for the constructor.
+`GameObjectFinder` is a class that finds `GameObject` by name or path (can specify [glob](https://en.wikipedia.org/wiki/Glob_(programming)) pattern).
+The constructor can specify the timeout seconds.
 
 
 #### Find GameObject by name
 
-Find `GameObject` by name (wait until they appear).
+Find a `GameObject` by name; if not found, poll until a timeout.
 
 Arguments:
 
@@ -147,7 +147,7 @@ public class MyIntegrationTest
 
 #### Find GameObject by path
 
-Find `GameObject` by path (wait until they appear).
+Find a `GameObject` by path; if not found, poll until a timeout.
 
 Arguments:
 
@@ -282,6 +282,9 @@ You should replace this when you want to operate special components that compris
 
 A sub-interface of the `IOperator` (e.g., `IClickOperator`) must be implemented to represent the type of operator.
 An operator must implement the `CanOperate` method to determine whether an operation such as click is possible and the `OperateAsync` method to execute the operation.
+
+> [!IMPORTANT]  
+> Until test-helper.monkey v0.14, the log output was output in the `Monkey` class. However, this has been changed to be output in `OperateAsync`.
 
 
 
