@@ -73,7 +73,9 @@ namespace TestHelper.Monkey.Operators
                 pointerCurrentRaycast = raycastResult,
                 pointerPressRaycast = raycastResult,
                 rawPointerPress = raycastResult.gameObject,
+#if UNITY_2022_3_OR_NEWER
                 displayIndex = raycastResult.displayIndex,
+#endif
                 position = raycastResult.screenPosition,
                 pressPosition = raycastResult.screenPosition,
                 pointerPress = component.gameObject,

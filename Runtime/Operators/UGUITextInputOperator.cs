@@ -73,7 +73,7 @@ namespace TestHelper.Monkey.Operators
             if (component.gameObject.TryGetEnabledComponent<InputFieldAnnotation>(out var annotation))
             {
                 // Overwrite rule if annotation is attached.
-                randomStringParams = _ => new RandomStringParameters(
+                randomStringParams = __ => new RandomStringParameters(
                     (int)annotation.minimumLength,
                     (int)annotation.maximumLength,
                     annotation.charactersKind);

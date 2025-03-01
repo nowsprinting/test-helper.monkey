@@ -90,9 +90,9 @@ namespace TestHelper.Monkey.Operators.Utils
 
             if (Properties.Count > 0)
             {
-                foreach (var (key, value) in Properties)
+                foreach (var prop in Properties)
                 {
-                    builder.Append($", {key}={Format(value)}");
+                    builder.Append($", {prop.Key}={Format(prop.Value)}");
                 }
             }
 
@@ -109,6 +109,11 @@ namespace TestHelper.Monkey.Operators.Utils
             if (value is Vector2 vector2)
             {
                 return $"({vector2.x:F0},{vector2.y:F0})"; // format as an integer because the screen position
+            }
+
+            if (value is Vector3 vector3)
+            {
+                return $"({vector3.x:F2},{vector3.y:F2},{vector3.z:F2})"; // C#8.0 or older have different formats
             }
 
             return value.ToString();
