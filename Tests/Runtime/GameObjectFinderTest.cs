@@ -60,8 +60,8 @@ namespace TestHelper.Monkey
             [LoadScene(TestScenePath)]
             public async Task FindByNameAsync_Found(string target, bool reachable, bool interactable)
             {
-                var (actual, _) = await _sut.FindByNameAsync(target, reachable, interactable);
-                Assert.That(actual.name, Is.EqualTo(target));
+                var result = await _sut.FindByNameAsync(target, reachable, interactable);
+                Assert.That(result.GameObject.name, Is.EqualTo(target));
             }
 
             [TestCase("NotActiveSelf")]
@@ -147,8 +147,9 @@ namespace TestHelper.Monkey
             [LoadScene(TestScenePath)]
             public async Task FindByPathAsync_Found(string path)
             {
-                var (actual, _) = await _sut.FindByPathAsync(path, reachable: false, interactable: false);
-                Assert.That(actual.transform.GetPath(), Is.EqualTo("/Canvas/Parent/Child/Grandchild/Interactable"));
+                var result = await _sut.FindByPathAsync(path, reachable: false, interactable: false);
+                Assert.That(result.GameObject.transform.GetPath(),
+                    Is.EqualTo("/Canvas/Parent/Child/Grandchild/Interactable"));
             }
 
             [TestCase("/Parent/Child/Grandchild/Interactable")]
@@ -187,8 +188,9 @@ namespace TestHelper.Monkey
                 }).Start();
 
                 var sut = new GameObjectFinder(0.5d);
-                var (actual, _) = await sut.FindByPathAsync(path, reachable: false, interactable: false);
-                Assert.That(actual.transform.GetPath(), Is.EqualTo("/Canvas/Parent/Child/Grandchild/Interactable"));
+                var result = await sut.FindByPathAsync(path, reachable: false, interactable: false);
+                Assert.That(result.GameObject.transform.GetPath(),
+                    Is.EqualTo("/Canvas/Parent/Child/Grandchild/Interactable"));
             }
         }
 
@@ -224,8 +226,8 @@ namespace TestHelper.Monkey
             [TestCase("EventTrigger", false, true)]
             public async Task FindByNameAsync_Found(string target, bool reachable, bool interactable)
             {
-                var (actual, _) = await _sut.FindByNameAsync(target, reachable, interactable);
-                Assert.That(actual.name, Is.EqualTo(target));
+                var result = await _sut.FindByNameAsync(target, reachable, interactable);
+                Assert.That(result.GameObject.name, Is.EqualTo(target));
             }
 
             [TestCase("OutOfSight")]

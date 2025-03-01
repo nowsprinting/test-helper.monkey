@@ -138,7 +138,8 @@ public class MyIntegrationTest
     public void MyTestMethod()
     {
         var finder = new GameObjectFinder(); // Default is 1 second timeout
-        var (dialog, _) = await finder.FindByNameAsync("ConfirmDialog", reachable: true, interactable: false);
+        var result = await finder.FindByNameAsync("ConfirmDialog", reachable: true, interactable: false);
+        var dialog = result.GameObject;
     }
 }
 ```
@@ -167,7 +168,8 @@ public class MyIntegrationTest
     public void MyTestMethod()
     {
         var finder = new GameObjectFinder(5d); // 5 seconds timeout
-        var (button, _) = await finder.FindByPathAsync("/**/Confirm/**/Cancel", reachable: true, interactable: true);
+        var result = await finder.FindByPathAsync("/**/Confirm/**/Cancel", reachable: true, interactable: true);
+        var button = result.GameObject;
     }
 }
 ```
@@ -193,11 +195,11 @@ public class MyIntegrationTest
     public void ClickStartButton()
     {
         var finder = new GameObjectFinder();
-        var (buttonObject, raycastResult) = await finder.FindByNameAsync("StartButton", interactable: true);
+        var result = await finder.FindByNameAsync("StartButton", interactable: true);
 
-        var button = buttonObject.GetInteractableComponents().First();
+        var button = result.GameObject.GetInteractableComponents().First();
         var clickOperator = button.SelectOperators<IClickOperator>(_operators).First();
-        clickOperator.OperateAsync(button, raycastResult);
+        clickOperator.OperateAsync(button, result.RaycastResult);
     }
 }
 ```
