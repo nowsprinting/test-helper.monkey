@@ -65,9 +65,9 @@ Configurations in `MonkeyConfig`:
     - **SuperSize**: The factor to increase resolution with. Default is 1.
     - **StereoCaptureMode**: The eye texture to capture when stereo rendering is enabled. Default is `LeftEye`.
 - **IsInteractable**: Returns whether the `Component` is interactable or not. The default implementation returns true if the component is a uGUI compatible component and its `interactable` property is true.
-- **IsIgnored**: Returns whether the `GameObject` is ignored or not. The default implementation returns true if the `GameObject` has `IgnoreAnnotation` attached.
-- **IsReachable**: Returns whether the `GameObject` is reachable from the user or not. The default implementation returns true if it can raycast from `Camera.main` to the pivot position.
-- **Operators**: Collection of `IOperator` that the monkey invokes. Default is ClickOperator, ClickAndHoldOperator, and TextInputOperator. There is support for standard uGUI components.
+- **IgnoreStrategy**: Strategy to examine whether `GameObject` should be ignored. The default implementation returns true if the `GameObject` has `IgnoreAnnotation` attached.
+- **ReachableStrategy**: Strategy to examine whether `GameObject` is reachable from the user. The default implementation returns true if it can raycast from `Camera.main` to the pivot position.
+- **Operators**: Collection of `IOperator` that the monkey invokes. Default is `ClickOperator`, `ClickAndHoldOperator`, and `TextInputOperator`. There is support for standard uGUI components.
 
 
 #### Annotations for Monkey's behavior
@@ -111,13 +111,13 @@ Specify the world position where Monkey operators operate.
 
 ### Find and operate interactable components API
 
-`GameObjectFinder` is a class that finds `GameObject` by name or path ([glob](https://en.wikipedia.org/wiki/Glob_(programming))).
-Can specify the timeout seconds and the functions of **IsInteractable** and **IsReachable** for the constructor.
+`GameObjectFinder` is a class that finds `GameObject` by name or path (can specify [glob](https://en.wikipedia.org/wiki/Glob_(programming)) pattern).
+The constructor can specify the timeout seconds.
 
 
 #### Find GameObject by name
 
-Find `GameObject` by name (wait until they appear).
+Find a `GameObject` by name; if not found, poll until a timeout.
 
 Arguments:
 
@@ -138,7 +138,8 @@ public class MyIntegrationTest
     public void MyTestMethod()
     {
         var finder = new GameObjectFinder(); // Default is 1 second timeout
-        var dialog = await finder.FindByNameAsync("ConfirmDialog", reachable: true, interactable: false);
+        var result = await finder.FindByNameAsync("ConfirmDialog", reachable: true, interactable: false);
+        var dialog = result.GameObject;
     }
 }
 ```
@@ -146,7 +147,7 @@ public class MyIntegrationTest
 
 #### Find GameObject by path
 
-Find `GameObject` by path (wait until they appear).
+Find a `GameObject` by path; if not found, poll until a timeout.
 
 Arguments:
 
@@ -167,7 +168,8 @@ public class MyIntegrationTest
     public void MyTestMethod()
     {
         var finder = new GameObjectFinder(5d); // 5 seconds timeout
-        var button = await finder.FindByPathAsync("/**/Confirm/**/Cancel", reachable: true, interactable: true);
+        var result = await finder.FindByPathAsync("/**/Confirm/**/Cancel", reachable: true, interactable: true);
+        var button = result.GameObject;
     }
 }
 ```
@@ -193,11 +195,11 @@ public class MyIntegrationTest
     public void ClickStartButton()
     {
         var finder = new GameObjectFinder();
-        var buttonObject = await finder.FindByNameAsync("StartButton", interactable: true);
+        var result = await finder.FindByNameAsync("StartButton", interactable: true);
 
-        var button = buttonObject.GetInteractableComponents().First();
+        var button = result.GameObject.GetInteractableComponents().First();
         var clickOperator = button.SelectOperators<IClickOperator>(_operators).First();
-        clickOperator.OperateAsync(button);
+        clickOperator.OperateAsync(button, result.RaycastResult);
     }
 }
 ```
@@ -256,17 +258,17 @@ Returns whether the `Component` is interactable or not.
 You should replace this when you want to control special components that comprise your game title.
 
 
-#### IsIgnored
+#### IgnoreStrategy
 
-Returns whether the `GameObject` is ignored or not.
+`IsIgnored()` method returns whether the `GameObject` is ignored or not.
 `DefaultIgnoreStrategy.IsIgnored()` returns true if the `GameObject` has `IgnoreAnnotation` attached.
 
 You should replace this when you want to ignore specific objects (e.g., by name and/or path) in your game title.
 
 
-#### IsReachable
+#### ReachableStrategy
 
-Returns whether the `GameObject` is reachable from the user or not.
+`IsReachable()` method returns whether the `GameObject` is reachable from the user or not.
 `DefaultReachableStrategy.IsReachable()` returns true if it can raycast from `Camera.main` to the pivot position.
 
 You should replace this when you want to customize the raycast point (e.g., randomize position, specify camera).
@@ -280,6 +282,9 @@ You should replace this when you want to operate special components that compris
 
 A sub-interface of the `IOperator` (e.g., `IClickOperator`) must be implemented to represent the type of operator.
 An operator must implement the `CanOperate` method to determine whether an operation such as click is possible and the `OperateAsync` method to execute the operation.
+
+> [!IMPORTANT]  
+> Until test-helper.monkey v0.14, the log output was output in the `Monkey` class. However, this has been changed to be output in `OperateAsync`.
 
 
 
@@ -307,7 +312,7 @@ The waiting seconds can be specified in the `MonkeyConfig.SecondsToErrorForNoInt
 #### Operation log message
 
 ```
-UGUIClickOperator operates to StartButton (UGUIMonkeyAgent01_0001.png)
+UGUIClickOperator operates to StartButton(-12345), screenshot=UGUIMonkeyAgent01_0001.png
 ```
 
 This log message is output just before the operator `UGUIClickOperator` operates on the `GameObject` named `StartButton`.

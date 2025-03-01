@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using TestHelper.Monkey.LogMessageBuilders;
+using TestHelper.Monkey.DefaultStrategies;
 using TestHelper.Monkey.Operators;
 using TestHelper.Random;
 using TestHelper.RuntimeInternals;
@@ -62,8 +62,8 @@ namespace TestHelper.Monkey
                         config.Logger,
                         config.Screenshots,
                         interactableComponentsFinder,
-                        config.IsIgnored,
-                        config.IsReachable,
+                        config.IgnoreStrategy,
+                        config.ReachableStrategy,
                         config.Verbose,
                         cancellationToken);
                     if (didAction)
@@ -107,8 +107,8 @@ namespace TestHelper.Monkey
         /// <param name="logger">Logger from <c>MonkeyConfig</c></param>
         /// <param name="screenshotOptions">Take screenshots options from <c>MonkeyConfig</c></param>
         /// <param name="interactableComponentsFinder">InteractableComponentsFinder instance includes isInteractable and operators</param>
-        /// <param name="isIgnored">Function returns the <c>GameObject</c> is ignored or not. from <c>MonkeyConfig</c></param>
-        /// <param name="isReachable">Function returns the <c>GameObject</c> is reachable from user or not. from <c>MonkeyConfig</c></param>
+        /// <param name="ignoreStrategy">Strategy to examine whether <c>GameObject</c> should be ignored. from <c>MonkeyConfig</c></param>
+        /// <param name="reachableStrategy">Strategy to examine whether <c>GameObject</c> is reachable from the user. from <c>MonkeyConfig</c></param>
         /// <param name="verbose">Output verbose logs</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>True if any operator was executed</returns>
@@ -117,30 +117,22 @@ namespace TestHelper.Monkey
             ILogger logger,
             ScreenshotOptions screenshotOptions,
             InteractableComponentsFinder interactableComponentsFinder,
-            Func<GameObject, ILogger, bool> isIgnored,
-            Func<GameObject, PointerEventData, List<RaycastResult>, ILogger, bool> isReachable,
+            IIgnoreStrategy ignoreStrategy,
+            IReachableStrategy reachableStrategy,
             bool verbose = false,
             CancellationToken cancellationToken = default)
         {
             var lotteryEntries = GetLotteryEntries(interactableComponentsFinder, verbose ? logger : null);
-            var (selectedComponent, selectedOperator) =
-                LotteryOperator(lotteryEntries.ToList(), random, isIgnored, isReachable, verbose ? logger : null);
+            var (selectedComponent, selectedOperator, raycastResult) = LotteryOperator(
+                lotteryEntries, random, ignoreStrategy, reachableStrategy, verbose ? logger : null);
             if (selectedComponent == null || selectedOperator == null)
             {
                 return false;
             }
 
-            var builder = new OperationMessageBuilder(selectedComponent, selectedOperator);
-            if (screenshotOptions != null)
-            {
-                var filename = screenshotOptions.FilenameStrategy.GetFilename();
-                await TakeScreenshotAsync(screenshotOptions, filename);
-                builder.AddComment(filename);
-            }
+            await selectedOperator.OperateAsync(
+                selectedComponent, raycastResult, logger, screenshotOptions, cancellationToken);
 
-            logger.Log(builder.ToString());
-
-            await selectedOperator.OperateAsync(selectedComponent, cancellationToken);
             return true;
         }
 
@@ -179,30 +171,29 @@ namespace TestHelper.Monkey
             verboseLogger.Log(lotteryEntries.ToString());
         }
 
-        internal static (Component, IOperator) LotteryOperator(
-            List<(Component, IOperator)> operators,
+        internal static (Component, IOperator, RaycastResult) LotteryOperator(
+            IEnumerable<(Component, IOperator)> operators,
             IRandom random,
-            Func<GameObject, ILogger, bool> isIgnored,
-            Func<GameObject, PointerEventData, List<RaycastResult>, ILogger, bool> isReachable,
+            IIgnoreStrategy ignoreStrategy,
+            IReachableStrategy reachableStrategy,
             ILogger verboseLogger = null)
         {
-            var pointerEventData = new PointerEventData(EventSystem.current);
-            var raycastResults = new List<RaycastResult>();
+            var operatorList = operators.ToList();
 
-            while (operators.Count > 0)
+            while (operatorList.Count > 0)
             {
-                var (selectedComponent, selectedOperator) = operators[random.Next(operators.Count)];
-                if (!isIgnored(selectedComponent.gameObject, verboseLogger) &&
-                    isReachable(selectedComponent.gameObject, pointerEventData, raycastResults, verboseLogger))
+                var (selectedComponent, selectedOperator) = operatorList[random.Next(operatorList.Count)];
+                if (!ignoreStrategy.IsIgnored(selectedComponent.gameObject, verboseLogger) &&
+                    reachableStrategy.IsReachable(selectedComponent.gameObject, out var raycastResult, verboseLogger))
                 {
-                    return (selectedComponent, selectedOperator);
+                    return (selectedComponent, selectedOperator, raycastResult);
                 }
 
-                operators.Remove((selectedComponent, selectedOperator));
+                operatorList.Remove((selectedComponent, selectedOperator));
             }
 
             verboseLogger?.Log("Lottery entries are empty or all of not reachable.");
-            return (null, null);
+            return (null, null, default);
         }
 
         private static async UniTask TakeScreenshotAsync(ScreenshotOptions screenshotOptions, string filename)

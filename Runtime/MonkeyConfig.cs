@@ -7,7 +7,6 @@ using TestHelper.Monkey.DefaultStrategies;
 using TestHelper.Monkey.Operators;
 using TestHelper.Random;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace TestHelper.Monkey
 {
@@ -62,19 +61,26 @@ namespace TestHelper.Monkey
         public Func<Component, bool> IsInteractable { get; set; } = DefaultComponentInteractableStrategy.IsInteractable;
 
         /// <summary>
-        /// Function returns the <c>GameObject</c> is ignored or not.
+        /// Strategy to examine whether <c>GameObject</c> should be ignored.
+        /// <c>verboseLogger</c> will be overridden at runtime by the <c>Logger</c> if <c>Verbose</c> is true.
         /// </summary>
-        public Func<GameObject, ILogger, bool> IsIgnored { get; set; } = DefaultIgnoreStrategy.IsIgnored;
+        /// <remarks>
+        /// This strategy replaces the v0.14.0 or older <c>IsIgnore</c> function.
+        /// </remarks>
+        public IIgnoreStrategy IgnoreStrategy { get; set; } = new DefaultIgnoreStrategy();
 
         /// <summary>
-        /// Function returns the <c>GameObject</c> is reachable from user or not.
-        /// This function is include ScreenPointStrategy (GetScreenPoint function).
+        /// Strategy to examine whether <c>GameObject</c> is reachable from the user.
+        /// <c>verboseLogger</c> will be overridden at runtime by the <c>Logger</c> if <c>Verbose</c> is true.
         /// </summary>
-        public Func<GameObject, PointerEventData, List<RaycastResult>, ILogger, bool> IsReachable { get; set; } =
-            DefaultReachableStrategy.IsReachable;
+        /// <remarks>
+        /// This strategy replaces the v0.14.0 or older <c>IsReachable</c> function.
+        /// </remarks>
+        public IReachableStrategy ReachableStrategy { get; set; } = new DefaultReachableStrategy();
 
         /// <summary>
         /// Operators that the monkey invokes.
+        /// <c>logger</c> and <c>screenshotOptions</c> will be overridden at runtime by the same name properties in this <c>MonkeyConfig</c> instance.
         /// </summary>
         public IEnumerable<IOperator> Operators { get; set; } = new IOperator[]
         {

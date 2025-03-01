@@ -8,19 +8,32 @@ using UnityEngine;
 namespace TestHelper.Monkey.DefaultStrategies
 {
     /// <summary>
-    /// Default strategy to examine whether GameObject should be ignored.
+    /// Default strategy to examine whether <c>GameObject</c> should be ignored.
     /// </summary>
-    public static class DefaultIgnoreStrategy
+    public class DefaultIgnoreStrategy : IIgnoreStrategy
     {
+        private readonly ILogger _verboseLogger;
+
         /// <summary>
-        /// Ensure the <c>GameObject</c> is ignored or not.
-        /// Default implementation is to check whether the GameObject has <c>IgnoreAnnotation</c> component.
+        /// Constructor.
         /// </summary>
-        /// <param name="gameObject"></param>
         /// <param name="verboseLogger">Logger set if you need verbose output</param>
-        /// <returns>True if GameObject is ignored</returns>
-        public static bool IsIgnored(GameObject gameObject, ILogger verboseLogger = null)
+        public DefaultIgnoreStrategy(ILogger verboseLogger = null)
         {
+            _verboseLogger = verboseLogger;
+        }
+
+        /// <summary>
+        /// Returns whether the <c>GameObject</c> is ignored or not.
+        /// Default implementation is to check whether the <c>GameObject</c> has <c>IgnoreAnnotation</c> component.
+        /// </summary>
+        /// <param name="gameObject">Target <c>GameObject</c></param>
+        /// <param name="verboseLogger">Logger set if you need verbose output</param>
+        /// <returns>True if <c>GameObject</c> is ignored</returns>
+        public bool IsIgnored(GameObject gameObject, ILogger verboseLogger = null)
+        {
+            verboseLogger = verboseLogger ?? _verboseLogger; // If null, use the specified in the constructor.
+
             var hasIgnoreAnnotation = gameObject.TryGetEnabledComponent<IgnoreAnnotation>(out _);
             if (hasIgnoreAnnotation && verboseLogger != null)
             {

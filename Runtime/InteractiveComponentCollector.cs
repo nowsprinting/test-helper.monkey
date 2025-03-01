@@ -1,4 +1,4 @@
-// Copyright (c) 2023-2024 Koji Hasegawa.
+﻿// Copyright (c) 2023-2024 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System;
@@ -41,15 +41,6 @@ namespace TestHelper.Monkey
             _isReachable = isReachable ?? DefaultReachableStrategy.IsReachable;
             _isInteractable = isInteractable ?? DefaultComponentInteractableStrategy.IsInteractable;
             _operators = operators;
-        }
-
-        /// <summary>
-        /// Constructor overload.
-        /// </summary>
-        /// <param name="config">The configuration for autopilot/tests</param>
-        public InteractiveComponentCollector(MonkeyConfig config)
-            : this(config.IsReachable, config.IsInteractable, config.Operators)
-        {
         }
 
         /// <summary>

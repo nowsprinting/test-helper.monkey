@@ -5,9 +5,10 @@ using System;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using TestHelper.Monkey.DefaultStrategies;
+using TestHelper.Monkey.Operators.Utils;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 
@@ -15,18 +16,22 @@ namespace TestHelper.Monkey.Operators
 {
     /// <summary>
     /// Click (tap) operator for Unity UI (uGUI) components.
+    /// This operator receives <c>RaycastResult</c>, but passing <c>default</c> may be OK, depending on the component being operated on.
     /// </summary>
     public class UGUIClickOperator : IClickOperator
     {
-        private readonly Func<GameObject, Vector2> _getScreenPoint;
+        private readonly ScreenshotOptions _screenshotOptions;
+        private readonly ILogger _logger;
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="getScreenPoint">The function returns the screen click position. Default is <c>DefaultScreenPointStrategy.GetScreenPoint</c>.</param>
-        public UGUIClickOperator(Func<GameObject, Vector2> getScreenPoint = null)
+        /// <param name="logger">Logger, if omitted, use Debug.unityLogger (output to console)</param>
+        /// <param name="screenshotOptions">Take screenshot options set if you need</param>
+        public UGUIClickOperator(ILogger logger = null, ScreenshotOptions screenshotOptions = null)
         {
-            this._getScreenPoint = getScreenPoint ?? DefaultScreenPointStrategy.GetScreenPoint;
+            _screenshotOptions = screenshotOptions;
+            _logger = logger ?? Debug.unityLogger;
         }
 
         /// <inheritdoc />
@@ -41,28 +46,49 @@ namespace TestHelper.Monkey.Operators
         }
 
         /// <inheritdoc />
-        public async UniTask OperateAsync(Component component, CancellationToken cancellationToken = default)
+        public async UniTask OperateAsync(Component component, RaycastResult raycastResult,
+            ILogger logger = null, ScreenshotOptions screenshotOptions = null,
+            CancellationToken cancellationToken = default)
         {
             if (!(component is IPointerClickHandler handler))
             {
                 throw new ArgumentException("Component must implement IPointerClickHandler.");
             }
 
-            EventSystem.current.SetSelectedGameObject(component.gameObject);
+            // Output log before the operation, after the shown effects
+            var operationLogger = new OperationLogger(component, this, logger ?? _logger,
+                screenshotOptions ?? _screenshotOptions);
+            operationLogger.Properties.Add("position", raycastResult.screenPosition);
+            await operationLogger.Log();
 
-            var position = _getScreenPoint(component.gameObject);
+            // Selected before operation
+            if (component is Selectable)
+            {
+                EventSystem.current.SetSelectedGameObject(component.gameObject);
+            }
+
+            // Pointer click
             var eventData = new PointerEventData(EventSystem.current)
             {
-                pointerEnter = component.gameObject,
+                pointerCurrentRaycast = raycastResult,
+                pointerPressRaycast = raycastResult,
+                rawPointerPress = raycastResult.gameObject,
+#if UNITY_2022_3_OR_NEWER
+                displayIndex = raycastResult.displayIndex,
+#endif
+                position = raycastResult.screenPosition,
+                pressPosition = raycastResult.screenPosition,
                 pointerPress = component.gameObject,
 #if UNITY_2020_3_OR_NEWER
                 pointerClick = component.gameObject,
 #endif
-                position = position,
-                pressPosition = position,
-                clickCount = 1,
+#if !UNITY_EDITOR && (UNITY_IOS || UNITY_ANDROID)
+                pointerId = 0, // Touchscreen touches go from 0
+#else
+                pointerId = -1, // Mouse left button
+#endif
                 button = PointerEventData.InputButton.Left,
-                // Note: Strictly, set rawPointerPress, pointerCurrentRaycast, and pointerPressRaycast to RaycastResults[0]
+                clickCount = 1,
             };
             handler.OnPointerClick(eventData);
         }

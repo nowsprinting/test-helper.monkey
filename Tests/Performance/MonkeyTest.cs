@@ -45,7 +45,7 @@ namespace TestHelper.Monkey
 
             Measure.Method(() =>
                 {
-                    Monkey.LotteryOperator(operators.ToList(), config.Random, config.IsIgnored, config.IsReachable);
+                    Monkey.LotteryOperator(operators, config.Random, config.IgnoreStrategy, config.ReachableStrategy);
                 })
                 .WarmupCount(5)
                 .MeasurementCount(20)
@@ -68,8 +68,8 @@ namespace TestHelper.Monkey
                         config.Logger,
                         config.Screenshots,
                         interactableComponentsFinder,
-                        config.IsIgnored,
-                        config.IsReachable)
+                        config.IgnoreStrategy,
+                        config.ReachableStrategy)
                     .ToCoroutine();
             }
         }

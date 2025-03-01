@@ -53,8 +53,8 @@ namespace TestHelper.Monkey
                 config.Logger,
                 config.Screenshots,
                 _interactableComponentsFinder,
-                config.IsIgnored,
-                config.IsReachable);
+                config.IgnoreStrategy,
+                config.ReachableStrategy);
 
             Assert.That(didAction, Is.EqualTo(true));
         }
@@ -75,8 +75,8 @@ namespace TestHelper.Monkey
                 config.Logger,
                 config.Screenshots,
                 _interactableComponentsFinder,
-                config.IsIgnored,
-                config.IsReachable);
+                config.IgnoreStrategy,
+                config.ReachableStrategy);
 
             Assert.That(didAction, Is.EqualTo(false));
         }
@@ -247,10 +247,10 @@ namespace TestHelper.Monkey
         [Test]
         public void LotteryOperator_NothingOperators_ReturnNull()
         {
-            var operators = new List<(Component, IOperator)>();
+            var operators = Enumerable.Empty<(Component, IOperator)>();
             var random = new StubRandom(0);
             var actual = Monkey.LotteryOperator(operators, random,
-                DefaultIgnoreStrategy.IsIgnored, DefaultReachableStrategy.IsReachable);
+                new DefaultIgnoreStrategy(), new DefaultReachableStrategy());
 
             Assert.That(actual.Item1, Is.Null, "InteractiveComponent is null");
             Assert.That(actual.Item2, Is.Null, "Operator is null");
@@ -268,7 +268,7 @@ namespace TestHelper.Monkey
             var operators = new List<(Component, IOperator)> { (clickable, new UGUIClickOperator()), };
             var random = new RandomWrapper();
             var actual = Monkey.LotteryOperator(operators, random,
-                DefaultIgnoreStrategy.IsIgnored, DefaultReachableStrategy.IsReachable);
+                new DefaultIgnoreStrategy(), new DefaultReachableStrategy());
 
             Assert.That(actual.Item1, Is.Null, "InteractiveComponent is null");
             Assert.That(actual.Item2, Is.Null, "Operator is null");
@@ -285,7 +285,7 @@ namespace TestHelper.Monkey
             var operators = new List<(Component, IOperator)> { (clickable, new UGUIClickOperator()), };
             var random = new RandomWrapper();
             var actual = Monkey.LotteryOperator(operators, random,
-                DefaultIgnoreStrategy.IsIgnored, DefaultReachableStrategy.IsReachable);
+                new DefaultIgnoreStrategy(), new DefaultReachableStrategy());
 
             Assert.That(actual.Item1, Is.Null, "InteractiveComponent is null");
             Assert.That(actual.Item2, Is.Null, "Operator is null");
@@ -307,7 +307,7 @@ namespace TestHelper.Monkey
             };
             var random = new StubRandom(new[] { 1 });
             var actual = Monkey.LotteryOperator(operators, random,
-                DefaultIgnoreStrategy.IsIgnored, DefaultReachableStrategy.IsReachable);
+                new DefaultIgnoreStrategy(), new DefaultReachableStrategy());
 
             Assert.That(actual.Item1, Is.EqualTo(clickable));
             Assert.That(actual.Item2, Is.EqualTo(clickOperator));
@@ -361,8 +361,8 @@ namespace TestHelper.Monkey
                     config.Logger,
                     config.Screenshots,
                     _interactableComponentsFinder,
-                    config.IsIgnored,
-                    config.IsReachable);
+                    config.IgnoreStrategy,
+                    config.ReachableStrategy);
 
                 Assert.That(_path, Does.Exist);
                 Assert.That(new FileInfo(_path), Has.Length.GreaterThan(FileSizeThreshold));
@@ -398,8 +398,8 @@ namespace TestHelper.Monkey
                     config.Logger,
                     config.Screenshots,
                     _interactableComponentsFinder,
-                    config.IsIgnored,
-                    config.IsReachable);
+                    config.IgnoreStrategy,
+                    config.ReachableStrategy);
 
                 Assert.That(path, Does.Exist);
                 Assert.That(new FileInfo(path), Has.Length.GreaterThan(FileSizeThreshold));
@@ -425,8 +425,8 @@ namespace TestHelper.Monkey
                     config.Logger,
                     config.Screenshots,
                     _interactableComponentsFinder,
-                    config.IsIgnored,
-                    config.IsReachable);
+                    config.IgnoreStrategy,
+                    config.ReachableStrategy);
 
                 Assert.That(_path, Does.Exist);
                 Assert.That(new FileInfo(_path), Has.Length.GreaterThan(FileSizeThreshold2X));
@@ -454,8 +454,8 @@ namespace TestHelper.Monkey
                     config.Logger,
                     config.Screenshots,
                     _interactableComponentsFinder,
-                    config.IsIgnored,
-                    config.IsReachable);
+                    config.IgnoreStrategy,
+                    config.ReachableStrategy);
 
                 Assert.That(_path, Does.Exist);
                 // Note: Require stereo rendering settings.
@@ -496,26 +496,22 @@ namespace TestHelper.Monkey
         [TestFixture]
         public class Verbose
         {
-            private IEnumerable<IOperator> _operators;
-            private InteractableComponentsFinder _interactableComponentsFinder;
-
-            [SetUp]
-            public void SetUp()
+            private static InteractableComponentsFinder CreateInteractableComponentsFinder()
             {
-                _operators = new IOperator[]
+                var operators = new IOperator[]
                 {
                     new UGUIClickOperator(), // click
                     new UGUIClickAndHoldOperator(1), // click and hold 1ms
                     new UGUITextInputOperator()
                 };
-                _interactableComponentsFinder = new InteractableComponentsFinder(operators: _operators);
+                return new InteractableComponentsFinder(operators: operators);
             }
 
             [Test]
             [LoadScene(TestScene)]
             public void GetLotteryEntries_NotOutputLog()
             {
-                var lotteryEntries = Monkey.GetLotteryEntries(_interactableComponentsFinder);
+                var lotteryEntries = Monkey.GetLotteryEntries(CreateInteractableComponentsFinder());
                 Assume.That(lotteryEntries.Count, Is.GreaterThan(0));
 
                 LogAssert.NoUnexpectedReceived();
@@ -528,7 +524,8 @@ namespace TestHelper.Monkey
                 GameObject.Find("UsingOnPointerClickHandler").AddComponent<IgnoreAnnotation>();
 
                 var spyLogger = new SpyLogger();
-                var lotteryEntries = Monkey.GetLotteryEntries(_interactableComponentsFinder, verboseLogger: spyLogger);
+                var lotteryEntries = Monkey.GetLotteryEntries(CreateInteractableComponentsFinder(),
+                    verboseLogger: spyLogger);
                 Assume.That(lotteryEntries.Count, Is.GreaterThan(0));
 
                 Assert.That(spyLogger.Messages, Has.Count.EqualTo(1));
@@ -552,7 +549,8 @@ namespace TestHelper.Monkey
             public void GetLotteryEntries_NoInteractableObject_LogNoLotteryEntries()
             {
                 var spyLogger = new SpyLogger();
-                var lotteryEntries = Monkey.GetLotteryEntries(_interactableComponentsFinder, verboseLogger: spyLogger);
+                var lotteryEntries = Monkey.GetLotteryEntries(CreateInteractableComponentsFinder(),
+                    verboseLogger: spyLogger);
                 Assume.That(lotteryEntries, Is.Empty);
 
                 Assert.That(spyLogger.Messages, Has.Count.EqualTo(1));
@@ -562,11 +560,12 @@ namespace TestHelper.Monkey
             [Test]
             public void LotteryOperator_NothingOperators_LogNotLottery()
             {
-                var operators = new List<(Component, IOperator)>();
+                var operators = Enumerable.Empty<(Component, IOperator)>();
                 var random = new StubRandom(0);
                 var spyLogger = new SpyLogger();
-                Monkey.LotteryOperator(operators, random,
-                    DefaultIgnoreStrategy.IsIgnored, DefaultReachableStrategy.IsReachable, spyLogger);
+                var ignoreStrategy = new DefaultIgnoreStrategy(verboseLogger: spyLogger);
+                var reachableStrategy = new DefaultReachableStrategy(verboseLogger: spyLogger);
+                Monkey.LotteryOperator(operators, random, ignoreStrategy, reachableStrategy, spyLogger);
 
                 Assert.That(spyLogger.Messages, Has.Count.EqualTo(1));
                 Assert.That(spyLogger.Messages[0], Is.EqualTo("Lottery entries are empty or all of not reachable."));
@@ -584,8 +583,9 @@ namespace TestHelper.Monkey
                 var operators = new List<(Component, IOperator)> { (clickable, new UGUIClickOperator()), };
                 var random = new RandomWrapper();
                 var spyLogger = new SpyLogger();
-                Monkey.LotteryOperator(operators, random,
-                    DefaultIgnoreStrategy.IsIgnored, DefaultReachableStrategy.IsReachable, spyLogger);
+                var ignoreStrategy = new DefaultIgnoreStrategy(verboseLogger: spyLogger);
+                var reachableStrategy = new DefaultReachableStrategy(verboseLogger: spyLogger);
+                Monkey.LotteryOperator(operators, random, ignoreStrategy, reachableStrategy, spyLogger);
 
                 Assert.That(spyLogger.Messages, Has.Count.EqualTo(2));
                 Assert.That(spyLogger.Messages[0], Does.Match(@"Ignored Cube\(\d+\)."));
@@ -603,8 +603,9 @@ namespace TestHelper.Monkey
                 var operators = new List<(Component, IOperator)> { (clickable, new UGUIClickOperator()), };
                 var random = new RandomWrapper();
                 var spyLogger = new SpyLogger();
-                Monkey.LotteryOperator(operators, random,
-                    DefaultIgnoreStrategy.IsIgnored, DefaultReachableStrategy.IsReachable, spyLogger);
+                var ignoreStrategy = new DefaultIgnoreStrategy(verboseLogger: spyLogger);
+                var reachableStrategy = new DefaultReachableStrategy(verboseLogger: spyLogger);
+                Monkey.LotteryOperator(operators, random, ignoreStrategy, reachableStrategy, spyLogger);
 
                 Assert.That(spyLogger.Messages, Has.Count.EqualTo(2));
                 Assert.That(spyLogger.Messages[0],
