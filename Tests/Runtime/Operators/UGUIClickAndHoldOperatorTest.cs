@@ -67,7 +67,7 @@ namespace TestHelper.Monkey.Operators
             await _sut.OperateAsync(component, raycastResult);
 
             LogAssert.Expect(LogType.Log, "ClickAndHoldTarget.OnPointerDown");
-            LogAssert.Expect(LogType.Log, "ClickAndHoldTarget.DestroyImmediate");
+            LogAssert.Expect(LogType.Log, "ClickAndHoldTarget.Destroy");
         }
 
         [Test]

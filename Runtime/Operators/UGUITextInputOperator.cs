@@ -2,6 +2,7 @@
 // This software is released under the MIT License.
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using TestHelper.Monkey.Annotations;
@@ -60,6 +61,7 @@ namespace TestHelper.Monkey.Operators
         }
 
         /// <inheritdoc />
+        [SuppressMessage("ReSharper", "UnusedParameter.Local")]
         public async UniTask OperateAsync(Component component, RaycastResult _,
             ILogger logger = null, ScreenshotOptions screenshotOptions = null,
             CancellationToken cancellationToken = default)
@@ -88,6 +90,7 @@ namespace TestHelper.Monkey.Operators
         }
 
         /// <inheritdoc />
+        [SuppressMessage("ReSharper", "ConvertIfStatementToSwitchStatement")]
         public async UniTask OperateAsync(Component component, string text,
             ILogger logger = null, ScreenshotOptions screenshotOptions = null,
             CancellationToken cancellationToken = default)
@@ -97,14 +100,16 @@ namespace TestHelper.Monkey.Operators
                 throw new ArgumentException("Component must be of type InputField or TMP_InputField.");
             }
 
+            logger = logger ?? _logger;
+            screenshotOptions = screenshotOptions ?? _screenshotOptions;
+
             // Output log before the operation, after the shown effects
-            var operationLogger = new OperationLogger(component, this, logger ?? _logger,
-                screenshotOptions ?? _screenshotOptions);
+            var operationLogger = new OperationLogger(component, this, logger, screenshotOptions);
             operationLogger.Properties.Add("text", $"\"{text}\"");
             await operationLogger.Log();
 
-            // Selected before operation
-            EventSystem.current.SetSelectedGameObject(component.gameObject);
+            // Select before input text
+            ExecuteEvents.ExecuteHierarchy(component.gameObject, null, ExecuteEvents.selectHandler);
 
             // Input text
             if (component is InputField inputField)

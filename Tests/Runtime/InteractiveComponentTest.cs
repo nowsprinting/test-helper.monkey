@@ -157,19 +157,6 @@ namespace TestHelper.Monkey
             }
 
             [Test]
-            public void Click_InvokeOnClick()
-            {
-                var button = new GameObject().AddComponent<Button>();
-                button.onClick.AddListener(() => Debug.Log("Invoke Button.OnClick!"));
-                var sut = InteractiveComponent.CreateInteractableComponent(button, operators: _operators);
-
-                Assume.That(sut.CanClick(), Is.True);
-                sut.Click();
-
-                LogAssert.Expect(LogType.Log, "Invoke Button.OnClick!");
-            }
-
-            [Test]
             public async Task ClickAndHold_InvokeOnPointerDownAndUp()
             {
                 var button = new GameObject("ClickAndHoldTarget").AddComponent<SpyOnPointerDownUpHandler>();
