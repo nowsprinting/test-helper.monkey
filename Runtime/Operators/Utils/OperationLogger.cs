@@ -14,7 +14,7 @@ namespace TestHelper.Monkey.Operators.Utils
     /// </summary>
     public class OperationLogger
     {
-        private readonly Component _component;
+        private readonly GameObject _gameObject;
         private readonly IOperator _operator;
         private readonly ILogger _logger;
         private readonly ScreenshotOptions _screenshotOptions;
@@ -37,14 +37,14 @@ namespace TestHelper.Monkey.Operators.Utils
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="component"></param>
+        /// <param name="gameObject"></param>
         /// <param name="operator"></param>
         /// <param name="logger"></param>
         /// <param name="screenshotOptions"></param>
-        public OperationLogger(Component component, IOperator @operator, ILogger logger,
+        public OperationLogger(GameObject gameObject, IOperator @operator, ILogger logger,
             ScreenshotOptions screenshotOptions = null)
         {
-            _component = component;
+            _gameObject = gameObject;
             _operator = @operator;
             _logger = logger;
             _screenshotOptions = screenshotOptions;
@@ -66,7 +66,7 @@ namespace TestHelper.Monkey.Operators.Utils
                         stereoCaptureMode: _screenshotOptions.StereoCaptureMode,
                         logFilepath: false
                     )
-                    .ToUniTask(_component as MonoBehaviour);
+                    .ToUniTask(_gameObject.GetComponent<MonoBehaviour>());
             }
 
             _logger.Log(BuildMessage());
@@ -75,7 +75,7 @@ namespace TestHelper.Monkey.Operators.Utils
         internal string BuildMessage()
         {
             var builder = new StringBuilder();
-            builder.Append($"{_operator.GetType().Name} operates to {_component.gameObject.name}");
+            builder.Append($"{_operator.GetType().Name} operates to {_gameObject.name}");
 
             if (Comments.Count > 0)
             {
@@ -85,7 +85,7 @@ namespace TestHelper.Monkey.Operators.Utils
             }
             else
             {
-                builder.Append($"({_component.gameObject.GetInstanceID()})");
+                builder.Append($"({_gameObject.GetInstanceID()})");
             }
 
             if (Properties.Count > 0)

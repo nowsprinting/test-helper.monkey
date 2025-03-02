@@ -24,53 +24,58 @@ namespace TestHelper.Monkey.Operators
         [Test]
         public void CanOperate_NotInputText_ReturnFalse()
         {
-            var component = new GameObject().AddComponent<Button>();
+            var gameObject = new GameObject();
+            gameObject.AddComponent<Button>();
 
-            Assert.That(_sut.CanOperate(component), Is.False);
+            Assert.That(_sut.CanOperate(gameObject), Is.False);
         }
 
         [Test]
         public void OperateAsync_InputText_SetsRandomText()
         {
-            var component = new GameObject().AddComponent<InputField>();
+            var gameObject = new GameObject();
+            var inputField = gameObject.AddComponent<InputField>();
 
-            Assume.That(_sut.CanOperate(component), Is.True);
-            _sut.OperateAsync(component, default(RaycastResult));
+            Assume.That(_sut.CanOperate(gameObject), Is.True);
+            _sut.OperateAsync(gameObject, default(RaycastResult));
 
-            Assert.That(component.text, Is.EqualTo("RANDOM"));
+            Assert.That(inputField.text, Is.EqualTo("RANDOM"));
         }
 
         [Test]
         public void OperateAsync_InputTextWithText_SetsSpecifiedText()
         {
-            var component = new GameObject().AddComponent<InputField>();
+            var gameObject = new GameObject();
+            var inputField = gameObject.AddComponent<InputField>();
 
-            Assume.That(_sut.CanOperate(component), Is.True);
-            _sut.OperateAsync(component, "SPECIFIED");
+            Assume.That(_sut.CanOperate(gameObject), Is.True);
+            _sut.OperateAsync(gameObject, "SPECIFIED");
 
-            Assert.That(component.text, Is.EqualTo("SPECIFIED"));
+            Assert.That(inputField.text, Is.EqualTo("SPECIFIED"));
         }
 
         [Test]
         public void OperateAsync_TmpInputText_SetsRandomText()
         {
-            var component = new GameObject().AddComponent<TMP_InputField>();
+            var gameObject = new GameObject();
+            var inputField = gameObject.AddComponent<TMP_InputField>();
 
-            Assume.That(_sut.CanOperate(component), Is.True);
-            _sut.OperateAsync(component, default(RaycastResult));
+            Assume.That(_sut.CanOperate(gameObject), Is.True);
+            _sut.OperateAsync(gameObject, default(RaycastResult));
 
-            Assert.That(component.text, Is.EqualTo("RANDOM"));
+            Assert.That(inputField.text, Is.EqualTo("RANDOM"));
         }
 
         [Test]
         public void OperateAsync_TmpInputTextWithText_SetsSpecifiedText()
         {
-            var component = new GameObject().AddComponent<TMP_InputField>();
+            var gameObject = new GameObject();
+            var inputField = gameObject.AddComponent<TMP_InputField>();
 
-            Assume.That(_sut.CanOperate(component), Is.True);
-            _sut.OperateAsync(component, "SPECIFIED");
+            Assume.That(_sut.CanOperate(gameObject), Is.True);
+            _sut.OperateAsync(gameObject, "SPECIFIED");
 
-            Assert.That(component.text, Is.EqualTo("SPECIFIED"));
+            Assert.That(inputField.text, Is.EqualTo("SPECIFIED"));
         }
     }
 }

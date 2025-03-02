@@ -16,8 +16,8 @@ namespace TestHelper.Monkey.TestDoubles
         {
             var nameToKeepAfterGetDestroy = this.name;
             Debug.Log($"{nameToKeepAfterGetDestroy}.{nameof(OnPointerDown)}");
-            DestroyImmediate(this.gameObject);
-            Debug.Log($"{nameToKeepAfterGetDestroy}.{nameof(DestroyImmediate)}");
+            Destroy(this.gameObject);
+            Debug.Log($"{nameToKeepAfterGetDestroy}.{nameof(Destroy)}");
         }
 
         public void OnPointerUp(PointerEventData eventData)

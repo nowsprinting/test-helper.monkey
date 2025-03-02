@@ -16,10 +16,11 @@ namespace TestHelper.Monkey.Operators.Utils
 
         private OperationLogger CreateOperationLogger(ScreenshotOptions screenshotOptions = null)
         {
-            var component = new GameObject("Target").AddComponent<FakeComponent>();
+            var gameObject = new GameObject("Target");
+            gameObject.AddComponent<FakeComponent>();
             var @operator = new UGUIClickOperator();
             _spyLogger = new SpyLogger();
-            return new OperationLogger(component, @operator, _spyLogger, screenshotOptions);
+            return new OperationLogger(gameObject, @operator, _spyLogger, screenshotOptions);
         }
 
         [Test]

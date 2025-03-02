@@ -122,36 +122,36 @@ namespace TestHelper.Monkey
             bool verbose = false,
             CancellationToken cancellationToken = default)
         {
-            var lotteryEntries = GetLotteryEntries(interactableComponentsFinder, verbose ? logger : null);
-            var (selectedComponent, selectedOperator, raycastResult) = LotteryOperator(
+            var lotteryEntries = GetLotteryEntries(interactableComponentsFinder, verbose ? logger : null).Distinct();
+            var (selectedObject, selectedOperator, raycastResult) = LotteryOperator(
                 lotteryEntries, random, ignoreStrategy, reachableStrategy, verbose ? logger : null);
-            if (selectedComponent == null || selectedOperator == null)
+            if (selectedObject == null || selectedOperator == null)
             {
                 return false;
             }
 
-            await selectedOperator.OperateAsync(
-                selectedComponent, raycastResult, logger, screenshotOptions, cancellationToken);
+            await selectedOperator.OperateAsync(selectedObject, raycastResult, logger, screenshotOptions,
+                cancellationToken);
 
             return true;
         }
 
-        internal static IEnumerable<(Component, IOperator)> GetLotteryEntries(
-            InteractableComponentsFinder interactableComponentsFinder,
+        internal static IEnumerable<(GameObject, IOperator)> GetLotteryEntries(
+            InteractableComponentsFinder finder,
             ILogger verboseLogger = null)
         {
             var lotteryEntries = verboseLogger != null ? new StringBuilder() : null;
 
-            foreach (var (component, iOperator) in
-                     interactableComponentsFinder.FindInteractableComponentsAndOperators())
+            foreach (var (component, @operator) in finder.FindInteractableComponentsAndOperators())
             {
+                var gameObject = component.gameObject;
                 if (verboseLogger != null)
                 {
                     lotteryEntries.Append(
-                        $"{component.gameObject.name}({component.gameObject.GetInstanceID()}):{component.GetType().Name}:{iOperator.GetType().Name}, ");
+                        $"{gameObject.name}({gameObject.GetInstanceID()}):{component.GetType().Name}:{@operator.GetType().Name}, ");
                 }
 
-                yield return (component, iOperator);
+                yield return (gameObject, @operator);
             }
 
             if (verboseLogger == null)
@@ -171,8 +171,8 @@ namespace TestHelper.Monkey
             verboseLogger.Log(lotteryEntries.ToString());
         }
 
-        internal static (Component, IOperator, RaycastResult) LotteryOperator(
-            IEnumerable<(Component, IOperator)> operators,
+        internal static (GameObject, IOperator, RaycastResult) LotteryOperator(
+            IEnumerable<(GameObject, IOperator)> operators,
             IRandom random,
             IIgnoreStrategy ignoreStrategy,
             IReachableStrategy reachableStrategy,
@@ -182,14 +182,14 @@ namespace TestHelper.Monkey
 
             while (operatorList.Count > 0)
             {
-                var (selectedComponent, selectedOperator) = operatorList[random.Next(operatorList.Count)];
-                if (!ignoreStrategy.IsIgnored(selectedComponent.gameObject, verboseLogger) &&
-                    reachableStrategy.IsReachable(selectedComponent.gameObject, out var raycastResult, verboseLogger))
+                var (selectedObject, selectedOperator) = operatorList[random.Next(operatorList.Count)];
+                if (!ignoreStrategy.IsIgnored(selectedObject, verboseLogger) &&
+                    reachableStrategy.IsReachable(selectedObject, out var raycastResult, verboseLogger))
                 {
-                    return (selectedComponent, selectedOperator, raycastResult);
+                    return (selectedObject, selectedOperator, raycastResult);
                 }
 
-                operatorList.Remove((selectedComponent, selectedOperator));
+                operatorList.Remove((selectedObject, selectedOperator));
             }
 
             verboseLogger?.Log("Lottery entries are empty or all of not reachable.");

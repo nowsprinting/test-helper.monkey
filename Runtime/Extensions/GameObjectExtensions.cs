@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using TestHelper.Monkey.DefaultStrategies;
+using TestHelper.Monkey.Operators;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.EventSystems;
@@ -170,6 +171,30 @@ namespace TestHelper.Monkey.Extensions
         {
             component = gameObject.GetComponent<T>();
             return component != null && (!(component is Behaviour) || (component as Behaviour).isActiveAndEnabled);
+        }
+
+        /// <summary>
+        /// Returns the operators available to this component.
+        /// </summary>
+        /// <param name="gameObject"></param>
+        /// <param name="operators">All available operators in autopilot/tests. Usually defined in <c>MonkeyConfig</c></param>
+        /// <returns>Available operators</returns>
+        public static IEnumerable<IOperator> SelectOperators(this GameObject gameObject,
+            IEnumerable<IOperator> operators)
+        {
+            return operators.Where(iOperator => iOperator.CanOperate(gameObject));
+        }
+
+        /// <summary>
+        /// Returns the operators that specify types and are available to this component.
+        /// </summary>
+        /// <param name="gameObject"></param>
+        /// <param name="operators">All available operators in autopilot/tests. Usually defined in <c>MonkeyConfig</c></param>
+        /// <returns>Available operators</returns>
+        public static IEnumerable<T> SelectOperators<T>(this GameObject gameObject, IEnumerable<IOperator> operators)
+            where T : IOperator
+        {
+            return operators.OfType<T>().Where(iOperator => iOperator.CanOperate(gameObject));
         }
     }
 }

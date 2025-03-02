@@ -109,7 +109,7 @@ Specify the world position where Monkey operators operate.
 
 
 
-### Find and operate interactable components API
+### Find and operate interactable components
 
 `GameObjectFinder` is a class that finds `GameObject` by name or path (can specify [glob](https://en.wikipedia.org/wiki/Glob_(programming)) pattern).
 The constructor can specify the timeout seconds.
@@ -197,7 +197,7 @@ public class MyIntegrationTest
         var finder = new GameObjectFinder();
         var result = await finder.FindByNameAsync("StartButton", interactable: true);
 
-        var button = result.GameObject.GetInteractableComponents().First();
+        var button = result.GameObject;
         var clickOperator = button.SelectOperators<IClickOperator>(_operators).First();
         clickOperator.OperateAsync(button, result.RaycastResult);
     }
@@ -284,7 +284,7 @@ A sub-interface of the `IOperator` (e.g., `IClickOperator`) must be implemented 
 An operator must implement the `CanOperate` method to determine whether an operation such as click is possible and the `OperateAsync` method to execute the operation.
 
 > [!IMPORTANT]  
-> Until test-helper.monkey v0.14, the log output was output in the `Monkey` class. However, this has been changed to be output in `OperateAsync`.
+> Until test-helper.monkey v0.14, it took screenshots and output logs in the caller. However, this has been changed to `OperateAsync` responsible.
 
 
 

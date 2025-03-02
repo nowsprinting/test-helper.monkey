@@ -212,23 +212,23 @@ namespace TestHelper.Monkey
         {
             var lotteryEntries = Monkey.GetLotteryEntries(_interactableComponentsFinder);
             var actual = new List<string>();
-            foreach (var (component, @operator) in lotteryEntries)
+            foreach (var (gameObject, @operator) in lotteryEntries)
             {
-                actual.Add($"{component.gameObject.name}|{component.GetType().Name}|{@operator.GetType().Name}");
+                actual.Add($"{gameObject.name}|{@operator.GetType().Name}");
             }
 
             var expected = new List<string>
             {
-                "UsingOnPointerClickHandler|SpyOnPointerClickHandler|UGUIClickOperator",
-                "UsingPointerClickEventTrigger|EventTrigger|UGUIClickOperator",
-                "UsingOnPointerDownUpHandler|SpyOnPointerDownUpHandler|UGUIClickAndHoldOperator",
-                "UsingPointerDownUpEventTrigger|EventTrigger|UGUIClickAndHoldOperator",
-                "UsingMultipleEventTriggers|EventTrigger|UGUIClickOperator",
-                "UsingMultipleEventTriggers|EventTrigger|UGUIClickAndHoldOperator",
-                "DestroyItselfIfPointerDown|StubDestroyingItselfWhenPointerDown|UGUIClickAndHoldOperator",
-                "InputField|InputField|UGUIClickOperator",
-                "InputField|InputField|UGUIClickAndHoldOperator",
-                "InputField|InputField|UGUITextInputOperator",
+                "UsingOnPointerClickHandler|UGUIClickOperator",
+                "UsingPointerClickEventTrigger|UGUIClickOperator",
+                "UsingOnPointerDownUpHandler|UGUIClickAndHoldOperator",
+                "UsingPointerDownUpEventTrigger|UGUIClickAndHoldOperator",
+                "UsingMultipleEventTriggers|UGUIClickOperator",
+                "UsingMultipleEventTriggers|UGUIClickAndHoldOperator",
+                "DestroyItselfIfPointerDown|UGUIClickAndHoldOperator",
+                "InputField|UGUIClickOperator",
+                "InputField|UGUIClickAndHoldOperator",
+                "InputField|UGUITextInputOperator",
             };
 
             Assert.That(actual, Is.EquivalentTo(expected));
@@ -247,7 +247,7 @@ namespace TestHelper.Monkey
         [Test]
         public void LotteryOperator_NothingOperators_ReturnNull()
         {
-            var operators = Enumerable.Empty<(Component, IOperator)>();
+            var operators = Enumerable.Empty<(GameObject, IOperator)>();
             var random = new StubRandom(0);
             var actual = Monkey.LotteryOperator(operators, random,
                 new DefaultIgnoreStrategy(), new DefaultReachableStrategy());
@@ -261,11 +261,11 @@ namespace TestHelper.Monkey
         public void LotteryOperator_IgnoredObjectOnly_ReturnNull()
         {
             var cube = GameObject.Find("Cube");
-            var clickable = cube.AddComponent<SpyOnPointerClickHandler>();
+            cube.AddComponent<SpyOnPointerClickHandler>();
             cube.transform.position = new Vector3(0, 0, 0);
-            cube.AddComponent<IgnoreAnnotation>();
+            cube.AddComponent<IgnoreAnnotation>(); // ignored
 
-            var operators = new List<(Component, IOperator)> { (clickable, new UGUIClickOperator()), };
+            var operators = new List<(GameObject, IOperator)> { (cube, new UGUIClickOperator()), };
             var random = new RandomWrapper();
             var actual = Monkey.LotteryOperator(operators, random,
                 new DefaultIgnoreStrategy(), new DefaultReachableStrategy());
@@ -279,10 +279,10 @@ namespace TestHelper.Monkey
         public void LotteryOperator_NotReachableObjectOnly_ReturnNull()
         {
             var cube = GameObject.Find("Cube");
-            var clickable = cube.AddComponent<SpyOnPointerClickHandler>();
+            cube.AddComponent<SpyOnPointerClickHandler>();
             cube.transform.position = new Vector3(0, 0, -20); // out of sight
 
-            var operators = new List<(Component, IOperator)> { (clickable, new UGUIClickOperator()), };
+            var operators = new List<(GameObject, IOperator)> { (cube, new UGUIClickOperator()), };
             var random = new RandomWrapper();
             var actual = Monkey.LotteryOperator(operators, random,
                 new DefaultIgnoreStrategy(), new DefaultReachableStrategy());
@@ -296,20 +296,20 @@ namespace TestHelper.Monkey
         public void LotteryOperator_BingoReachableComponent_ReturnOperator()
         {
             var cube = GameObject.Find("Cube");
-            var clickable = cube.AddComponent<SpyOnPointerClickHandler>();
+            cube.AddComponent<SpyOnPointerClickHandler>();
             var clickOperator = new UGUIClickOperator();
 
-            var operators = new List<(Component, IOperator)>()
+            var operators = new List<(GameObject, IOperator)>()
             {
                 (null, null), // dummy
-                (clickable, clickOperator),
+                (cube, clickOperator),
                 (null, null), // dummy
             };
             var random = new StubRandom(new[] { 1 });
             var actual = Monkey.LotteryOperator(operators, random,
                 new DefaultIgnoreStrategy(), new DefaultReachableStrategy());
 
-            Assert.That(actual.Item1, Is.EqualTo(clickable));
+            Assert.That(actual.Item1, Is.EqualTo(cube));
             Assert.That(actual.Item2, Is.EqualTo(clickOperator));
         }
 
@@ -560,7 +560,7 @@ namespace TestHelper.Monkey
             [Test]
             public void LotteryOperator_NothingOperators_LogNotLottery()
             {
-                var operators = Enumerable.Empty<(Component, IOperator)>();
+                var operators = Enumerable.Empty<(GameObject, IOperator)>();
                 var random = new StubRandom(0);
                 var spyLogger = new SpyLogger();
                 var ignoreStrategy = new DefaultIgnoreStrategy(verboseLogger: spyLogger);
@@ -576,11 +576,11 @@ namespace TestHelper.Monkey
             public void LotteryOperator_IgnoredObjectOnly_LogNotLottery()
             {
                 var cube = GameObject.Find("Cube");
-                var clickable = cube.AddComponent<SpyOnPointerClickHandler>();
+                cube.AddComponent<SpyOnPointerClickHandler>();
                 cube.transform.position = new Vector3(0, 0, 0);
-                cube.AddComponent<IgnoreAnnotation>();
+                cube.AddComponent<IgnoreAnnotation>(); // ignored
 
-                var operators = new List<(Component, IOperator)> { (clickable, new UGUIClickOperator()), };
+                var operators = new List<(GameObject, IOperator)> { (cube, new UGUIClickOperator()), };
                 var random = new RandomWrapper();
                 var spyLogger = new SpyLogger();
                 var ignoreStrategy = new DefaultIgnoreStrategy(verboseLogger: spyLogger);
@@ -597,10 +597,10 @@ namespace TestHelper.Monkey
             public void LotteryOperator_NotReachableObjectOnly_LogNotLottery()
             {
                 var cube = GameObject.Find("Cube");
-                var clickable = cube.AddComponent<SpyOnPointerClickHandler>();
+                cube.AddComponent<SpyOnPointerClickHandler>();
                 cube.transform.position = new Vector3(0, 0, -20); // out of sight
 
-                var operators = new List<(Component, IOperator)> { (clickable, new UGUIClickOperator()), };
+                var operators = new List<(GameObject, IOperator)> { (cube, new UGUIClickOperator()), };
                 var random = new RandomWrapper();
                 var spyLogger = new SpyLogger();
                 var ignoreStrategy = new DefaultIgnoreStrategy(verboseLogger: spyLogger);

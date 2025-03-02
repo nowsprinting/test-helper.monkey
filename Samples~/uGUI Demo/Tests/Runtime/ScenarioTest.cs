@@ -29,25 +29,25 @@ namespace TestHelper.Monkey.Samples.UGUIDemo
 
             // When click Start button, then open Home screen.
             var startButton = await _finder.FindByNameAsync("StartButton", interactable: true);
-            var startComponent = startButton.GameObject.GetInteractableComponents().First();
-            var startOperator = startComponent.SelectOperators<IClickOperator>(_config.Operators).First();
-            await startOperator.OperateAsync(startComponent, startButton.RaycastResult);
+            var startButtonObject = startButton.GameObject;
+            var startOperator = startButtonObject.SelectOperators<IClickOperator>(_config.Operators).First();
+            await startOperator.OperateAsync(startButtonObject, startButton.RaycastResult);
 
             await _finder.FindByNameAsync("Home");
 
             // When click target button, then open target screen.
             var targetButton = await _finder.FindByNameAsync($"{target}Button", interactable: true);
-            var targetComponent = targetButton.GameObject.GetInteractableComponents().First();
-            var targetOperator = targetComponent.SelectOperators<IClickOperator>(_config.Operators).First();
-            await targetOperator.OperateAsync(targetComponent, targetButton.RaycastResult);
+            var targetObject = targetButton.GameObject;
+            var targetOperator = targetObject.SelectOperators<IClickOperator>(_config.Operators).First();
+            await targetOperator.OperateAsync(targetObject, targetButton.RaycastResult);
 
             await _finder.FindByNameAsync(target);
 
             // When click Back button, then return Home screen.
             var backButton = await _finder.FindByPathAsync($"**/{target}/BackButton", interactable: true);
-            var backComponent = backButton.GameObject.GetInteractableComponents().First();
-            var backOperator = backComponent.SelectOperators<IClickOperator>(_config.Operators).First();
-            await backOperator.OperateAsync(backComponent, backButton.RaycastResult);
+            var backObject = backButton.GameObject;
+            var backOperator = backObject.SelectOperators<IClickOperator>(_config.Operators).First();
+            await backOperator.OperateAsync(backObject, backButton.RaycastResult);
 
             await _finder.FindByNameAsync("Home");
         }

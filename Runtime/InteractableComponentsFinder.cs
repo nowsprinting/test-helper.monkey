@@ -68,7 +68,8 @@ namespace TestHelper.Monkey
         /// <returns>Tuple of interactable component and operator</returns>
         public IEnumerable<(Component, IOperator)> FindInteractableComponentsAndOperators()
         {
-            return FindInteractableComponents().SelectMany(x => x.SelectOperators(_operators), (x, o) => (x, o));
+            return FindInteractableComponents()
+                .SelectMany(x => x.gameObject.SelectOperators(_operators), (x, o) => (x, o));
         }
 
         private static IEnumerable<MonoBehaviour> FindMonoBehaviours()

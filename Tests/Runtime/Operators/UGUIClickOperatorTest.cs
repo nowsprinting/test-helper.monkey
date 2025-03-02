@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2023-2024 Koji Hasegawa.
 // This software is released under the MIT License.
 
+using System.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Monkey.DefaultStrategies;
 using TestHelper.Monkey.TestDoubles;
@@ -18,34 +19,36 @@ namespace TestHelper.Monkey.Operators
         [Test]
         public void CanOperate_CanNotClick_ReturnFalse()
         {
-            var component = new GameObject().AddComponent<SpyOnPointerDownUpHandler>();
+            var gameObject = new GameObject();
+            gameObject.AddComponent<SpyOnPointerDownUpHandler>();
 
-            Assert.That(_sut.CanOperate(component), Is.False);
+            Assert.That(_sut.CanOperate(gameObject), Is.False);
         }
 
         [Test]
-        public void OperateAsync_EventHandler_InvokeOnClick()
+        public async Task OperateAsync_EventHandler_InvokeOnClick()
         {
-            var component = new GameObject("ClickTarget").AddComponent<SpyOnPointerClickHandler>();
-            var position = TransformPositionStrategy.GetScreenPoint(component.gameObject);
+            var gameObject = new GameObject("ClickTarget");
+            gameObject.AddComponent<SpyOnPointerClickHandler>();
+            var position = TransformPositionStrategy.GetScreenPoint(gameObject);
             var raycastResult = new RaycastResult { screenPosition = position };
 
-            Assume.That(_sut.CanOperate(component), Is.True);
-            _sut.OperateAsync(component, raycastResult);
+            Assume.That(_sut.CanOperate(gameObject), Is.True);
+            await _sut.OperateAsync(gameObject, raycastResult);
 
             LogAssert.Expect(LogType.Log, "ClickTarget.OnPointerClick");
         }
 
         [Test]
-        public void OperateAsync_EventTrigger_InvokeOnClick()
+        public async Task OperateAsync_EventTrigger_InvokeOnClick()
         {
-            var receiver = new GameObject("ClickTarget").AddComponent<SpyPointerClickEventReceiver>();
-            var component = receiver.gameObject.GetComponent<EventTrigger>();
-            var position = TransformPositionStrategy.GetScreenPoint(component.gameObject);
+            var gameObject = new GameObject("ClickTarget");
+            gameObject.AddComponent<SpyPointerClickEventReceiver>();
+            var position = TransformPositionStrategy.GetScreenPoint(gameObject);
             var raycastResult = new RaycastResult { screenPosition = position };
 
-            Assume.That(_sut.CanOperate(component), Is.True);
-            _sut.OperateAsync(component, raycastResult);
+            Assume.That(_sut.CanOperate(gameObject), Is.True);
+            await _sut.OperateAsync(gameObject, raycastResult);
 
             LogAssert.Expect(LogType.Log, "ClickTarget.ReceivePointerClick");
         }

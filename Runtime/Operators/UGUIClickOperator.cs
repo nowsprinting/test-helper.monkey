@@ -1,14 +1,13 @@
 ﻿// Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
-using System;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using TestHelper.Monkey.Extensions;
 using TestHelper.Monkey.Operators.Utils;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 #pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 
@@ -35,62 +34,36 @@ namespace TestHelper.Monkey.Operators
         }
 
         /// <inheritdoc />
-        public bool CanOperate(Component component)
+        public bool CanOperate(GameObject gameObject)
         {
-            if (component as EventTrigger)
+            if (gameObject.TryGetEnabledComponent<EventTrigger>(out var eventTrigger))
             {
-                return ((EventTrigger)component).triggers.Any(x => x.eventID == EventTriggerType.PointerClick);
+                return eventTrigger.triggers.Any(x => x.eventID == EventTriggerType.PointerClick);
             }
 
-            return component.GetType().GetInterfaces().Contains(typeof(IPointerClickHandler));
+            return gameObject.GetComponents<Component>()
+                .SelectMany(x => x.GetType().GetInterfaces())
+                .Any(x => x == typeof(IPointerClickHandler));
         }
 
         /// <inheritdoc />
-        public async UniTask OperateAsync(Component component, RaycastResult raycastResult,
+        public async UniTask OperateAsync(GameObject gameObject, RaycastResult raycastResult,
             ILogger logger = null, ScreenshotOptions screenshotOptions = null,
             CancellationToken cancellationToken = default)
         {
-            if (!(component is IPointerClickHandler handler))
-            {
-                throw new ArgumentException("Component must implement IPointerClickHandler.");
-            }
+            logger = logger ?? _logger;
+            screenshotOptions = screenshotOptions ?? _screenshotOptions;
 
             // Output log before the operation, after the shown effects
-            var operationLogger = new OperationLogger(component, this, logger ?? _logger,
-                screenshotOptions ?? _screenshotOptions);
+            var operationLogger = new OperationLogger(gameObject, this, logger, screenshotOptions);
             operationLogger.Properties.Add("position", raycastResult.screenPosition);
             await operationLogger.Log();
 
-            // Selected before operation
-            if (component is Selectable)
+            // Do operation
+            using (var pointerClickSimulator = new PointerEventSimulator(gameObject, raycastResult, logger))
             {
-                EventSystem.current.SetSelectedGameObject(component.gameObject);
+                await pointerClickSimulator.PointerClickAsync(cancellationToken: cancellationToken);
             }
-
-            // Pointer click
-            var eventData = new PointerEventData(EventSystem.current)
-            {
-                pointerCurrentRaycast = raycastResult,
-                pointerPressRaycast = raycastResult,
-                rawPointerPress = raycastResult.gameObject,
-#if UNITY_2022_3_OR_NEWER
-                displayIndex = raycastResult.displayIndex,
-#endif
-                position = raycastResult.screenPosition,
-                pressPosition = raycastResult.screenPosition,
-                pointerPress = component.gameObject,
-#if UNITY_2020_3_OR_NEWER
-                pointerClick = component.gameObject,
-#endif
-#if !UNITY_EDITOR && (UNITY_IOS || UNITY_ANDROID)
-                pointerId = 0, // Touchscreen touches go from 0
-#else
-                pointerId = -1, // Mouse left button
-#endif
-                button = PointerEventData.InputButton.Left,
-                clickCount = 1,
-            };
-            handler.OnPointerClick(eventData);
         }
     }
 }

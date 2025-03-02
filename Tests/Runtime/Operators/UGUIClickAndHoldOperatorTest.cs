@@ -22,20 +22,22 @@ namespace TestHelper.Monkey.Operators
         [Test]
         public void CanOperate_CanNotTouchAndHold_ReturnFalse()
         {
-            var component = new GameObject().AddComponent<SpyOnPointerClickHandler>();
+            var gameObject = new GameObject();
+            gameObject.AddComponent<SpyOnPointerClickHandler>();
 
-            Assert.That(_sut.CanOperate(component), Is.False);
+            Assert.That(_sut.CanOperate(gameObject), Is.False);
         }
 
         [Test]
         public async Task OperateAsync_EventHandler_InvokeOnPointerDownAndUp()
         {
-            var component = new GameObject("ClickAndHoldTarget").AddComponent<SpyOnPointerDownUpHandler>();
-            var position = TransformPositionStrategy.GetScreenPoint(component.gameObject);
+            var gameObject = new GameObject("ClickAndHoldTarget");
+            gameObject.AddComponent<SpyOnPointerDownUpHandler>();
+            var position = TransformPositionStrategy.GetScreenPoint(gameObject);
             var raycastResult = new RaycastResult { screenPosition = position };
 
-            Assume.That(_sut.CanOperate(component), Is.True);
-            await _sut.OperateAsync(component, raycastResult);
+            Assume.That(_sut.CanOperate(gameObject), Is.True);
+            await _sut.OperateAsync(gameObject, raycastResult);
 
             LogAssert.Expect(LogType.Log, "ClickAndHoldTarget.OnPointerDown");
             LogAssert.Expect(LogType.Log, "ClickAndHoldTarget.OnPointerUp");
@@ -44,13 +46,13 @@ namespace TestHelper.Monkey.Operators
         [Test]
         public async Task OperateAsync_EventTrigger_InvokeOnPointerDownAndUp()
         {
-            var receiver = new GameObject("ClickAndHoldTarget").AddComponent<SpyPointerDownUpEventReceiver>();
-            var component = receiver.gameObject.GetComponent<EventTrigger>();
-            var position = TransformPositionStrategy.GetScreenPoint(component.gameObject);
+            var gameObject = new GameObject("ClickAndHoldTarget");
+            gameObject.AddComponent<SpyPointerDownUpEventReceiver>();
+            var position = TransformPositionStrategy.GetScreenPoint(gameObject);
             var raycastResult = new RaycastResult { screenPosition = position };
 
-            Assume.That(_sut.CanOperate(component), Is.True);
-            await _sut.OperateAsync(component, raycastResult);
+            Assume.That(_sut.CanOperate(gameObject), Is.True);
+            await _sut.OperateAsync(gameObject, raycastResult);
 
             LogAssert.Expect(LogType.Log, "ClickAndHoldTarget.ReceivePointerDown");
             LogAssert.Expect(LogType.Log, "ClickAndHoldTarget.ReceivePointerUp");
@@ -59,30 +61,32 @@ namespace TestHelper.Monkey.Operators
         [Test]
         public async Task OperateAsync_DestroyAfterPointerDown_NoError()
         {
-            var component = new GameObject("ClickAndHoldTarget").AddComponent<StubDestroyingItselfWhenPointerDown>();
-            var position = TransformPositionStrategy.GetScreenPoint(component.gameObject);
+            var gameObject = new GameObject("ClickAndHoldTarget");
+            gameObject.AddComponent<StubDestroyingItselfWhenPointerDown>();
+            var position = TransformPositionStrategy.GetScreenPoint(gameObject);
             var raycastResult = new RaycastResult { screenPosition = position };
 
-            Assume.That(_sut.CanOperate(component), Is.True);
-            await _sut.OperateAsync(component, raycastResult);
+            Assume.That(_sut.CanOperate(gameObject), Is.True);
+            await _sut.OperateAsync(gameObject, raycastResult);
 
             LogAssert.Expect(LogType.Log, "ClickAndHoldTarget.OnPointerDown");
-            LogAssert.Expect(LogType.Log, "ClickAndHoldTarget.DestroyImmediate");
+            LogAssert.Expect(LogType.Log, "ClickAndHoldTarget.Destroy");
         }
 
         [Test]
         [SuppressMessage("ReSharper", "MethodSupportsCancellation")]
         public async Task OperateAsync_Cancel()
         {
-            var component = new GameObject("ClickAndHoldTarget").AddComponent<StubLogErrorWhenOnPointerUp>();
-            var position = TransformPositionStrategy.GetScreenPoint(component.gameObject);
+            var gameObject = new GameObject("ClickAndHoldTarget");
+            gameObject.AddComponent<StubLogErrorWhenOnPointerUp>();
+            var position = TransformPositionStrategy.GetScreenPoint(gameObject);
             var raycastResult = new RaycastResult { screenPosition = position };
 
-            Assume.That(_sut.CanOperate(component), Is.True);
+            Assume.That(_sut.CanOperate(gameObject), Is.True);
 
             using (var cancellationTokenSource = new CancellationTokenSource())
             {
-                _sut.OperateAsync(component, raycastResult, null, null, cancellationTokenSource.Token).Forget();
+                _sut.OperateAsync(gameObject, raycastResult, null, null, cancellationTokenSource.Token).Forget();
                 await UniTask.NextFrame();
 
                 cancellationTokenSource.Cancel(); // Not output LogError from StubLogErrorWhenOnPointerUp
