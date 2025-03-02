@@ -54,9 +54,10 @@ namespace TestHelper.Monkey.Operators
         public bool CanOperate(GameObject gameObject)
         {
 #if ENABLE_TMP
-            return gameObject.TryGetComponent<InputField>(out _) || gameObject.TryGetComponent<TMP_InputField>(out _);
+            return gameObject.TryGetEnabledComponent<InputField>(out _) ||
+                   gameObject.TryGetEnabledComponent<TMP_InputField>(out _);
 #else
-            return gameObject.TryGetComponent<InputField>(out _);
+            return gameObject.TryGetEnabledComponent<InputField>(out _);
 #endif
         }
 
@@ -103,12 +104,12 @@ namespace TestHelper.Monkey.Operators
             // Note: OnDeselect event is called by the system when the focus moves to another element, so it is not called in this method.
 
             // Input text
-            if (gameObject.TryGetComponent<InputField>(out var inputField))
+            if (gameObject.TryGetEnabledComponent<InputField>(out var inputField))
             {
                 inputField.text = text;
             }
 #if ENABLE_TMP
-            if (gameObject.TryGetComponent<TMP_InputField>(out var tmpInputField))
+            if (gameObject.TryGetEnabledComponent<TMP_InputField>(out var tmpInputField))
             {
                 tmpInputField.text = text;
             }

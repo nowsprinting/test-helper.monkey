@@ -4,6 +4,7 @@
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using TestHelper.Monkey.Extensions;
 using TestHelper.Monkey.Operators.Utils;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -35,7 +36,7 @@ namespace TestHelper.Monkey.Operators
         /// <inheritdoc />
         public bool CanOperate(GameObject gameObject)
         {
-            if (gameObject.TryGetComponent<EventTrigger>(out var eventTrigger))
+            if (gameObject.TryGetEnabledComponent<EventTrigger>(out var eventTrigger))
             {
                 return eventTrigger.triggers.Any(x => x.eventID == EventTriggerType.PointerClick);
             }
