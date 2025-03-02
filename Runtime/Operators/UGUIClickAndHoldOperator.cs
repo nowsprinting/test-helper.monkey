@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
-using System;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -39,38 +38,35 @@ namespace TestHelper.Monkey.Operators
         }
 
         /// <inheritdoc />
-        public bool CanOperate(Component component)
+        public bool CanOperate(GameObject gameObject)
         {
-            if (component as EventTrigger)
+            if (gameObject.TryGetComponent<EventTrigger>(out var eventTrigger))
             {
-                return ((EventTrigger)component).triggers.Any(x => x.eventID == EventTriggerType.PointerDown) &&
-                       ((EventTrigger)component).triggers.Any(x => x.eventID == EventTriggerType.PointerUp);
+                return eventTrigger.triggers.Any(x => x.eventID == EventTriggerType.PointerDown) &&
+                       eventTrigger.triggers.Any(x => x.eventID == EventTriggerType.PointerUp);
             }
 
-            var interfaces = component.GetType().GetInterfaces();
+            var interfaces = gameObject.GetComponents<Component>()
+                .SelectMany(x => x.GetType().GetInterfaces())
+                .ToList();
             return interfaces.Contains(typeof(IPointerDownHandler)) && interfaces.Contains(typeof(IPointerUpHandler));
         }
 
         /// <inheritdoc />
-        public async UniTask OperateAsync(Component component, RaycastResult raycastResult,
+        public async UniTask OperateAsync(GameObject gameObject, RaycastResult raycastResult,
             ILogger logger = null, ScreenshotOptions screenshotOptions = null,
             CancellationToken cancellationToken = default)
         {
-            if (!(component is IPointerDownHandler) || !(component is IPointerUpHandler))
-            {
-                throw new ArgumentException("Component must implement IPointerDownHandler and IPointerUpHandler.");
-            }
-
             logger = logger ?? _logger;
             screenshotOptions = screenshotOptions ?? _screenshotOptions;
 
             // Output log before the operation, after the shown effects
-            var operationLogger = new OperationLogger(component, this, logger, screenshotOptions);
+            var operationLogger = new OperationLogger(gameObject, this, logger, screenshotOptions);
             operationLogger.Properties.Add("position", raycastResult.screenPosition);
             await operationLogger.Log();
 
             // Do operation
-            using (var pointerClickSimulator = new PointerEventSimulator(component.gameObject, raycastResult, logger))
+            using (var pointerClickSimulator = new PointerEventSimulator(gameObject, raycastResult, logger))
             {
                 await pointerClickSimulator.PointerClickAsync(_holdMillis, cancellationToken);
             }

@@ -19,9 +19,10 @@ namespace TestHelper.Monkey.Extensions
         /// <param name="component"></param>
         /// <param name="operators">All available operators in autopilot/tests. Usually defined in <c>MonkeyConfig</c></param>
         /// <returns>Available operators</returns>
+        [Obsolete("Use GameObjectExtensions.SelectOperators instead.")]
         public static IEnumerable<IOperator> SelectOperators(this Component component, IEnumerable<IOperator> operators)
         {
-            return operators.Where(iOperator => iOperator.CanOperate(component));
+            return operators.Where(iOperator => iOperator.CanOperate(component.gameObject));
         }
 
         /// <summary>
@@ -30,10 +31,11 @@ namespace TestHelper.Monkey.Extensions
         /// <param name="component"></param>
         /// <param name="operators">All available operators in autopilot/tests. Usually defined in <c>MonkeyConfig</c></param>
         /// <returns>Available operators</returns>
+        [Obsolete("Use GameObjectExtensions.SelectOperators<T> instead.")]
         public static IEnumerable<T> SelectOperators<T>(this Component component, IEnumerable<IOperator> operators)
             where T : IOperator
         {
-            return operators.OfType<T>().Where(iOperator => iOperator.CanOperate(component));
+            return operators.OfType<T>().Where(iOperator => iOperator.CanOperate(component.gameObject));
         }
 
         /// <summary>

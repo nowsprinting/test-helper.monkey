@@ -54,7 +54,7 @@ namespace TestHelper.Monkey.Operators.Utils
         /// </list>
         /// </summary>
         /// <remarks>
-        /// <c>OnDeselect</c> event is called by the system when the focus moves to another element, so it is not called explicitly.
+        /// <c>OnDeselect</c> event is called by the system when the focus moves to another element, so it is not called in this method.
         /// </remarks>
         /// <param name="holdMillis">Hold time in milliseconds if click-and-hold</param>
         /// <param name="cancellationToken">Cancellation token to use when holding</param>

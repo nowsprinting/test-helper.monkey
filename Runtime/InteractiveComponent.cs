@@ -161,7 +161,7 @@ namespace TestHelper.Monkey
         /// Click component.
         /// </summary>
         [Obsolete]
-        public void Click() => GetOperatorsByType<IClickOperator>().First().OperateAsync(component, default);
+        public void Click() => GetOperatorsByType<IClickOperator>().First().OperateAsync(component.gameObject, default);
 
         [Obsolete]
         public bool CanTap() => CanClick();
@@ -182,7 +182,7 @@ namespace TestHelper.Monkey
         public async UniTask ClickAndHold(CancellationToken cancellationToken = default)
         {
             var clickAndHoldOperator = GetOperatorsByType<IClickAndHoldOperator>().First();
-            await clickAndHoldOperator.OperateAsync(component, default, null, null, cancellationToken);
+            await clickAndHoldOperator.OperateAsync(component.gameObject, default, null, null, cancellationToken);
         }
 
         [Obsolete]
@@ -203,7 +203,7 @@ namespace TestHelper.Monkey
         /// </summary>
         [Obsolete]
         public void TextInput() => GetOperatorsByType<ITextInputOperator>().First()
-            .OperateAsync(component, default(RaycastResult));
+            .OperateAsync(component.gameObject, default(RaycastResult));
 
         /// <summary>
         /// Input specified text.
@@ -212,7 +212,7 @@ namespace TestHelper.Monkey
         public void TextInput(string text)
         {
             var textInputOperator = GetOperatorsByType<ITextInputOperator>().First();
-            textInputOperator.OperateAsync(component, text);
+            textInputOperator.OperateAsync(component.gameObject, text);
         }
     }
 }

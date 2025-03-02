@@ -51,28 +51,23 @@ namespace TestHelper.Monkey.Operators
         }
 
         /// <inheritdoc />
-        public bool CanOperate(Component component)
+        public bool CanOperate(GameObject gameObject)
         {
 #if ENABLE_TMP
-            return component is InputField || component is TMP_InputField;
+            return gameObject.TryGetComponent<InputField>(out _) || gameObject.TryGetComponent<TMP_InputField>(out _);
 #else
-            return component is InputField;
+            return gameObject.TryGetComponent<InputField>(out _);
 #endif
         }
 
         /// <inheritdoc />
         [SuppressMessage("ReSharper", "UnusedParameter.Local")]
-        public async UniTask OperateAsync(Component component, RaycastResult _,
+        public async UniTask OperateAsync(GameObject gameObject, RaycastResult _,
             ILogger logger = null, ScreenshotOptions screenshotOptions = null,
             CancellationToken cancellationToken = default)
         {
-            if (!CanOperate(component))
-            {
-                throw new ArgumentException("Component must be of type InputField or TMP_InputField.");
-            }
-
             Func<GameObject, RandomStringParameters> randomStringParams;
-            if (component.gameObject.TryGetEnabledComponent<InputFieldAnnotation>(out var annotation))
+            if (gameObject.TryGetEnabledComponent<InputFieldAnnotation>(out var annotation))
             {
                 // Overwrite rule if annotation is attached.
                 randomStringParams = __ => new RandomStringParameters(
@@ -85,39 +80,35 @@ namespace TestHelper.Monkey.Operators
                 randomStringParams = _randomStringParams;
             }
 
-            var text = _randomString.Next(randomStringParams(component.gameObject));
-            await OperateAsync(component, text, logger, screenshotOptions, cancellationToken);
+            var text = _randomString.Next(randomStringParams(gameObject));
+            await OperateAsync(gameObject, text, logger, screenshotOptions, cancellationToken);
         }
 
         /// <inheritdoc />
         [SuppressMessage("ReSharper", "ConvertIfStatementToSwitchStatement")]
-        public async UniTask OperateAsync(Component component, string text,
+        public async UniTask OperateAsync(GameObject gameObject, string text,
             ILogger logger = null, ScreenshotOptions screenshotOptions = null,
             CancellationToken cancellationToken = default)
         {
-            if (!CanOperate(component))
-            {
-                throw new ArgumentException("Component must be of type InputField or TMP_InputField.");
-            }
-
             logger = logger ?? _logger;
             screenshotOptions = screenshotOptions ?? _screenshotOptions;
 
             // Output log before the operation, after the shown effects
-            var operationLogger = new OperationLogger(component, this, logger, screenshotOptions);
+            var operationLogger = new OperationLogger(gameObject, this, logger, screenshotOptions);
             operationLogger.Properties.Add("text", $"\"{text}\"");
             await operationLogger.Log();
 
             // Select before input text
-            ExecuteEvents.ExecuteHierarchy(component.gameObject, null, ExecuteEvents.selectHandler);
+            ExecuteEvents.ExecuteHierarchy(gameObject, null, ExecuteEvents.selectHandler);
+            // Note: OnDeselect event is called by the system when the focus moves to another element, so it is not called in this method.
 
             // Input text
-            if (component is InputField inputField)
+            if (gameObject.TryGetComponent<InputField>(out var inputField))
             {
                 inputField.text = text;
             }
 #if ENABLE_TMP
-            if (component is TMP_InputField tmpInputField)
+            if (gameObject.TryGetComponent<TMP_InputField>(out var tmpInputField))
             {
                 tmpInputField.text = text;
             }

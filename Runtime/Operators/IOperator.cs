@@ -19,11 +19,11 @@ namespace TestHelper.Monkey.Operators
     public interface IOperator
     {
         /// <summary>
-        /// Returns if can operate target component this Operator.
+        /// Returns if can operate target <c>GameObject</c> this Operator.
         /// </summary>
-        /// <param name="component">Operation target component</param>
-        /// <returns>True if can operate component this Operator.</returns>
-        bool CanOperate(Component component);
+        /// <param name="gameObject">Operation target <c>GameObject</c></param>
+        /// <returns>True if can operate <c>GameObject</c> this Operator.</returns>
+        bool CanOperate(GameObject gameObject);
 
         /// <summary>
         /// Execute this operator in monkey testing.
@@ -32,12 +32,12 @@ namespace TestHelper.Monkey.Operators
         /// If required parameters for the operation, such as hold time, input text strategy, etc., keep them in instance fields of the implementation class.
         /// If you want to add parameters for execution outside of monkey tests, define a sub-interface (e.g., <c>ITextInputOperator</c>).
         /// </remarks>
-        /// <param name="component">Operation target component</param>
+        /// <param name="gameObject">Operation target <c>GameObject</c></param>
         /// <param name="raycastResult"><c>RaycastResult</c> includes the screen position of the starting operation. Passing <c>default</c> may be OK, depending on the operator implementation.</param>
         /// <param name="logger">Logger set if you need</param>
         /// <param name="screenshotOptions">Take screenshot options set if you need</param>
         /// <param name="cancellationToken">Cancellation token for operation (e.g., click and hold)</param>
-        UniTask OperateAsync(Component component, RaycastResult raycastResult,
+        UniTask OperateAsync(GameObject gameObject, RaycastResult raycastResult,
             ILogger logger = null, ScreenshotOptions screenshotOptions = null,
             CancellationToken cancellationToken = default);
     }
