@@ -3,7 +3,7 @@
 
 using UnityEngine;
 
-namespace TestHelper.Monkey.Meshes
+namespace TestHelper.Monkey.TestComponents
 {
     /// <summary>
     /// Create a mesh that not contains a Transform position of the GameObject that the component attached to.
