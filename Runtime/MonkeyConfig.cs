@@ -27,7 +27,7 @@ namespace TestHelper.Monkey
         public int DelayMillis { get; set; } = 200;
 
         /// <summary>
-        /// Seconds to determine that a throw <see cref="TimeoutException"/> when an object that can be interacted with does not exist.
+        /// Seconds after which a <see cref="TimeoutException"/> is thrown if no interactive component is found.
         /// Disable detection if set to 0.
         /// </summary>
         public int SecondsToErrorForNoInteractiveComponent { get; set; } = 5;
