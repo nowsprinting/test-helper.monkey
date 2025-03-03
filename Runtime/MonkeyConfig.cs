@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using TestHelper.Monkey.DefaultStrategies;
+using TestHelper.Monkey.Exceptions;
 using TestHelper.Monkey.Operators;
 using TestHelper.Random;
 using UnityEngine;
@@ -26,9 +27,15 @@ namespace TestHelper.Monkey
         public int DelayMillis { get; set; } = 200;
 
         /// <summary>
-        /// Seconds to determine that an error has occurred when an object that can be interacted with does not exist
+        /// Seconds to determine that a throw <see cref="TimeoutException"/> when an object that can be interacted with does not exist.
         /// </summary>
         public int SecondsToErrorForNoInteractiveComponent { get; set; } = 5;
+
+        /// <summary>
+        /// An <see cref="InfiniteLoopException"/> is thrown if a repeating operation is detected within the specified buffer length.
+        /// For example, if the buffer length is 10, repeating 5-step sequences can be detected.
+        /// </summary>
+        public int BufferLengthForDetectLooping { get; set; } = 10;
 
         /// <summary>
         /// Pseudo-random number generator
