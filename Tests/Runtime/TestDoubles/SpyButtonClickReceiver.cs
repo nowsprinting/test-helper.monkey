@@ -10,7 +10,7 @@ namespace TestHelper.Monkey.TestDoubles
     /// <summary>
     /// OnClick event receiver for UnityEngine.UI.Button
     /// </summary>
-    [AddComponentMenu("")] // Hide from "Add Component" picker
+    [AddComponentMenu("/")] // Hide from "Add Component" picker
     [RequireComponent(typeof(Button))]
     internal class SpyButtonClickReceiver : MonoBehaviour
     {

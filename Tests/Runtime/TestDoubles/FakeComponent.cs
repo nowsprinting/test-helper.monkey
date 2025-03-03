@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace TestHelper.Monkey.TestDoubles
 {
+    [AddComponentMenu("/")] // Hide from "Add Component" picker
     public class FakeComponent : MonoBehaviour
     {
     }

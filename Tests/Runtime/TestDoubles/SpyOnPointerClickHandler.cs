@@ -10,7 +10,7 @@ namespace TestHelper.Monkey.TestDoubles
     /// <summary>
     /// Pointer click event handler
     /// </summary>
-    [AddComponentMenu("")] // Hide from "Add Component" picker
+    [AddComponentMenu("/")] // Hide from "Add Component" picker
     internal class SpyOnPointerClickHandler : MonoBehaviour, IPointerClickHandler
     {
         private void Log([CallerMemberName] string member = "")
