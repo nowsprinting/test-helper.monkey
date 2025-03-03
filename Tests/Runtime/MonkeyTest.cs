@@ -49,7 +49,7 @@ namespace TestHelper.Monkey
         public async Task RunStep_finish()
         {
             var config = new MonkeyConfig();
-            var didAction = await Monkey.RunStep(
+            var (didAction, _) = await Monkey.RunStep(
                 config.Random,
                 config.Logger,
                 config.Screenshots,
@@ -71,7 +71,7 @@ namespace TestHelper.Monkey
             }
 
             var config = new MonkeyConfig();
-            var didAction = await Monkey.RunStep(
+            var (didAction, _) = await Monkey.RunStep(
                 config.Random,
                 config.Logger,
                 config.Screenshots,

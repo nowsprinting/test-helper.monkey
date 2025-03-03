@@ -53,7 +53,7 @@ namespace TestHelper.Monkey
             }
 
             var interactableComponentsFinder = new InteractableComponentsFinder(config);
-            var operationSequence = new List<int>();
+            var operationSequence = new List<int>(config.BufferLengthForDetectLooping);
 
             config.Logger.Log($"Using {config.Random}");
 
@@ -75,15 +75,18 @@ namespace TestHelper.Monkey
                         lastOperationTime = Time.realtimeSinceStartup;
 
                         // Detecting infinite loop
-                        if (operationSequence.Count >= config.BufferLengthForDetectLooping)
-                            operationSequence.Remove(0);
-                        operationSequence.Add(instanceId);
-                        if (DetectInfiniteLoop(ref operationSequence))
+                        if (config.BufferLengthForDetectLooping > 0)
                         {
-                            throw new InfiniteLoopException();
+                            if (operationSequence.Count >= config.BufferLengthForDetectLooping)
+                                operationSequence.Remove(0);
+                            operationSequence.Add(instanceId);
+                            if (DetectInfiniteLoop(ref operationSequence))
+                            {
+                                throw new InfiniteLoopException();
+                            }
                         }
                     }
-                    else if (0 < config.SecondsToErrorForNoInteractiveComponent &&
+                    else if (config.SecondsToErrorForNoInteractiveComponent > 0 &&
                              config.SecondsToErrorForNoInteractiveComponent <
                              (Time.realtimeSinceStartup - lastOperationTime))
                     {
