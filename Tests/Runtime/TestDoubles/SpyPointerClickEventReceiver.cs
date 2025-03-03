@@ -11,7 +11,7 @@ namespace TestHelper.Monkey.TestDoubles
     /// <summary>
     /// Pointer click event receiver using EventTrigger
     /// </summary>
-    [AddComponentMenu("")] // Hide from "Add Component" picker
+    [AddComponentMenu("/")] // Hide from "Add Component" picker
     [RequireComponent(typeof(EventTrigger))]
     internal class SpyPointerClickEventReceiver : MonoBehaviour
     {

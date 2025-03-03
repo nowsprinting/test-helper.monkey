@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 namespace TestHelper.Monkey.TestDoubles
 {
-    [AddComponentMenu("")] // Hide from "Add Component" picker
+    [AddComponentMenu("/")] // Hide from "Add Component" picker
     [RequireComponent(typeof(InputField))]
     public class SpyInputFieldValidator : MonoBehaviour
     {

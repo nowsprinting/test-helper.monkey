@@ -9,7 +9,7 @@ namespace TestHelper.Monkey.TestDoubles
     /// <summary>
     /// Write LogError when OnPointerUp is called.
     /// </summary>
-    [AddComponentMenu("")] // Hide from "Add Component" picker
+    [AddComponentMenu("/")] // Hide from "Add Component" picker
     public class StubLogErrorWhenOnPointerUp : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     {
         public void OnPointerDown(PointerEventData eventData)

@@ -9,7 +9,7 @@ namespace TestHelper.Monkey.TestDoubles
     /// <summary>
     /// Pointer down event handler
     /// </summary>
-    [AddComponentMenu("")] // Hide from "Add Component" picker
+    [AddComponentMenu("/")] // Hide from "Add Component" picker
     public class StubDestroyingItselfWhenPointerDown : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     {
         public void OnPointerDown(PointerEventData eventData)

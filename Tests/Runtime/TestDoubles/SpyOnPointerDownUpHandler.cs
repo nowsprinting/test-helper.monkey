@@ -10,7 +10,7 @@ namespace TestHelper.Monkey.TestDoubles
     /// <summary>
     /// Pointer down/up event handler
     /// </summary>
-    [AddComponentMenu("")] // Hide from "Add Component" picker
+    [AddComponentMenu("/")] // Hide from "Add Component" picker
     internal class SpyOnPointerDownUpHandler : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     {
         private void Log([CallerMemberName] string member = "")
