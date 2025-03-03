@@ -10,13 +10,8 @@ namespace TestHelper.Monkey.TestComponents
     // [AddComponentMenu("/")] // Hide from "Add Component" picker
     public class RelayButton : MonoBehaviour
     {
-        [field: SerializeField]
-        [Tooltip("Next enabled button.")]
-        public Button NextButton { get; private set; }
-
-        [field: SerializeField]
-        [Tooltip("Enabled on load. It is assumed that only one is set to true in the scene..")]
-        public bool EnabledOnLoad { get; set; } = false;
+        [field: SerializeField] public Button NextButton { get; private set; }
+        [field: SerializeField] public bool EnabledOnLoad { get; set; } = false;
 
         private Button _button;
 
