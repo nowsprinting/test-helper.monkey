@@ -647,6 +647,7 @@ namespace TestHelper.Monkey
             [TestCase("1, 1")] // under repeating length
             [TestCase("1, 1, 1")] // under repeating length
             [TestCase("1, 2, 3, 1, 2")] // not looping yet
+            [TestCase("1, 2, 2, 2, 2")] // not looping yet
             public void DetectInfiniteLoop_NotRepeatingSequence_ReturnsFalse(string commaSeparatedSequence)
                 // Note: If a parameter type is `int[]`, all test names will contain `System.Int32[]` will be indistinguishable, so pass it as a comma-separated string and parse it.
             {

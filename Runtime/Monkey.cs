@@ -217,7 +217,7 @@ namespace TestHelper.Monkey
         {
             for (var patternLength = 2; patternLength <= sequence.Count / 2; patternLength++)
             {
-                var pattern = sequence.Skip(sequence.Count - patternLength).Take(patternLength).ToArray();
+                var pattern = sequence.Take(patternLength).ToArray();
                 var isLoop = true;
                 for (var i = 0; i < patternLength; i++)
                 {
