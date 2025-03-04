@@ -648,6 +648,7 @@ namespace TestHelper.Monkey
             [TestCase("1, 1, 1")] // under repeating length
             [TestCase("1, 2, 3, 1, 2")] // not looping yet
             [TestCase("1, 2, 2, 2, 2")] // not looping yet
+            [TestCase("2, 2, 2, 2, 3")] // precondition is (1, 2, 2, 2, 2), add "3" and remove "1" (buffer overflow)
             public void DetectInfiniteLoop_NotRepeatingSequence_ReturnsFalse(string commaSeparatedSequence)
                 // Note: If a parameter type is `int[]`, all test names will contain `System.Int32[]` will be indistinguishable, so pass it as a comma-separated string and parse it.
             {
@@ -658,6 +659,7 @@ namespace TestHelper.Monkey
             [TestCase("1, 1, 1, 1")] // pattern (1, 1) is repeated twice
             [TestCase("1, 2, 1, 2")]
             [TestCase("1, 2, 3, 1, 2, 3")]
+            [TestCase("1, 2, 3, 1, 2, 3, 1")] // one loop and unfinished loop
             public void DetectInfiniteLoop_RepeatingSequence_ReturnsTrue(string commaSeparatedSequence)
                 // Note: If a parameter type is `int[]`, all test names will contain `System.Int32[]` will be indistinguishable, so pass it as a comma-separated string and parse it.
             {

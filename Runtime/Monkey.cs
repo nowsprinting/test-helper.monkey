@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -78,7 +79,7 @@ namespace TestHelper.Monkey
                         if (config.BufferLengthForDetectLooping > 0)
                         {
                             if (operationSequence.Count >= config.BufferLengthForDetectLooping)
-                                operationSequence.Remove(0);
+                                operationSequence.RemoveAt(0);
                             operationSequence.Add(instanceId);
                             if (DetectInfiniteLoop(ref operationSequence))
                             {
@@ -213,24 +214,29 @@ namespace TestHelper.Monkey
             return (null, null, default);
         }
 
+        [SuppressMessage("ReSharper", "CognitiveComplexity")]
         internal static bool DetectInfiniteLoop(ref List<int> sequence)
         {
             for (var patternLength = 2; patternLength <= sequence.Count / 2; patternLength++)
             {
                 var pattern = sequence.Take(patternLength).ToArray();
-                var isLoop = true;
-                for (var i = 0; i < patternLength; i++)
+                var patternIndex = 0;
+                for (var i = patternLength; i < sequence.Count; i++)
                 {
-                    if (pattern[i] != sequence[sequence.Count - patternLength - patternLength + i])
+                    if (pattern[patternIndex++] != sequence[i])
                     {
-                        isLoop = false;
-                        break;
+                        break; // not loop
                     }
-                }
 
-                if (isLoop)
-                {
-                    return true;
+                    if (i == sequence.Count - 1)
+                    {
+                        return true;
+                    }
+
+                    if (patternIndex >= patternLength)
+                    {
+                        patternIndex = 0;
+                    }
                 }
             }
 
