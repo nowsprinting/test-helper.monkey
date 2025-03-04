@@ -13,6 +13,7 @@ using NUnit.Framework;
 using TestHelper.Attributes;
 using TestHelper.Monkey.Annotations;
 using TestHelper.Monkey.DefaultStrategies;
+using TestHelper.Monkey.Exceptions;
 using TestHelper.Monkey.Operators;
 using TestHelper.Monkey.TestDoubles;
 using TestHelper.Random;
@@ -48,7 +49,7 @@ namespace TestHelper.Monkey
         public async Task RunStep_finish()
         {
             var config = new MonkeyConfig();
-            var didAction = await Monkey.RunStep(
+            var (didAction, _) = await Monkey.RunStep(
                 config.Random,
                 config.Logger,
                 config.Screenshots,
@@ -70,7 +71,7 @@ namespace TestHelper.Monkey
             }
 
             var config = new MonkeyConfig();
-            var didAction = await Monkey.RunStep(
+            var (didAction, _) = await Monkey.RunStep(
                 config.Random,
                 config.Logger,
                 config.Screenshots,
@@ -612,6 +613,58 @@ namespace TestHelper.Monkey
                     Does.Match(
                         @"Not reachable to Cube\(\d+\), position=\(\d+,\d+\), camera=Main Camera\(\d+\)\. Raycast is not hit\."));
                 Assert.That(spyLogger.Messages[1], Is.EqualTo("Lottery entries are empty or all of not reachable."));
+            }
+        }
+
+        [TestFixture]
+        public class DetectingInfiniteLoop
+        {
+            [Test]
+            [GameViewResolution(GameViewResolution.VGA)]
+            [LoadScene("../Scenes/InfiniteLoop.unity")]
+            public async Task Run_InfiniteLoop_throwsInfiniteLoopException()
+            {
+                var config = new MonkeyConfig
+                {
+                    Lifetime = TimeSpan.FromSeconds(2), // 2sec
+                    DelayMillis = 1, // 1ms
+                    BufferLengthForDetectLooping = 10, // repeating 5-step sequences can be detected
+                    Operators = new IOperator[] { new UGUIClickOperator() },
+                };
+
+                try
+                {
+                    await Monkey.Run(config);
+                    Assert.Fail("InfiniteLoopException was not thrown");
+                }
+                catch (InfiniteLoopException)
+                {
+                    // pass
+                }
+            }
+
+            [TestCase("1")] // under pattern length
+            [TestCase("1, 1")] // under repeating length
+            [TestCase("1, 1, 1")] // under repeating length
+            [TestCase("1, 2, 3, 1, 2")] // not looping yet
+            [TestCase("1, 2, 2, 2, 2")] // not looping yet
+            [TestCase("2, 2, 2, 2, 3")] // precondition is (1, 2, 2, 2, 2), add "3" and remove "1" (buffer overflow)
+            public void DetectInfiniteLoop_NotRepeatingSequence_ReturnsFalse(string commaSeparatedSequence)
+                // Note: If a parameter type is `int[]`, all test names will contain `System.Int32[]` will be indistinguishable, so pass it as a comma-separated string and parse it.
+            {
+                var sequence = new List<int>(commaSeparatedSequence.Split(',').Select(int.Parse));
+                Assert.That(Monkey.DetectInfiniteLoop(ref sequence), Is.False);
+            }
+
+            [TestCase("1, 1, 1, 1")] // pattern (1, 1) is repeated twice
+            [TestCase("1, 2, 1, 2")]
+            [TestCase("1, 2, 3, 1, 2, 3")]
+            [TestCase("1, 2, 3, 1, 2, 3, 1")] // one loop and unfinished loop
+            public void DetectInfiniteLoop_RepeatingSequence_ReturnsTrue(string commaSeparatedSequence)
+                // Note: If a parameter type is `int[]`, all test names will contain `System.Int32[]` will be indistinguishable, so pass it as a comma-separated string and parse it.
+            {
+                var sequence = new List<int>(commaSeparatedSequence.Split(',').Select(int.Parse));
+                Assert.That(Monkey.DetectInfiniteLoop(ref sequence), Is.True);
             }
         }
     }

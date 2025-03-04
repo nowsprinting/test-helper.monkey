@@ -3,11 +3,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using TestHelper.Monkey.DefaultStrategies;
+using TestHelper.Monkey.Exceptions;
 using TestHelper.Monkey.Operators;
 using TestHelper.Random;
 using TestHelper.RuntimeInternals;
@@ -23,7 +25,7 @@ namespace TestHelper.Monkey
     ///   <item>Can specify lifetime and delay time</item>
     ///   <item>Can specify random number generator</item>
     ///   <item>Only clickable objects can be selected or operated</item>
-    ///   <item>Throw assert exception if Interactive component not found in 5 sec</item>
+    ///   <item>Detects that cannot continue</item>
     /// </list>
     /// </summary>
     public static class Monkey
@@ -35,6 +37,8 @@ namespace TestHelper.Monkey
         /// </summary>
         /// <param name="config">Run configuration for monkey testing</param>
         /// <param name="cancellationToken">Cancellation token</param>
+        /// <exception cref="InfiniteLoopException">Thrown if a repeating operation is detected within the specified buffer length</exception>
+        /// <exception cref="TimeoutException">Thrown if an object that can be interacted with does not exist</exception>
         public static async UniTask Run(MonkeyConfig config, CancellationToken cancellationToken = default)
         {
             var endTime = config.Lifetime == TimeSpan.MaxValue
@@ -50,6 +54,7 @@ namespace TestHelper.Monkey
             }
 
             var interactableComponentsFinder = new InteractableComponentsFinder(config);
+            var operationSequence = new List<int>(config.BufferLengthForDetectLooping);
 
             config.Logger.Log($"Using {config.Random}");
 
@@ -57,7 +62,7 @@ namespace TestHelper.Monkey
             {
                 while (Time.realtimeSinceStartup < endTime)
                 {
-                    var didAction = await RunStep(
+                    var (didAction, instanceId) = await RunStep(
                         config.Random,
                         config.Logger,
                         config.Screenshots,
@@ -69,11 +74,24 @@ namespace TestHelper.Monkey
                     if (didAction)
                     {
                         lastOperationTime = Time.realtimeSinceStartup;
+
+                        // Detecting infinite loop
+                        if (config.BufferLengthForDetectLooping > 0)
+                        {
+                            if (operationSequence.Count >= config.BufferLengthForDetectLooping)
+                                operationSequence.RemoveAt(0);
+                            operationSequence.Add(instanceId);
+                            if (DetectInfiniteLoop(ref operationSequence))
+                            {
+                                throw new InfiniteLoopException();
+                            }
+                        }
                     }
-                    else if (0 < config.SecondsToErrorForNoInteractiveComponent &&
+                    else if (config.SecondsToErrorForNoInteractiveComponent > 0 &&
                              config.SecondsToErrorForNoInteractiveComponent <
                              (Time.realtimeSinceStartup - lastOperationTime))
                     {
+                        // No interactive component found
                         var message = new StringBuilder(
                             $"Interactive component not found in {config.SecondsToErrorForNoInteractiveComponent} seconds");
                         if (config.Screenshots != null)
@@ -111,8 +129,8 @@ namespace TestHelper.Monkey
         /// <param name="reachableStrategy">Strategy to examine whether <c>GameObject</c> is reachable from the user. from <c>MonkeyConfig</c></param>
         /// <param name="verbose">Output verbose logs</param>
         /// <param name="cancellationToken">Cancellation token</param>
-        /// <returns>True if any operator was executed</returns>
-        public static async UniTask<bool> RunStep(
+        /// <returns>True if any operator was executed, and the instance ID of operated <c>GameObject</c></returns>
+        public static async UniTask<(bool, int)> RunStep(
             IRandom random,
             ILogger logger,
             ScreenshotOptions screenshotOptions,
@@ -127,13 +145,13 @@ namespace TestHelper.Monkey
                 lotteryEntries, random, ignoreStrategy, reachableStrategy, verbose ? logger : null);
             if (selectedObject == null || selectedOperator == null)
             {
-                return false;
+                return (false, 0);
             }
 
             await selectedOperator.OperateAsync(selectedObject, raycastResult, logger, screenshotOptions,
                 cancellationToken);
 
-            return true;
+            return (true, selectedObject.GetInstanceID());
         }
 
         internal static IEnumerable<(GameObject, IOperator)> GetLotteryEntries(
@@ -194,6 +212,35 @@ namespace TestHelper.Monkey
 
             verboseLogger?.Log("Lottery entries are empty or all of not reachable.");
             return (null, null, default);
+        }
+
+        [SuppressMessage("ReSharper", "CognitiveComplexity")]
+        internal static bool DetectInfiniteLoop(ref List<int> sequence)
+        {
+            for (var patternLength = 2; patternLength <= sequence.Count / 2; patternLength++)
+            {
+                var pattern = sequence.Take(patternLength).ToArray();
+                var patternIndex = 0;
+                for (var i = patternLength; i < sequence.Count; i++)
+                {
+                    if (pattern[patternIndex++] != sequence[i])
+                    {
+                        break; // not loop
+                    }
+
+                    if (i == sequence.Count - 1)
+                    {
+                        return true;
+                    }
+
+                    if (patternIndex >= patternLength)
+                    {
+                        patternIndex = 0;
+                    }
+                }
+            }
+
+            return false;
         }
 
         private static async UniTask TakeScreenshotAsync(ScreenshotOptions screenshotOptions, string filename)

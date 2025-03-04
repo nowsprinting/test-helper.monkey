@@ -54,7 +54,8 @@ Configurations in `MonkeyConfig`:
 
 - **Lifetime**: Running time
 - **DelayMillis**: Delay time between operations
-- **SecondsToErrorForNoInteractiveComponent**: Seconds to determine that an error has occurred when an object that can be interacted with does not exist
+- **SecondsToErrorForNoInteractiveComponent**: Seconds after which a `TimeoutException` is thrown if no interactive component is found; default is 5 seconds
+- **BufferLengthForDetectLooping**: An `InfiniteLoopException` is thrown if a repeating operation is detected within the specified buffer length; default is 10
 - **Random**: Pseudo-random number generator
 - **Logger**: Logger
 - **Verbose**: Output verbose log if true
