@@ -7,7 +7,7 @@ using UnityEngine.UI;
 namespace TestHelper.Monkey.TestComponents
 {
     [RequireComponent(typeof(Button))]
-    // [AddComponentMenu("/")] // Hide from "Add Component" picker
+    [AddComponentMenu("/")] // Hide from "Add Component" picker
     public class RelayButton : MonoBehaviour
     {
         [field: SerializeField] public Button NextButton { get; private set; }
