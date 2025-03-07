@@ -6,8 +6,7 @@
 
 Object-based Unity UI (uGUI) monkey testing and API for custom implementation.
 
-This library can be used in runtime code because it does not depend on the Unity Test Framework.
-
+This library can be used in runtime code because it does not depend on the Unity Test Framework.  
 Required Unity 2019 LTS or later.
 
 
@@ -55,7 +54,7 @@ Configurations in `MonkeyConfig`:
 - **Lifetime**: Running time
 - **DelayMillis**: Delay time between operations
 - **SecondsToErrorForNoInteractiveComponent**: Seconds after which a `TimeoutException` is thrown if no interactive component is found; default is 5 seconds
-- **BufferLengthForDetectLooping**: An `InfiniteLoopException` is thrown if a repeating operation is detected within the specified buffer length; default is 10
+- **BufferLengthForDetectLooping**: An `InfiniteLoopException` is thrown if a repeating operation is detected within the specified buffer length; default length is 10
 - **Random**: Pseudo-random number generator
 - **Logger**: Logger
 - **Verbose**: Output verbose log if true
@@ -65,10 +64,74 @@ Configurations in `MonkeyConfig`:
     - **FilenameStrategy**: Strategy for file paths of screenshot images. Default is test case name and four digit sequential number.
     - **SuperSize**: The factor to increase resolution with. Default is 1.
     - **StereoCaptureMode**: The eye texture to capture when stereo rendering is enabled. Default is `LeftEye`.
-- **IsInteractable**: Returns whether the `Component` is interactable or not. The default implementation returns true if the component is a uGUI compatible component and its `interactable` property is true.
+- **IsInteractable**: Function returns whether the `Component` is interactable or not. The default implementation returns true if the component is a uGUI compatible component and its `interactable` property is true.
 - **IgnoreStrategy**: Strategy to examine whether `GameObject` should be ignored. The default implementation returns true if the `GameObject` has `IgnoreAnnotation` attached.
 - **ReachableStrategy**: Strategy to examine whether `GameObject` is reachable from the user. The default implementation returns true if it can raycast from `Camera.main` to the pivot position.
-- **Operators**: Collection of `IOperator` that the monkey invokes. Default is `ClickOperator`, `ClickAndHoldOperator`, and `TextInputOperator`. There is support for standard uGUI components.
+- **Operators**: A collection of `IOperator` that the monkey invokes. the default is `ClickOperator`, `ClickAndHoldOperator`, and `TextInputOperator`. There is support for standard uGUI components.
+
+Class diagram for default strategies:
+
+```mermaid
+classDiagram
+    class MonkeyConfig {
+        +Func&lt;Component, bool&gt; IsInteractable
+        +IIgnoreStrategy IgnoreStrategy
+        +IReachableStrategy ReachableStrategy
+        +IOperator[] Operators
+    }
+
+    MonkeyConfig --> DefaultComponentInteractableStrategy
+
+    class DefaultComponentInteractableStrategy {
+        +IsInteractable(Component) bool$
+    }
+
+    MonkeyConfig --> IIgnoreStrategy
+    IIgnoreStrategy <|-- DefaultIgnoreStrategy
+
+    class IIgnoreStrategy {
+        +IsIgnored(GameObject, ILogger) bool*
+    }
+
+    MonkeyConfig --> IReachableStrategy
+    IReachableStrategy <|-- DefaultReachableStrategy
+    DefaultReachableStrategy --> DefaultScreenPointStrategy
+    DefaultScreenPointStrategy --> DefaultTransformPositionStrategy
+
+    class IReachableStrategy {
+        +IsReachable(GameObject, out RaycastResult, ILogger) bool*
+    }
+
+    class DefaultReachableStrategy {
+        +DefaultReachableStrategy(Func&lt;GameObject, Vector2&gt;, ILogger)
+        +IsReachable(GameObject, out RaycastResult, ILogger) bool
+    }
+
+    class DefaultScreenPointStrategy {
+        +GetScreenPoint(GameObject) Vector2$
+    }
+
+    class DefaultTransformPositionStrategy {
+        +GetScreenPoint(GameObjct) Vector2$
+        +GetScreenPointByWorldPosition(GameObject, Vector3) Vector2$
+    }
+
+    MonkeyConfig --> "*" IOperator
+
+    class IOperator {
+        +CanOperate(GameObject) bool*
+        +OperateAsync(GameObject, RaycastResult, ILogger, ScreenshotOptions, CancellationToken) UniTask*
+    }
+
+    IOperator <|-- IClickOperator
+    IClickOperator <|-- UGUIClickOperator
+
+    IOperator <|-- IClickAndHoldOperator
+    IClickAndHoldOperator <|-- UGUIClickAndHoldOperator
+
+    IOperator <|-- ITextInputOperator
+    ITextInputOperator <|-- UGUITextInputOperator
+```
 
 
 #### Annotations for Monkey's behavior
@@ -110,15 +173,21 @@ Specify the world position where Monkey operators operate.
 
 
 
-### Find and operate interactable components
+### Find and operate interactable GameObject
 
 `GameObjectFinder` is a class that finds `GameObject` by name or path (can specify [glob](https://en.wikipedia.org/wiki/Glob_(programming)) pattern).
-The constructor can specify the timeout seconds.
+
+Constructor arguments:
+
+- **timeoutSeconds**: Timeout seconds for find methods. The default is 1 second.
+- **reachableStrategy**: Strategy to examine whether `GameObject` is reachable from the user. The default implementation returns true if it can raycast from `Camera.main` to the pivot position.
+- **isComponentInteractable**: Function returns whether the `Component` is interactable or not. The default implementation returns true if the component is a uGUI compatible component and its `interactable` property is true.
 
 
 #### Find GameObject by name
 
 Find a `GameObject` by name; if not found, poll until a timeout.
+If the timeout, a `TimeOutException` is thrown.
 
 Arguments:
 
@@ -136,9 +205,9 @@ using TestHelper.Monkey;
 public class MyIntegrationTest
 {
     [Test]
-    public void MyTestMethod()
+    public async Task MyTestMethod()
     {
-        var finder = new GameObjectFinder(); // Default is 1 second timeout
+        var finder = new GameObjectFinder();
         var result = await finder.FindByNameAsync("ConfirmDialog", reachable: true, interactable: false);
         var dialog = result.GameObject;
     }
@@ -149,6 +218,7 @@ public class MyIntegrationTest
 #### Find GameObject by path
 
 Find a `GameObject` by path; if not found, poll until a timeout.
+If the timeout, a `TimeOutException` is thrown.
 
 Arguments:
 
@@ -166,21 +236,19 @@ using TestHelper.Monkey;
 public class MyIntegrationTest
 {
     [Test]
-    public void MyTestMethod()
+    public async Task MyTestMethod()
     {
         var finder = new GameObjectFinder(5d); // 5 seconds timeout
         var result = await finder.FindByPathAsync("/**/Confirm/**/Cancel", reachable: true, interactable: true);
-        var button = result.GameObject;
+        var cancelButton = result.GameObject;
     }
 }
 ```
 
 
-#### Operate interactable components
+#### Operate to a found GameObject
 
-`GetInteractableComponents()` are extensions of `GameObject` that return interactable components.
-
-`SelectOperators` and `SelectOperators<T>` are extensions of `Component` that return available operators.
+`SelectOperators` and `SelectOperators<T>` are extensions of `GameObject` that return available operators.
 Operators implement the `IOperator` interface. It has an `OperateAsync` method that operates on the component.
 
 Usage:
@@ -193,14 +261,14 @@ using TestHelper.Monkey;
 public class MyIntegrationTest
 {
     [Test]
-    public void ClickStartButton()
+    public async Task ClickStartButton()
     {
         var finder = new GameObjectFinder();
         var result = await finder.FindByNameAsync("StartButton", interactable: true);
 
         var button = result.GameObject;
         var clickOperator = button.SelectOperators<IClickOperator>(_operators).First();
-        clickOperator.OperateAsync(button, result.RaycastResult);
+        await clickOperator.OperateAsync(button, result.RaycastResult);
     }
 }
 ```
@@ -209,8 +277,12 @@ public class MyIntegrationTest
 
 ### Find interactable components on the scene
 
-`InteractableComponentsFinder.FindInteractableComponents()` method returns all interactable components on the scene.
-Can specify the **IsInteractable** function and **Operator**s for the constructor.
+`InteractableComponentsFinder` is a class that collects interactable components on the scene.
+
+Constructor arguments:
+
+- **isInteractable**: Function returns whether the `Component` is interactable or not. The default implementation returns true if the component is a uGUI compatible component and its `interactable` property is true.
+- **operators**: A collection of `IOperator` used in the `FindInteractableComponentsAndOperators` method. The default is empty.
 
 Usage:
 
@@ -225,7 +297,8 @@ public class MyIntegrationTest
     [Test]
     public void MyTestMethod()
     {
-        var components = new InteractableComponentsFinder().FindInteractableComponents();
+        var finder = new InteractableComponentsFinder();
+        var components = finder.FindInteractableComponents();
     }
 }
 ```
@@ -285,7 +358,7 @@ A sub-interface of the `IOperator` (e.g., `IClickOperator`) must be implemented 
 An operator must implement the `CanOperate` method to determine whether an operation such as click is possible and the `OperateAsync` method to execute the operation.
 
 > [!IMPORTANT]  
-> Until test-helper.monkey v0.14, it took screenshots and output logs in the caller. However, this has been changed to `OperateAsync` responsible.
+> Until test-helper.monkey v0.14.0, it took screenshots and output logs in the caller. However, this has been changed to `OperateAsync` responsible.
 
 
 
@@ -308,6 +381,16 @@ This indicates that no `GameObject` with an interactable component appeared in t
 More details can be output using the verbose option (`MonkeyConfig.Verbose`).
 
 The waiting seconds can be specified in the `MonkeyConfig.SecondsToErrorForNoInteractiveComponent`.
+If you want to disable this feature, specify `0`.
+
+
+#### Thrown InfiniteLoopException
+
+An `InfiniteLoopException` is thrown if a repeating operation is detected within the specified buffer length.
+The repeating pattern length is from 2 to half the buffer length.
+
+The buffer length can be specified in the `MonkeyConfig.BufferLengthForDetectLooping`.
+If you want to disable this feature, specify `0`.
 
 
 #### Operation log message
@@ -333,7 +416,8 @@ Lottery entries: {
   StartButton(30502):Button:UGUIClickOperator,
   StartButton(30502):Button:UGUIClickAndHoldOperator,
   MenuButton(30668):Button:UGUIClickOperator,
-  MenuButton(30668):Button:UGUIClickAndHoldOperator}
+  MenuButton(30668):Button:UGUIClickAndHoldOperator
+}
 ```
 
 Each entry format is `GameObject` name (instance ID) : `Component` type : `Operator` type.
@@ -541,3 +625,6 @@ After tagging, [OpenUPM](https://openupm.com/) retrieves the tag and updates it.
 
 > [!CAUTION]  
 > You must modify the package name to publish a forked package.
+
+> [!TIP]  
+> If you want to specify the version number to be released, change the version number of the draft release before running the "Create release pull request" workflow.
