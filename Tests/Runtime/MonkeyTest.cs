@@ -90,6 +90,7 @@ namespace TestHelper.Monkey
             {
                 Lifetime = TimeSpan.FromMilliseconds(200), // 200ms
                 DelayMillis = 1, // 1ms
+                BufferLengthForDetectLooping = 0, // disable loop detection
                 Operators = _operators,
             };
             var task = Monkey.Run(config);
@@ -105,6 +106,7 @@ namespace TestHelper.Monkey
             var config = new MonkeyConfig
             {
                 Lifetime = TimeSpan.MaxValue, // Test that it does not overflow
+                Operators = Enumerable.Empty<IOperator>(),
             };
             using (var cancellationTokenSource = new CancellationTokenSource())
             {
