@@ -23,8 +23,7 @@ namespace TestHelper.Monkey
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="isInteractable">The function returns the <c>Component</c> is interactable or not.
-        /// Default is <c>DefaultComponentInteractableStrategy.IsInteractable</c>.</param>
+        /// <param name="isInteractable">The function returns the <c>Component</c> is interactable or not. Default is <c>DefaultComponentInteractableStrategy.IsInteractable</c>.</param>
         /// <param name="operators">All available operators in autopilot/tests. Usually defined in <c>MonkeyConfig</c></param>
         public InteractableComponentsFinder(
             Func<Component, bool> isInteractable = null,
@@ -38,6 +37,7 @@ namespace TestHelper.Monkey
         /// Constructor overload.
         /// </summary>
         /// <param name="config">The configuration for autopilot/tests</param>
+        [Obsolete("Use InteractableComponentsFinder(Func<Component, bool>, IEnumerable<IOperator>) instead.")]
         public InteractableComponentsFinder(MonkeyConfig config)
             : this(config.IsInteractable, config.Operators)
         {

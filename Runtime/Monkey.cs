@@ -20,7 +20,6 @@ namespace TestHelper.Monkey
 {
     /// <summary>
     /// Reference implementation of the monkey testing.
-    ///
     /// <list type="bullet">
     ///   <item>Can specify lifetime and delay time</item>
     ///   <item>Can specify random number generator</item>
@@ -53,7 +52,8 @@ namespace TestHelper.Monkey
                 GameViewControlHelper.SetGizmos(true);
             }
 
-            var interactableComponentsFinder = new InteractableComponentsFinder(config);
+            var interactableComponentsFinder =
+                new InteractableComponentsFinder(config.IsInteractable, config.Operators);
             var operationSequence = new List<int>(config.BufferLengthForDetectLooping);
 
             config.Logger.Log($"Using {config.Random}");

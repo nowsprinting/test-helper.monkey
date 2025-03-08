@@ -20,7 +20,7 @@ namespace TestHelper.Monkey
     {
         private readonly double _timeoutSeconds;
         private readonly IReachableStrategy _reachableStrategy;
-        private readonly Func<Component, bool> _isComponentInteractable;
+        private readonly Func<Component, bool> _isInteractable;
 
         private const double MinTimeoutSeconds = 0.01d;
         private const double MaxPollingIntervalSeconds = 1.0d;
@@ -30,17 +30,17 @@ namespace TestHelper.Monkey
         /// </summary>
         /// <param name="timeoutSeconds">Seconds to wait until <c>GameObject</c> appear.</param>
         /// <param name="reachableStrategy">Strategy to examine whether <c>GameObject</c> is reachable from the user. Default is <c>DefaultReachableStrategy</c>.</param>
-        /// <param name="isComponentInteractable">The function returns the <c>Component</c> is interactable or not. Default is <c>DefaultComponentInteractableStrategy.IsInteractable</c>.</param>
+        /// <param name="isInteractable">The function returns the <c>Component</c> is interactable or not. Default is <c>DefaultComponentInteractableStrategy.IsInteractable</c>.</param>
         public GameObjectFinder(double timeoutSeconds = 1.0d,
             IReachableStrategy reachableStrategy = null,
-            Func<Component, bool> isComponentInteractable = null)
+            Func<Component, bool> isInteractable = null)
         {
             Assert.IsTrue(timeoutSeconds > MinTimeoutSeconds,
                 $"TimeoutSeconds must be greater than {MinTimeoutSeconds}.");
 
             _timeoutSeconds = timeoutSeconds;
             _reachableStrategy = reachableStrategy ?? new DefaultReachableStrategy();
-            _isComponentInteractable = isComponentInteractable ?? DefaultComponentInteractableStrategy.IsInteractable;
+            _isInteractable = isInteractable ?? DefaultComponentInteractableStrategy.IsInteractable;
         }
 
         private enum Reason
@@ -75,7 +75,7 @@ namespace TestHelper.Monkey
                 return (null, default, Reason.NotReachable);
             }
 
-            if (interactable && !foundObject.GetComponents<Component>().Any(_isComponentInteractable))
+            if (interactable && !foundObject.GetComponents<Component>().Any(_isInteractable))
             {
                 return (null, default, Reason.NotInteractable);
             }
