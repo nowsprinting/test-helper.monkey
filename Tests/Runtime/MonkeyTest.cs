@@ -183,7 +183,7 @@ namespace TestHelper.Monkey
 
             await Monkey.Run(config);
 
-            Assert.That(spyLogger.Messages, Does.Contain("Using RandomWrapper using System.Random, seed=0"));
+            Assert.That(spyLogger.Messages, Does.Contain("Using RandomWrapper includes System.Random, seed=0"));
         }
 
         [Test]
