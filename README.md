@@ -4,9 +4,9 @@
 [![Test](https://github.com/nowsprinting/test-helper.monkey/actions/workflows/test.yml/badge.svg)](https://github.com/nowsprinting/test-helper.monkey/actions/workflows/test.yml)
 [![openupm](https://img.shields.io/npm/v/com.nowsprinting.test-helper.monkey?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.nowsprinting.test-helper.monkey/)
 
-Object-based Unity UI (uGUI) monkey testing and API for custom implementation.
+Object-based [Unity UI](https://docs.unity3d.com/Packages/com.unity.ugui@latest) (uGUI) monkey testing and API for custom implementation.
 
-This library can be used in runtime code because it does not depend on the Unity Test Framework.  
+This library can be used in runtime code because it does **NOT** depend on the [Unity Test Framework](https://docs.unity3d.com/Packages/com.unity.test-framework@latest).  
 Required Unity 2019 LTS or later.
 
 
