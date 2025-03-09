@@ -489,7 +489,38 @@ namespace TestHelper.Monkey
                 }
                 catch (TimeoutException e)
                 {
-                    Assert.That(e.Message, Does.Contain($"Interactive component not found in 1 seconds ({_filename})"));
+                    Assert.That(e.Message, Does.Contain(
+                        $"Interactive component not found in 1 seconds, screenshot={_filename}"));
+                }
+
+                Assert.That(_path, Does.Exist);
+            }
+
+            [Test]
+            [GameViewResolution(GameViewResolution.VGA)]
+            [LoadScene("../Scenes/InfiniteLoop.unity")]
+            public async Task Run_withScreenshots_InfiniteLoop_takeScreenshot()
+            {
+                _filename = $"{TestContext.CurrentContext.Test.Name}_0011.png"; // 10 steps + 1
+                _path = Path.Combine(_defaultOutputDirectory, _filename);
+
+                var config = new MonkeyConfig
+                {
+                    Lifetime = TimeSpan.FromSeconds(2), // 2sec
+                    DelayMillis = 1, // 1ms
+                    BufferLengthForDetectLooping = 10, // repeating 5-step sequences can be detected
+                    Operators = new IOperator[] { new UGUIClickOperator() },
+                    Screenshots = new ScreenshotOptions() // take screenshots and save files
+                };
+
+                try
+                {
+                    await Monkey.Run(config);
+                    Assert.Fail("InfiniteLoopException was not thrown");
+                }
+                catch (InfiniteLoopException e)
+                {
+                    Assert.That(e.Message, Does.Contain(_filename));
                 }
 
                 Assert.That(_path, Does.Exist);
@@ -655,7 +686,7 @@ namespace TestHelper.Monkey
                 // Note: If a parameter type is `int[]`, all test names will contain `System.Int32[]` will be indistinguishable, so pass it as a comma-separated string and parse it.
             {
                 var sequence = new List<int>(commaSeparatedSequence.Split(',').Select(int.Parse));
-                Assert.That(Monkey.DetectInfiniteLoop(ref sequence), Is.False);
+                Assert.That(Monkey.DetectInfiniteLoop(sequence), Is.False);
             }
 
             [TestCase("1, 1, 1, 1")] // pattern (1, 1) is repeated twice
@@ -666,7 +697,7 @@ namespace TestHelper.Monkey
                 // Note: If a parameter type is `int[]`, all test names will contain `System.Int32[]` will be indistinguishable, so pass it as a comma-separated string and parse it.
             {
                 var sequence = new List<int>(commaSeparatedSequence.Split(',').Select(int.Parse));
-                Assert.That(Monkey.DetectInfiniteLoop(ref sequence), Is.True);
+                Assert.That(Monkey.DetectInfiniteLoop(sequence), Is.True);
             }
         }
     }

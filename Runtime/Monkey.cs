@@ -78,12 +78,13 @@ namespace TestHelper.Monkey
                         // Detecting infinite loop
                         if (config.BufferLengthForDetectLooping > 0)
                         {
-                            if (operationSequence.Count >= config.BufferLengthForDetectLooping)
-                                operationSequence.RemoveAt(0);
-                            operationSequence.Add(instanceId);
-                            if (DetectInfiniteLoop(ref operationSequence))
+                            AddToSequence(operationSequence, instanceId, config.BufferLengthForDetectLooping);
+                            if (DetectInfiniteLoop(operationSequence))
                             {
-                                throw new InfiniteLoopException();
+                                var message = new StringBuilder(
+                                    $"Found loop in the operation sequence: [{string.Join(", ", operationSequence)}]");
+                                await TakeScreenshotAsync(config.Screenshots, message);
+                                throw new InfiniteLoopException(message.ToString());
                             }
                         }
                     }
@@ -94,13 +95,7 @@ namespace TestHelper.Monkey
                         // No interactive component found
                         var message = new StringBuilder(
                             $"Interactive component not found in {config.SecondsToErrorForNoInteractiveComponent} seconds");
-                        if (config.Screenshots != null)
-                        {
-                            var filename = config.Screenshots.FilenameStrategy.GetFilename();
-                            await TakeScreenshotAsync(config.Screenshots, filename);
-                            message.Append($" ({filename})");
-                        }
-
+                        await TakeScreenshotAsync(config.Screenshots, message);
                         throw new TimeoutException(message.ToString());
                     }
 
@@ -214,8 +209,18 @@ namespace TestHelper.Monkey
             return (null, null, default);
         }
 
+        private static void AddToSequence(List<int> sequence, int instanceId, int bufferLength)
+        {
+            if (sequence.Count >= bufferLength)
+            {
+                sequence.RemoveAt(0);
+            }
+
+            sequence.Add(instanceId);
+        }
+
         [SuppressMessage("ReSharper", "CognitiveComplexity")]
-        internal static bool DetectInfiniteLoop(ref List<int> sequence)
+        internal static bool DetectInfiniteLoop(List<int> sequence)
         {
             for (var patternLength = 2; patternLength <= sequence.Count / 2; patternLength++)
             {
@@ -243,12 +248,20 @@ namespace TestHelper.Monkey
             return false;
         }
 
-        private static async UniTask TakeScreenshotAsync(ScreenshotOptions screenshotOptions, string filename)
+        private static async UniTask TakeScreenshotAsync(ScreenshotOptions screenshotOptions, StringBuilder message)
         {
+            if (screenshotOptions == null)
+            {
+                return;
+            }
+
             if (!s_coroutineRunner)
             {
                 s_coroutineRunner = new GameObject("CoroutineRunner").AddComponent<CoroutineRunner>();
             }
+
+            var filename = screenshotOptions.FilenameStrategy.GetFilename();
+            message.Append($", screenshot={filename}");
 
             await ScreenshotHelper.TakeScreenshot(
                     directory: screenshotOptions.Directory,
