@@ -12,7 +12,6 @@ using TestHelper.Monkey.TestDoubles;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.TestTools;
-using UnityEngine.UI;
 
 namespace TestHelper.Monkey.Operators
 {
@@ -34,7 +33,7 @@ namespace TestHelper.Monkey.Operators
         [LoadScene("../../Scenes/MissingComponent.unity")]
         public void CanOperate_ButtonWithMissingComponent_ReturnTrue()
         {
-            var buttonWithMissing = Object.FindAnyObjectByType<Button>().gameObject;
+            var buttonWithMissing = GameObject.Find("Button with Missing");
 
             Assert.That(_sut.CanOperate(buttonWithMissing), Is.True);
         }

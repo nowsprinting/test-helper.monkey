@@ -35,7 +35,7 @@ namespace TestHelper.Monkey.Operators
         [LoadScene("../../Scenes/MissingComponent.unity")]
         public void CanOperate_InputFieldWithMissingComponent_ReturnTrue()
         {
-            var inputFieldWithMissing = Object.FindAnyObjectByType<InputField>().gameObject;
+            var inputFieldWithMissing = GameObject.Find("InputField with Missing");
 
             Assert.That(_sut.CanOperate(inputFieldWithMissing), Is.True);
         }
