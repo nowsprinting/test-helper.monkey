@@ -47,10 +47,8 @@ namespace TestHelper.Monkey.Operators
                        eventTrigger.triggers.Any(x => x.eventID == EventTriggerType.PointerUp);
             }
 
-            var interfaces = gameObject.GetComponents<Component>()
-                .SelectMany(x => x.GetType().GetInterfaces())
-                .ToList();
-            return interfaces.Contains(typeof(IPointerDownHandler)) && interfaces.Contains(typeof(IPointerUpHandler));
+            return gameObject.TryGetEnabledComponent<IPointerDownHandler>(out _) &&
+                   gameObject.TryGetEnabledComponent<IPointerUpHandler>(out _);
         }
 
         /// <inheritdoc />

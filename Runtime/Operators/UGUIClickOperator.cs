@@ -41,9 +41,7 @@ namespace TestHelper.Monkey.Operators
                 return eventTrigger.triggers.Any(x => x.eventID == EventTriggerType.PointerClick);
             }
 
-            return gameObject.GetComponents<Component>()
-                .SelectMany(x => x.GetType().GetInterfaces())
-                .Any(x => x == typeof(IPointerClickHandler));
+            return gameObject.TryGetEnabledComponent<IPointerClickHandler>(out _);
         }
 
         /// <inheritdoc />
