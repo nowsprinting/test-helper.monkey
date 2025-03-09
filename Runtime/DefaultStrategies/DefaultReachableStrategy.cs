@@ -76,7 +76,7 @@ namespace TestHelper.Monkey.DefaultStrategies
             if (!isSameOrChildObject && verboseLogger != null)
             {
                 var message = new StringBuilder(CreateMessage(gameObject, pointerEventData.position));
-                message.Append(" Raycast hit other objects: {");
+                message.Append(" Raycast hit other objects: [");
                 foreach (var result in _results)
                 {
                     message.Append($"{result.gameObject.name}({result.gameObject.GetInstanceID()})");
@@ -84,7 +84,7 @@ namespace TestHelper.Monkey.DefaultStrategies
                 }
 
                 message.Remove(message.Length - 2, 2);
-                message.Append("}");
+                message.Append("]");
                 verboseLogger.Log(message.ToString());
             }
 

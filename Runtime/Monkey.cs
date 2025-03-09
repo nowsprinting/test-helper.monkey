@@ -183,9 +183,9 @@ namespace TestHelper.Monkey
                 yield break;
             }
 
-            lotteryEntries.Insert(0, "Lottery entries: {");
+            lotteryEntries.Insert(0, "Lottery entries: [");
             lotteryEntries.Remove(lotteryEntries.Length - 2, 2);
-            lotteryEntries.Append("}");
+            lotteryEntries.Append("]");
             verboseLogger.Log(lotteryEntries.ToString());
         }
 

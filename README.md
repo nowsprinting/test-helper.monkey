@@ -412,12 +412,12 @@ You can output details logs when the `MonkeyConfig.Verbose` is true.
 ##### Lottery entries
 
 ```
-Lottery entries: {
+Lottery entries: [
   StartButton(30502):Button:UGUIClickOperator,
   StartButton(30502):Button:UGUIClickAndHoldOperator,
   MenuButton(30668):Button:UGUIClickOperator,
   MenuButton(30668):Button:UGUIClickAndHoldOperator
-}
+]
 ```
 
 Each entry format is `GameObject` name (instance ID) : `Component` type : `Operator` type.
@@ -451,7 +451,7 @@ Not reachable to CloseButton(-2278), position=(515,-32). Raycast is not hit.
 Or
 
 ```
-Not reachable to BehindButton(-2324), position=(320,240). Raycast hit other objects: {BlockScreen, FrontButton}
+Not reachable to BehindButton(-2324), position=(320,240). Raycast hit other objects: [BlockScreen, FrontButton]
 ```
 
 The former output is when the object is off-screen, and the latter is when other objects hide the pivot position.
