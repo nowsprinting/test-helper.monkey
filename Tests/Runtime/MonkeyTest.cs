@@ -489,7 +489,8 @@ namespace TestHelper.Monkey
                 }
                 catch (TimeoutException e)
                 {
-                    Assert.That(e.Message, Does.Contain($"Interactive component not found in 1 seconds ({_filename})"));
+                    Assert.That(e.Message, Does.Contain(
+                        $"Interactive component not found in 1 seconds, screenshot={_filename}"));
                 }
 
                 Assert.That(_path, Does.Exist);
