@@ -81,7 +81,10 @@ namespace TestHelper.Monkey
                             AddToSequence(ref operationSequence, instanceId, config.BufferLengthForDetectLooping);
                             if (DetectInfiniteLoop(ref operationSequence))
                             {
-                                throw new InfiniteLoopException();
+                                var message = new StringBuilder(
+                                    $"Found loop in the latest operation sequence: [{string.Join(", ", operationSequence)}]");
+                                await TakeScreenshotAsync(config.Screenshots, message);
+                                throw new InfiniteLoopException(message.ToString());
                             }
                         }
                     }

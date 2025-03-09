@@ -386,9 +386,17 @@ If you want to disable this feature, specify `0`.
 
 #### Thrown InfiniteLoopException
 
-An `InfiniteLoopException` is thrown if a repeating operation is detected within the specified buffer length.
-The repeating pattern length is from 2 to half the buffer length.
+If thrown `InfiniteLoopException` with the following message:
 
+```
+Found loop in the latest operation sequence: [44030, 43938, 44010, 44030, 43938, 44010, 44030, 43938, 44010, 44030]
+```
+
+This indicates that a repeating operation is detected within the specified buffer length.
+The pattern `[44030, 43938, 44010]` is looped in the above message.
+Numbers are the instance ID of the operated `GameObject`.
+
+The detectable repeating pattern max length is half the buffer length.
 The buffer length can be specified in the `MonkeyConfig.BufferLengthForDetectLooping`.
 If you want to disable this feature, specify `0`.
 

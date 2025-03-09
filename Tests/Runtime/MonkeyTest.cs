@@ -495,6 +495,36 @@ namespace TestHelper.Monkey
 
                 Assert.That(_path, Does.Exist);
             }
+
+            [Test]
+            [GameViewResolution(GameViewResolution.VGA)]
+            [LoadScene("../Scenes/InfiniteLoop.unity")]
+            public async Task Run_withScreenshots_InfiniteLoop_takeScreenshot()
+            {
+                _filename = $"{TestContext.CurrentContext.Test.Name}_0011.png"; // 10 steps + 1
+                _path = Path.Combine(_defaultOutputDirectory, _filename);
+
+                var config = new MonkeyConfig
+                {
+                    Lifetime = TimeSpan.FromSeconds(2), // 2sec
+                    DelayMillis = 1, // 1ms
+                    BufferLengthForDetectLooping = 10, // repeating 5-step sequences can be detected
+                    Operators = new IOperator[] { new UGUIClickOperator() },
+                    Screenshots = new ScreenshotOptions() // take screenshots and save files
+                };
+
+                try
+                {
+                    await Monkey.Run(config);
+                    Assert.Fail("InfiniteLoopException was not thrown");
+                }
+                catch (InfiniteLoopException e)
+                {
+                    Assert.That(e.Message, Does.Contain(_filename));
+                }
+
+                Assert.That(_path, Does.Exist);
+            }
         }
 
         [TestFixture]
