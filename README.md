@@ -389,7 +389,7 @@ If you want to disable this feature, specify `0`.
 If thrown `InfiniteLoopException` with the following message:
 
 ```
-Found loop in the latest operation sequence: [44030, 43938, 44010, 44030, 43938, 44010, 44030, 43938, 44010, 44030]
+Found loop in the operation sequence: [44030, 43938, 44010, 44030, 43938, 44010, 44030, 43938, 44010, 44030]
 ```
 
 This indicates that a repeating operation is detected within the specified buffer length.

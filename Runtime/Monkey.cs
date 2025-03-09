@@ -82,7 +82,7 @@ namespace TestHelper.Monkey
                             if (DetectInfiniteLoop(operationSequence))
                             {
                                 var message = new StringBuilder(
-                                    $"Found loop in the latest operation sequence: [{string.Join(", ", operationSequence)}]");
+                                    $"Found loop in the operation sequence: [{string.Join(", ", operationSequence)}]");
                                 await TakeScreenshotAsync(config.Screenshots, message);
                                 throw new InfiniteLoopException(message.ToString());
                             }
