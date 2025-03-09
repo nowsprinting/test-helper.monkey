@@ -686,7 +686,7 @@ namespace TestHelper.Monkey
                 // Note: If a parameter type is `int[]`, all test names will contain `System.Int32[]` will be indistinguishable, so pass it as a comma-separated string and parse it.
             {
                 var sequence = new List<int>(commaSeparatedSequence.Split(',').Select(int.Parse));
-                Assert.That(Monkey.DetectInfiniteLoop(ref sequence), Is.False);
+                Assert.That(Monkey.DetectInfiniteLoop(sequence), Is.False);
             }
 
             [TestCase("1, 1, 1, 1")] // pattern (1, 1) is repeated twice
@@ -697,7 +697,7 @@ namespace TestHelper.Monkey
                 // Note: If a parameter type is `int[]`, all test names will contain `System.Int32[]` will be indistinguishable, so pass it as a comma-separated string and parse it.
             {
                 var sequence = new List<int>(commaSeparatedSequence.Split(',').Select(int.Parse));
-                Assert.That(Monkey.DetectInfiniteLoop(ref sequence), Is.True);
+                Assert.That(Monkey.DetectInfiniteLoop(sequence), Is.True);
             }
         }
     }

@@ -78,8 +78,8 @@ namespace TestHelper.Monkey
                         // Detecting infinite loop
                         if (config.BufferLengthForDetectLooping > 0)
                         {
-                            AddToSequence(ref operationSequence, instanceId, config.BufferLengthForDetectLooping);
-                            if (DetectInfiniteLoop(ref operationSequence))
+                            AddToSequence(operationSequence, instanceId, config.BufferLengthForDetectLooping);
+                            if (DetectInfiniteLoop(operationSequence))
                             {
                                 var message = new StringBuilder(
                                     $"Found loop in the latest operation sequence: [{string.Join(", ", operationSequence)}]");
@@ -209,7 +209,7 @@ namespace TestHelper.Monkey
             return (null, null, default);
         }
 
-        private static void AddToSequence(ref List<int> sequence, int instanceId, int bufferLength)
+        private static void AddToSequence(List<int> sequence, int instanceId, int bufferLength)
         {
             if (sequence.Count >= bufferLength)
             {
@@ -220,7 +220,7 @@ namespace TestHelper.Monkey
         }
 
         [SuppressMessage("ReSharper", "CognitiveComplexity")]
-        internal static bool DetectInfiniteLoop(ref List<int> sequence)
+        internal static bool DetectInfiniteLoop(List<int> sequence)
         {
             for (var patternLength = 2; patternLength <= sequence.Count / 2; patternLength++)
             {
