@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2023-2024 Koji Hasegawa.
+﻿// Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
 using System.Diagnostics.CodeAnalysis;
@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using NUnit.Framework;
+using TestHelper.Attributes;
 using TestHelper.Monkey.DefaultStrategies;
 using TestHelper.Monkey.TestDoubles;
 using UnityEngine;
@@ -26,6 +27,15 @@ namespace TestHelper.Monkey.Operators
             gameObject.AddComponent<SpyOnPointerClickHandler>();
 
             Assert.That(_sut.CanOperate(gameObject), Is.False);
+        }
+
+        [Test]
+        [LoadScene("../../Scenes/MissingComponent.unity")]
+        public void CanOperate_ButtonWithMissingComponent_ReturnTrue()
+        {
+            var buttonWithMissing = GameObject.Find("Button with Missing");
+
+            Assert.That(_sut.CanOperate(buttonWithMissing), Is.True);
         }
 
         [Test]

@@ -2,6 +2,7 @@
 // This software is released under the MIT License.
 
 using NUnit.Framework;
+using TestHelper.Attributes;
 using TestHelper.Monkey.TestDoubles;
 using TMPro;
 using UnityEngine;
@@ -28,6 +29,15 @@ namespace TestHelper.Monkey.Operators
             gameObject.AddComponent<Button>();
 
             Assert.That(_sut.CanOperate(gameObject), Is.False);
+        }
+
+        [Test]
+        [LoadScene("../../Scenes/MissingComponent.unity")]
+        public void CanOperate_InputFieldWithMissingComponent_ReturnTrue()
+        {
+            var inputFieldWithMissing = GameObject.Find("InputField with Missing");
+
+            Assert.That(_sut.CanOperate(inputFieldWithMissing), Is.True);
         }
 
         [Test]
