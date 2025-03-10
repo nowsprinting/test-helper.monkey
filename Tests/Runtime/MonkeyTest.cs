@@ -199,6 +199,7 @@ namespace TestHelper.Monkey
             {
                 Lifetime = TimeSpan.FromMilliseconds(200), // 200ms
                 DelayMillis = 1, // 1ms
+                BufferLengthForDetectLooping = 0, // disable loop detection
                 Gizmos = true, // show Gizmos
                 Operators = _operators,
             };
