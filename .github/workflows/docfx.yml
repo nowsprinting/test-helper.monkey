@@ -35,7 +35,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
 
       - name: Copy images
         run: |
@@ -71,7 +71,7 @@ jobs:
           COPYRIGHT_LINE=$(grep '^Copyright' LICENSE.md)
           echo "COPYRIGHT=${COPYRIGHT_LINE}" >> "$GITHUB_ENV"
 
-      - uses: sator-imaging/docfx-pages@v1
+      - uses: sator-imaging/docfx-pages@51d7fba3d9e5cc92132f58232edd90292f72fa9f # v1
         id: deployment
         with:
           app_name: ${{ env.PACKAGE_NAME }} ${{ env.PACKAGE_VERSION }}

@@ -1,3 +1,6 @@
+# Copyright (c) 2023-2025 Koji Hasegawa.
+# This software is released under the MIT License.
+
 name: Check pull requests for conflicts
 
 on:
@@ -24,8 +27,8 @@ jobs:
       checks: write
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: wktk/conflibot@v1
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - uses: wktk/conflibot@4881912dc3fe459059127d667251d5b324622299 # v1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           exclude: ""
