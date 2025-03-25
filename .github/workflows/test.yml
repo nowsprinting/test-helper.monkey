@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2024 Koji Hasegawa.
+# Copyright (c) 2023-2025 Koji Hasegawa.
 # This software is released under the MIT License.
 
 name: Test
@@ -42,24 +42,24 @@ jobs:
       matrix:
         unityVersion: # Available versions see: https://game.ci/docs/docker/versions
           - 2019.4.40f1
-          - 2022.3.58f1
+          - 2022.3.60f1
           - 2023.2.20f1
-          - 6000.0.38f1
+          - 6000.0.43f1
         testMode:
           - All # run tests in editor
         include:
-          - unityVersion: 6000.0.38f1
+          - unityVersion: 6000.0.43f1
             octocov: true
-          - unityVersion: 6000.0.38f1
+          - unityVersion: 6000.0.43f1
             testMode: Standalone  # run tests on player
 
     steps:
       - name: Crete project for tests
-        uses: nowsprinting/create-unity-project-action@v3
+        uses: nowsprinting/create-unity-project-action@fab595f04a568aa51a94b28b7202b861b0f7d8b2 # v3
         with:
           project-path: UnityProject~
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4
         with:
           path: ${{ env.CREATED_PROJECT_PATH }}/Library
           key: Library-linux-${{ matrix.unityVersion }}-${{ github.ref }}
@@ -74,7 +74,7 @@ jobs:
           echo "PACKAGE_PATH=$CREATED_PROJECT_PATH/Packages/$name" >> "$GITHUB_ENV"
 
       - name: Checkout repository as embedded package
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
         with:
           submodules: false
           lfs: false
@@ -106,7 +106,7 @@ jobs:
         run: echo "secret_key=UNITY_LICENSE_$(echo ${{ matrix.unityVersion }} | cut -c 1-4)" >> "$GITHUB_ENV"
 
       - name: Run tests
-        uses: game-ci/unity-test-runner@v4
+        uses: game-ci/unity-test-runner@0ff419b913a3630032cbe0de48a0099b5a9f0ed9 # v4
         with:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           unityVersion: ${{ matrix.unityVersion }}  # Default is `auto`
@@ -129,11 +129,11 @@ jobs:
         if: ${{ matrix.octocov }}
 
       - name: Run octocov
-        uses: k1LoW/octocov-action@v1
+        uses: k1LoW/octocov-action@73d561f65d59e66899ed5c87e4621a913b5d5c20 # v1
         if: ${{ matrix.octocov }}
 
       - name: Upload test results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: TestResults-Unity${{ matrix.unityVersion }}-${{ matrix.testMode }}
           path: |
@@ -150,7 +150,7 @@ jobs:
       actions: read
 
     steps:
-      - uses: Gamesight/slack-workflow-status@v1.3.0
+      - uses: Gamesight/slack-workflow-status@68bf00d0dbdbcb206c278399aa1ef6c14f74347a # v1.3.0
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}

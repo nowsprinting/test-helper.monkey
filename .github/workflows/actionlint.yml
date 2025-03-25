@@ -1,4 +1,4 @@
-# Copyright (c) 2023 Koji Hasegawa.
+# Copyright (c) 2023-2025 Koji Hasegawa.
 # This software is released under the MIT License.
 
 name: Lint workflow files
@@ -29,7 +29,7 @@ jobs:
       actions: read
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
 
       - name: Lint workflow files
         shell: bash
@@ -37,7 +37,7 @@ jobs:
           bash <(curl -LsS --retry 2 https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
           ./actionlint -color
 
-      - uses: 8398a7/action-slack@v3
+      - uses: 8398a7/action-slack@28ba43ae48961b90635b50953d216767a6bea486 # v3
         with:
           status: ${{ job.status }}
           fields: repo,message,job,pullRequest

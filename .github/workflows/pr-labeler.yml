@@ -1,4 +1,4 @@
-# Copyright (c) 2023 Koji Hasegawa.
+# Copyright (c) 2023-2025 Koji Hasegawa.
 # This software is released under the MIT License.
 
 name: PR Labeler
@@ -23,7 +23,7 @@ jobs:
       pull-requests: write
 
     steps:
-      - uses: TimonVS/pr-labeler-action@v5
+      - uses: TimonVS/pr-labeler-action@f9c084306ce8b3f488a8f3ee1ccedc6da131d1af # v5
         with:
           configuration-path: .github/pr-labeler.yml
         env:
