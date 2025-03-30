@@ -179,7 +179,7 @@ Specify the world position where Monkey operators operate.
 
 Constructor arguments:
 
-- **timeoutSeconds**: Seconds to wait until `GameObject` appear. The default is 1 second.
+- **timeoutSeconds**: Seconds to wait until `GameObject` appears. The default is 1 second.
 - **reachableStrategy**: Strategy to examine whether `GameObject` is reachable from the user. The default implementation returns true if it can raycast from `Camera.main` to the pivot position.
 - **isInteractable**: Function returns whether the `Component` is interactable or not. The default implementation returns true if the component is a uGUI compatible component and its `interactable` property is true.
 
