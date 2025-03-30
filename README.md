@@ -599,7 +599,7 @@ git submodule add git@github.com:nowsprinting/test-helper.monkey.git Packages/co
 > [!WARNING]  
 > Required installation packages for running tests (when embedded package or adding to the `testables` in manifest.json), as follows:
 > - [Unity Test Framework](https://docs.unity3d.com/Packages/com.unity.test-framework@latest) package v1.3.4 or later
-> - TextMesh Pro package or Unity UI package v2.0.0 or later
+> - [TextMesh Pro](https://docs.unity3d.com/Packages/com.unity.textmeshpro@latest) package or [Unity UI](https://docs.unity3d.com/Packages/com.unity.ugui@latest) package v2.0.0 or later
 
 
 ### Run tests
