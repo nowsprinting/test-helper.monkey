@@ -28,7 +28,7 @@ namespace TestHelper.Monkey
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="timeoutSeconds">Seconds to wait until <c>GameObject</c> appear.</param>
+        /// <param name="timeoutSeconds">Seconds to wait until <c>GameObject</c> appears.</param>
         /// <param name="reachableStrategy">Strategy to examine whether <c>GameObject</c> is reachable from the user. Default is <c>DefaultReachableStrategy</c>.</param>
         /// <param name="isInteractable">The function returns the <c>Component</c> is interactable or not. Default is <c>DefaultComponentInteractableStrategy.IsInteractable</c>.</param>
         public GameObjectFinder(double timeoutSeconds = 1.0d,

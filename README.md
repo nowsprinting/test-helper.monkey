@@ -67,7 +67,7 @@ Configurations in `MonkeyConfig`:
 - **IsInteractable**: Function returns whether the `Component` is interactable or not. The default implementation returns true if the component is a uGUI compatible component and its `interactable` property is true.
 - **IgnoreStrategy**: Strategy to examine whether `GameObject` should be ignored. The default implementation returns true if the `GameObject` has `IgnoreAnnotation` attached.
 - **ReachableStrategy**: Strategy to examine whether `GameObject` is reachable from the user. The default implementation returns true if it can raycast from `Camera.main` to the pivot position.
-- **Operators**: A collection of `IOperator` that the monkey invokes. the default is `ClickOperator`, `ClickAndHoldOperator`, and `TextInputOperator`. There is support for standard uGUI components.
+- **Operators**: A collection of `IOperator` that the monkey invokes. the default is `UGUIClickOperator`, `UGUIClickAndHoldOperator`, and `UGUITextInputOperator`. There is support for standard uGUI components.
 
 Class diagram for default strategies:
 
@@ -179,15 +179,15 @@ Specify the world position where Monkey operators operate.
 
 Constructor arguments:
 
-- **timeoutSeconds**: Timeout seconds for find methods. The default is 1 second.
+- **timeoutSeconds**: Seconds to wait until `GameObject` appears. The default is 1 second.
 - **reachableStrategy**: Strategy to examine whether `GameObject` is reachable from the user. The default implementation returns true if it can raycast from `Camera.main` to the pivot position.
-- **isComponentInteractable**: Function returns whether the `Component` is interactable or not. The default implementation returns true if the component is a uGUI compatible component and its `interactable` property is true.
+- **isInteractable**: Function returns whether the `Component` is interactable or not. The default implementation returns true if the component is a uGUI compatible component and its `interactable` property is true.
 
 
 #### Find GameObject by name
 
 Find a `GameObject` by name; if not found, poll until a timeout.
-If the timeout, a `TimeOutException` is thrown.
+If the timeout, a `TimeoutException` is thrown.
 
 Arguments:
 
@@ -218,7 +218,7 @@ public class MyIntegrationTest
 #### Find GameObject by path
 
 Find a `GameObject` by path; if not found, poll until a timeout.
-If the timeout, a `TimeOutException` is thrown.
+If the timeout, a `TimeoutException` is thrown.
 
 Arguments:
 
@@ -266,9 +266,8 @@ public class MyIntegrationTest
         var finder = new GameObjectFinder();
         var result = await finder.FindByNameAsync("StartButton", interactable: true);
 
-        var button = result.GameObject;
-        var clickOperator = button.SelectOperators<IClickOperator>(_operators).First();
-        await clickOperator.OperateAsync(button, result.RaycastResult);
+        var clickOperator = new UGUIClickOperator();
+        await clickOperator.OperateAsync(result.GameObject, result.RaycastResult);
     }
 }
 ```
@@ -600,7 +599,7 @@ git submodule add git@github.com:nowsprinting/test-helper.monkey.git Packages/co
 > [!WARNING]  
 > Required installation packages for running tests (when embedded package or adding to the `testables` in manifest.json), as follows:
 > - [Unity Test Framework](https://docs.unity3d.com/Packages/com.unity.test-framework@latest) package v1.3.4 or later
-> - TextMesh Pro package or Unity UI package v2.0.0 or later
+> - [TextMesh Pro](https://docs.unity3d.com/Packages/com.unity.textmeshpro@latest) package or [Unity UI](https://docs.unity3d.com/Packages/com.unity.ugui@latest) package v2.0.0 or later
 
 
 ### Run tests
