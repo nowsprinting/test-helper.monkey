@@ -182,6 +182,9 @@ csharp_style_var_for_built_in_types = true:suggestion
 csharp_style_var_when_type_is_apparent = true:suggestion
 csharp_style_var_elsewhere = true:suggestion
 
+# Namespace declarations style
+csharp_style_namespace_declarations = block_scoped:suggestion
+
 # Prefer method-like constructs to have a block body
 csharp_style_expression_bodied_methods = false:none
 csharp_style_expression_bodied_constructors = false:none
@@ -232,12 +235,27 @@ csharp_preserve_single_line_statements = true
 # IDE0060: Remove unused parameter
 dotnet_diagnostic.IDE0060.severity = warning
 
+# BannedApiAnalyzers
+dotnet_diagnostic.RS0030.severity = error
+
 # Suppress C#8.0+ syntax sugar (for under Unity 2020.2 compatibility)
 # See: https://www.jetbrains.com/help/resharper/Reference__Code_Inspections_CSHARP.html
 resharper_convert_to_using_declaration_highlighting = none
 resharper_convert_to_null_coalescing_compound_assignment_highlighting = none
 resharper_merge_into_logical_pattern_highlighting = none
 resharper_use_negated_pattern_in_is_expression_highlighting = none
+
+# ReSharper comment alignment
+resharper_csharp_int_align_comments = true
+
+# Unity Test Framework
+[**/Tests/**/*.cs]
+
+# NUnit2045: Use Assert.Multiple
+dotnet_diagnostic.NUnit2045.severity = none
+
+# Access to a static member of a type via a derived type (e.g., NUnit.Framework.Is)
+resharper_access_to_static_member_via_derived_type_highlighting = none
 
 [src/{Compilers,ExpressionEvaluator,Scripting}/**Test**/*.{cs,vb}]
 
