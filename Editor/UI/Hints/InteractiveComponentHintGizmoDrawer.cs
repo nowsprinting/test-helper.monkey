@@ -40,7 +40,7 @@ namespace TestHelper.Monkey.Editor.UI.Hints
                 GUI.color = hint.unreachableColor;
                 Handles.Label(worldPoint + s_labelOffset, label);
             }
-            
+
             foreach (var worldPointAndLabel in hint.ReallyInteractives)
             {
                 var (worldPoint, camNorm) = worldPointAndLabel.Key;

@@ -28,8 +28,8 @@ namespace TestHelper.Monkey.Annotations
             _config = new MonkeyConfig
             {
                 Lifetime = TimeSpan.FromMilliseconds(500), // 500ms
-                DelayMillis = 1, // 1ms
-                BufferLengthForDetectLooping = 0, // disable loop operation detection
+                DelayMillis = 1,                           // 1ms
+                BufferLengthForDetectLooping = 0,          // disable loop operation detection
                 Operators = new[] { new UGUITextInputOperator() }
             };
         }

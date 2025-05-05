@@ -58,7 +58,7 @@ namespace TestHelper.Monkey.Annotations
 
             private static readonly IEnumerable<string> s_annotations = new[]
             {
-                "ScreenOffsetAnnotation", // The offset is within the GameObject's rect on XGA
+                "ScreenOffsetAnnotation",   // The offset is within the GameObject's rect on XGA
                 "ScreenPositionAnnotation", // The position is within the GameObject's rect on XGA
             };
 

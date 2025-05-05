@@ -14,7 +14,9 @@ namespace TestHelper.Monkey.Editor.UI.Annotations
     public class WorldOffsetAnnotationEditor : UnityEditor.Editor
     {
         private static readonly string s_offset = L10n.Tr("Offset");
-        private static readonly string s_offsetTooltip = L10n.Tr("Offset from a world point of the GameObject that the annotation attached to");
+
+        private static readonly string s_offsetTooltip =
+            L10n.Tr("Offset from a world point of the GameObject that the annotation attached to");
 
         public override void OnInspectorGUI()
         {

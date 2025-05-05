@@ -10,8 +10,11 @@ namespace TestHelper.Monkey.TestComponents
     [AddComponentMenu("/")] // Hide from "Add Component" picker
     public class RelayButton : MonoBehaviour
     {
-        [field: SerializeField] public Button NextButton { get; private set; }
-        [field: SerializeField] public bool EnabledOnLoad { get; set; } = false;
+        [field: SerializeField]
+        public Button NextButton { get; private set; }
+
+        [field: SerializeField]
+        public bool EnabledOnLoad { get; set; } = false;
 
         private Button _button;
 

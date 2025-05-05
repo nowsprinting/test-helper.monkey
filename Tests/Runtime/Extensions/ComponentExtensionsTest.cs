@@ -18,7 +18,7 @@ namespace TestHelper.Monkey.Extensions
         private readonly IEnumerable<IOperator> _operators = new[]
         {
             s_clickOperator, s_clickAndHoldOperator, // Matches UnityEngine.UI.Button
-            s_textInputOperator, // Does not match UnityEngine.UI.Button
+            s_textInputOperator,                     // Does not match UnityEngine.UI.Button
         };
 
         [Test]
