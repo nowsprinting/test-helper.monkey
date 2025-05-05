@@ -43,13 +43,14 @@ jobs:
         unityVersion: # Available versions see: https://game.ci/docs/docker/versions
           - 2019.4.40f1
           - 2022.3.61f1
-          - 6000.0.46f1
+          - 6000.0.48f1
+          - 6000.1.1f1
         testMode:
           - All # run tests in editor
         include:
-          - unityVersion: 6000.0.46f1
+          - unityVersion: 6000.0.48f1
             octocov: true
-          - unityVersion: 6000.0.46f1
+          - unityVersion: 6000.0.48f1
             testMode: Standalone  # run tests on player
 
     steps:
