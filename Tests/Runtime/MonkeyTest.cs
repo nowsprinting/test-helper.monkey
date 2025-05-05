@@ -37,7 +37,7 @@ namespace TestHelper.Monkey
         {
             _operators = new IOperator[]
             {
-                new UGUIClickOperator(), // click
+                new UGUIClickOperator(),         // click
                 new UGUIClickAndHoldOperator(1), // click and hold 1ms
                 new UGUITextInputOperator()
             };
@@ -89,8 +89,8 @@ namespace TestHelper.Monkey
             var config = new MonkeyConfig
             {
                 Lifetime = TimeSpan.FromMilliseconds(200), // 200ms
-                DelayMillis = 1, // 1ms
-                BufferLengthForDetectLooping = 0, // disable loop detection
+                DelayMillis = 1,                           // 1ms
+                BufferLengthForDetectLooping = 0,          // disable loop detection
                 Operators = _operators,
             };
             var task = Monkey.Run(config);
@@ -132,7 +132,7 @@ namespace TestHelper.Monkey
 
             var config = new MonkeyConfig
             {
-                Lifetime = TimeSpan.FromSeconds(2), // 2sec
+                Lifetime = TimeSpan.FromSeconds(2),          // 2sec
                 SecondsToErrorForNoInteractiveComponent = 1, // 1sec
             };
 
@@ -159,8 +159,8 @@ namespace TestHelper.Monkey
 
             var config = new MonkeyConfig
             {
-                Lifetime = TimeSpan.FromSeconds(2), // 2sec
-                DelayMillis = 1, // 1ms
+                Lifetime = TimeSpan.FromSeconds(2),          // 2sec
+                DelayMillis = 1,                             // 1ms
                 SecondsToErrorForNoInteractiveComponent = 0, // not detect error
             };
 
@@ -178,7 +178,7 @@ namespace TestHelper.Monkey
             var config = new MonkeyConfig
             {
                 Lifetime = TimeSpan.FromSeconds(1), // 1sec
-                Random = new RandomWrapper(0), // pin seed
+                Random = new RandomWrapper(0),      // pin seed
                 Logger = spyLogger,
                 Operators = _operators,
             };
@@ -198,9 +198,9 @@ namespace TestHelper.Monkey
             var config = new MonkeyConfig
             {
                 Lifetime = TimeSpan.FromMilliseconds(200), // 200ms
-                DelayMillis = 1, // 1ms
-                BufferLengthForDetectLooping = 0, // disable loop detection
-                Gizmos = true, // show Gizmos
+                DelayMillis = 1,                           // 1ms
+                BufferLengthForDetectLooping = 0,          // disable loop detection
+                Gizmos = true,                             // show Gizmos
                 Operators = _operators,
             };
             var task = Monkey.Run(config);
@@ -325,7 +325,7 @@ namespace TestHelper.Monkey
             private IEnumerable<IOperator> _operators;
             private InteractableComponentsFinder _interactableComponentsFinder;
 
-            private const int FileSizeThreshold = 5441; // VGA size solid color file size
+            private const int FileSizeThreshold = 5441;         // VGA size solid color file size
             private const int FileSizeThreshold2X = 100 * 1024; // Normal size is 80 to 90KB
             private readonly string _defaultOutputDirectory = CommandLineArgs.GetScreenshotDirectory();
             private string _filename;
@@ -336,7 +336,7 @@ namespace TestHelper.Monkey
             {
                 _operators = new IOperator[]
                 {
-                    new UGUIClickOperator(), // click
+                    new UGUIClickOperator(),         // click
                     new UGUIClickAndHoldOperator(1), // click and hold 1ms
                     new UGUITextInputOperator()
                 };
@@ -417,7 +417,7 @@ namespace TestHelper.Monkey
                 var config = new MonkeyConfig
                 {
                     Lifetime = TimeSpan.FromMilliseconds(200), // 200ms
-                    DelayMillis = 1, // 1ms
+                    DelayMillis = 1,                           // 1ms
                     Screenshots = new ScreenshotOptions()
                     {
                         SuperSize = 2, // 2x size
@@ -446,7 +446,7 @@ namespace TestHelper.Monkey
                 var config = new MonkeyConfig
                 {
                     Lifetime = TimeSpan.FromMilliseconds(200), // 200ms
-                    DelayMillis = 1, // 1ms
+                    DelayMillis = 1,                           // 1ms
                     Screenshots = new ScreenshotOptions()
                     {
                         StereoCaptureMode = ScreenCapture.StereoScreenCaptureMode.BothEyes,
@@ -478,9 +478,9 @@ namespace TestHelper.Monkey
 
                 var config = new MonkeyConfig
                 {
-                    Lifetime = TimeSpan.FromSeconds(2), // 2sec
+                    Lifetime = TimeSpan.FromSeconds(2),          // 2sec
                     SecondsToErrorForNoInteractiveComponent = 1, // 1sec
-                    Screenshots = new ScreenshotOptions() // take screenshots and save files
+                    Screenshots = new ScreenshotOptions()        // take screenshots and save files
                 };
 
                 try
@@ -508,8 +508,8 @@ namespace TestHelper.Monkey
                 var config = new MonkeyConfig
                 {
                     Lifetime = TimeSpan.FromSeconds(2), // 2sec
-                    DelayMillis = 1, // 1ms
-                    BufferLengthForDetectLooping = 10, // repeating 5-step sequences can be detected
+                    DelayMillis = 1,                    // 1ms
+                    BufferLengthForDetectLooping = 10,  // repeating 5-step sequences can be detected
                     Operators = new IOperator[] { new UGUIClickOperator() },
                     Screenshots = new ScreenshotOptions() // take screenshots and save files
                 };
@@ -535,7 +535,7 @@ namespace TestHelper.Monkey
             {
                 var operators = new IOperator[]
                 {
-                    new UGUIClickOperator(), // click
+                    new UGUIClickOperator(),         // click
                     new UGUIClickAndHoldOperator(1), // click and hold 1ms
                     new UGUITextInputOperator()
                 };
@@ -661,8 +661,8 @@ namespace TestHelper.Monkey
                 var config = new MonkeyConfig
                 {
                     Lifetime = TimeSpan.FromSeconds(2), // 2sec
-                    DelayMillis = 1, // 1ms
-                    BufferLengthForDetectLooping = 10, // repeating 5-step sequences can be detected
+                    DelayMillis = 1,                    // 1ms
+                    BufferLengthForDetectLooping = 10,  // repeating 5-step sequences can be detected
                     Operators = new IOperator[] { new UGUIClickOperator() },
                 };
 
@@ -677,9 +677,9 @@ namespace TestHelper.Monkey
                 }
             }
 
-            [TestCase("1")] // under pattern length
-            [TestCase("1, 1")] // under repeating length
-            [TestCase("1, 1, 1")] // under repeating length
+            [TestCase("1")]             // under pattern length
+            [TestCase("1, 1")]          // under repeating length
+            [TestCase("1, 1, 1")]       // under repeating length
             [TestCase("1, 2, 3, 1, 2")] // not looping yet
             [TestCase("1, 2, 2, 2, 2")] // not looping yet
             [TestCase("2, 2, 2, 2, 3")] // precondition is (1, 2, 2, 2, 2), add "3" and remove "1" (buffer overflow)

@@ -62,7 +62,7 @@ namespace TestHelper.Monkey
 
             [TestCase("UsingEventHandler")] // Implements IPointerClickHandler
             [TestCase("UsingEventTrigger")] // Attached EventTrigger
-            [TestCase("ChildInTheSight")] // Parent object is out of sight, but this object is in the sight
+            [TestCase("ChildInTheSight")]   // Parent object is out of sight, but this object is in the sight
             [LoadScene(TestScene)]
             public void IsReachable_reachableObjects_returnTrue(string targetName)
             {
@@ -73,7 +73,7 @@ namespace TestHelper.Monkey
             }
 
             [TestCase("BeyondTheWall")] // Beyond the another object
-            [TestCase("OutOfSight")] // Out of sight
+            [TestCase("OutOfSight")]    // Out of sight
             [LoadScene(TestScene)]
             public void IsReachable_unreachableObjects_returnFalse(string targetName)
             {
@@ -93,8 +93,8 @@ namespace TestHelper.Monkey
             private const string TestScene =
                 "Packages/com.nowsprinting.test-helper.monkey/Tests/Scenes/MonkeyUiWorldSpace.unity";
 
-            [TestCase("Button")] // Attached Button
-            [TestCase("ChildInTheSight")] // Parent object is out of sight, but this object is in the sight
+            [TestCase("Button")]              // Attached Button
+            [TestCase("ChildInTheSight")]     // Parent object is out of sight, but this object is in the sight
             [TestCase("ButtonOnInnerCanvas")] // On the inner Canvas
             [LoadScene(TestScene)]
             public async Task IsReachable_reachableObjects_returnTrue(string targetName)
@@ -133,7 +133,7 @@ namespace TestHelper.Monkey
             private readonly IEnumerable<IOperator> _operators = new[]
             {
                 s_clickOperator, s_clickAndHoldOperator, // Matches UnityEngine.UI.Button
-                s_textInputOperator, // Does not match UnityEngine.UI.Button
+                s_textInputOperator,                     // Does not match UnityEngine.UI.Button
             };
 
             [Test]

@@ -51,7 +51,8 @@ namespace TestHelper.Monkey.Editor.UI.Hints
             _unreachablePointColorProp =
                 serializedObject.FindProperty(nameof(InteractiveComponentHint.unreachableColor));
             _unreachablePointColorContent = new GUIContent(s_unreachableColor, s_unreachableTooltip);
-            _originalPointColorProp = serializedObject.FindProperty(nameof(InteractiveComponentHint.originalPointColor));
+            _originalPointColorProp =
+                serializedObject.FindProperty(nameof(InteractiveComponentHint.originalPointColor));
             _originalPointColorContent = new GUIContent(s_originalPointColor, s_originalPointTooltip);
             _refreshFrameCountProp = serializedObject.FindProperty(nameof(InteractiveComponentHint.framesPerRefresh));
             _refreshFrameCountContent = new GUIContent(s_refreshFrameCount, s_refreshFrameCountTooltip);

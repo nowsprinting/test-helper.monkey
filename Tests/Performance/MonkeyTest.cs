@@ -2,7 +2,6 @@
 // This software is released under the MIT License.
 
 using System.Collections;
-using System.Linq;
 using Cysharp.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;

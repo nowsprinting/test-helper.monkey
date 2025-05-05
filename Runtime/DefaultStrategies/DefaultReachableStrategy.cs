@@ -15,7 +15,8 @@ namespace TestHelper.Monkey.DefaultStrategies
     /// </summary>
     public class DefaultReachableStrategy : IReachableStrategy
     {
-        [Obsolete] private static Func<GameObject, Vector2> GetScreenPoint => DefaultScreenPointStrategy.GetScreenPoint;
+        [Obsolete]
+        private static Func<GameObject, Vector2> GetScreenPoint => DefaultScreenPointStrategy.GetScreenPoint;
 
         private readonly Func<GameObject, Vector2> _getScreenPoint;
         private readonly ILogger _verboseLogger;

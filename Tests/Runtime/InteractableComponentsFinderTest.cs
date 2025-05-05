@@ -23,13 +23,13 @@ namespace TestHelper.Monkey
             {
                 "UsingEventHandler", // Implements IPointerClickHandler
                 "UsingEventTrigger", // Attached EventTrigger
-                "ChildInTheSight", // Parent object is out of sight, but this object is in the sight
+                "ChildInTheSight",   // Parent object is out of sight, but this object is in the sight
             };
 
             private static readonly string[] s_unreachableObjects =
             {
                 "BeyondTheWall", // Beyond the another object
-                "OutOfSight", // Out of sight
+                "OutOfSight",    // Out of sight
             };
 
             private static IEnumerable<string> s_interactiveObjects()
@@ -60,13 +60,13 @@ namespace TestHelper.Monkey
             {
                 "UsingEventHandler", // Implements IPointerClickHandler
                 "UsingEventTrigger", // Attached EventTrigger
-                "ChildInTheSight", // Parent object is out of sight, but this object is in the sight
+                "ChildInTheSight",   // Parent object is out of sight, but this object is in the sight
             };
 
             private static readonly string[] s_unreachableObjects =
             {
                 "BeyondTheWall", // Beyond the another object
-                "OutOfSight", // Out of sight
+                "OutOfSight",    // Out of sight
             };
 
             private static IEnumerable<string> s_interactiveObjects()
@@ -90,17 +90,17 @@ namespace TestHelper.Monkey
         {
             private static readonly string[] s_reachableUiObjects =
             {
-                "Button", // Attached Button
-                "ChildInTheSight", // Parent object is out of sight, but this object is in the sight
+                "Button",              // Attached Button
+                "ChildInTheSight",     // Parent object is out of sight, but this object is in the sight
                 "ButtonOnInnerCanvas", // On the inner Canvas
             };
 
             private static readonly string[] s_unreachableUiObjects =
             {
                 "BeyondTheWall", // Beyond the another object
-                "OutOfSight", // Out of sight
-                "BeyondThe2D", // Beyond the 2D object (GraphicRaycaster.blockingObjects is BlockingObjects.All)
-                "BeyondThe3D", // Beyond the 3D object (GraphicRaycaster.blockingObjects is BlockingObjects.All)
+                "OutOfSight",    // Out of sight
+                "BeyondThe2D",   // Beyond the 2D object (GraphicRaycaster.blockingObjects is BlockingObjects.All)
+                "BeyondThe3D",   // Beyond the 3D object (GraphicRaycaster.blockingObjects is BlockingObjects.All)
             };
 
             private static IEnumerable<string> s_interactiveUiObjects()
@@ -119,7 +119,7 @@ namespace TestHelper.Monkey
                 private static readonly string[] s_unreachableUiObjectsInOverlayCanvas =
                 {
                     "BeyondTheWall", // Beyond the another object
-                    "OutOfSight", // Out of sight
+                    "OutOfSight",    // Out of sight
                 };
 
                 private static IEnumerable<string> s_interactiveUiObjectsInOverlayCanvas()
