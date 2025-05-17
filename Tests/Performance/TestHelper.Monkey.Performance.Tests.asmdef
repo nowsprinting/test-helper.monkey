@@ -21,13 +21,13 @@
     "defineConstraints": [
         "UNITY_INCLUDE_TESTS",
         "UNITY_2020_3_OR_NEWER",
-        "ENABLED_PERFORMANCE_TESTING"
+        "ENABLE_PERFORMANCE_TESTING"
     ],
     "versionDefines": [
         {
             "name": "com.unity.test-framework.performance",
             "expression": "3.0.0",
-            "define": "ENABLED_PERFORMANCE_TESTING"
+            "define": "ENABLE_PERFORMANCE_TESTING"
         }
     ],
     "noEngineReferences": false
