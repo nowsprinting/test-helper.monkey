@@ -76,7 +76,7 @@ namespace TestHelper.Monkey
                 }
                 catch (TimeoutException e)
                 {
-                    Assert.That(e.Message, Is.EqualTo($"GameObject `{target}` is not found."));
+                    Assert.That(e.Message, Is.EqualTo($"GameObject (name={target}) is not found."));
                 }
             }
 
@@ -92,7 +92,7 @@ namespace TestHelper.Monkey
                 }
                 catch (TimeoutException e)
                 {
-                    Assert.That(e.Message, Is.EqualTo($"GameObject `{target}` is found, but not reachable."));
+                    Assert.That(e.Message, Is.EqualTo($"GameObject (name={target}) is found, but not reachable."));
                 }
             }
 
@@ -111,7 +111,7 @@ namespace TestHelper.Monkey
                 }
                 catch (TimeoutException e)
                 {
-                    Assert.That(e.Message, Is.EqualTo($"GameObject `{target}` is found, but not reachable."));
+                    Assert.That(e.Message, Is.EqualTo($"GameObject (name={target}) is found, but not reachable."));
                 }
 
                 Assert.That(spyLogger.Messages, Is.Not.Empty);
@@ -135,7 +135,7 @@ namespace TestHelper.Monkey
                 }
                 catch (TimeoutException e)
                 {
-                    Assert.That(e.Message, Is.EqualTo($"GameObject `{target}` is found, but not interactable."));
+                    Assert.That(e.Message, Is.EqualTo($"GameObject (name={target}) is found, but not interactable."));
                 }
             }
 
@@ -166,7 +166,7 @@ namespace TestHelper.Monkey
                 catch (TimeoutException e)
                 {
                     Assert.That(e.Message,
-                        Is.EqualTo($"GameObject `Interactable` is found, but it does not match path `{path}`."));
+                        Is.EqualTo($"GameObject (path={path}) is not found."));
                 }
             }
 
@@ -241,7 +241,7 @@ namespace TestHelper.Monkey
                 }
                 catch (TimeoutException e)
                 {
-                    Assert.That(e.Message, Is.EqualTo($"GameObject `{target}` is found, but not reachable."));
+                    Assert.That(e.Message, Is.EqualTo($"GameObject (name={target}) is found, but not reachable."));
                 }
             }
 
@@ -257,7 +257,7 @@ namespace TestHelper.Monkey
                 }
                 catch (TimeoutException e)
                 {
-                    Assert.That(e.Message, Is.EqualTo($"GameObject `{target}` is found, but not interactable."));
+                    Assert.That(e.Message, Is.EqualTo($"GameObject (name={target}) is found, but not interactable."));
                 }
             }
         }

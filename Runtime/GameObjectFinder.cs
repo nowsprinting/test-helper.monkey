@@ -6,10 +6,11 @@ using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using TestHelper.Monkey.DefaultStrategies;
-using TestHelper.Monkey.Extensions;
+using TestHelper.Monkey.GameObjectMatchers;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 
 namespace TestHelper.Monkey
 {
@@ -46,28 +47,44 @@ namespace TestHelper.Monkey
         private enum Reason
         {
             NotFound,
-            NotMatchPath,
             NotReachable,
             NotInteractable,
             None
         }
 
-        private (GameObject, RaycastResult, Reason) FindByName(string name, string path, bool reachable,
-            bool interactable)
+        private (GameObject, RaycastResult, Reason) FindByMatcher(IGameObjectMatcher matcher,
+            bool reachable, bool interactable)
         {
-            var foundObject = GameObject.Find(name);
-            // Note: Cases where there are multiple GameObjects with the same name are not considered.
-
+            GameObject foundObject = null;
             RaycastResult raycastResult = default;
 
-            if (foundObject == null)
+            for (var i = 0; i < SceneManager.sceneCount; i++)
             {
-                return (null, default, Reason.NotFound);
+                var scene = SceneManager.GetSceneAt(i);
+                if (!scene.isLoaded)
+                {
+                    continue;
+                }
+
+                var rootGameObjects = scene.GetRootGameObjects();
+                foreach (var rootGameObject in rootGameObjects)
+                {
+                    foundObject = FindRecursive(rootGameObject, matcher);
+                    if (foundObject)
+                    {
+                        break;
+                    }
+                }
+
+                if (foundObject)
+                {
+                    break;
+                }
             }
 
-            if (path != null && !foundObject.transform.MatchPath(path))
+            if (!foundObject)
             {
-                return (null, default, Reason.NotMatchPath);
+                return (null, default, Reason.NotFound);
             }
 
             if (reachable && !_reachableStrategy.IsReachable(foundObject, out raycastResult))
@@ -83,7 +100,18 @@ namespace TestHelper.Monkey
             return (foundObject, raycastResult, Reason.None);
         }
 
-        private async UniTask<GameObjectFinderResult> FindByNameAsync(string name, string path,
+        private static GameObject FindRecursive(GameObject current, IGameObjectMatcher matcher)
+        {
+            if (current.activeInHierarchy && matcher.IsMatch(current))
+            {
+                return current;
+            }
+
+            return (from Transform childTransform in current.transform
+                select FindRecursive(childTransform.gameObject, matcher)).FirstOrDefault(found => found);
+        }
+
+        private async UniTask<GameObjectFinderResult> FindByMatcherAsync(IGameObjectMatcher matcher,
             bool reachable, bool interactable, CancellationToken cancellationToken)
         {
             var timeoutTime = Time.realtimeSinceStartup + (float)_timeoutSeconds;
@@ -94,8 +122,8 @@ namespace TestHelper.Monkey
             {
                 GameObject foundObject;
                 RaycastResult raycastResult;
-                (foundObject, raycastResult, reason) = FindByName(name, path, reachable, interactable);
-                if (foundObject != null)
+                (foundObject, raycastResult, reason) = FindByMatcher(matcher, reachable, interactable);
+                if (foundObject)
                 {
                     return new GameObjectFinderResult(foundObject, raycastResult);
                 }
@@ -108,13 +136,11 @@ namespace TestHelper.Monkey
             switch (reason)
             {
                 case Reason.NotFound:
-                    throw new TimeoutException($"GameObject `{name}` is not found.");
-                case Reason.NotMatchPath:
-                    throw new TimeoutException($"GameObject `{name}` is found, but it does not match path `{path}`.");
+                    throw new TimeoutException($"GameObject ({matcher}) is not found.");
                 case Reason.NotReachable:
-                    throw new TimeoutException($"GameObject `{name}` is found, but not reachable.");
+                    throw new TimeoutException($"GameObject ({matcher}) is found, but not reachable.");
                 case Reason.NotInteractable:
-                    throw new TimeoutException($"GameObject `{name}` is found, but not interactable.");
+                    throw new TimeoutException($"GameObject ({matcher}) is found, but not interactable.");
                 case Reason.None:
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -133,7 +159,8 @@ namespace TestHelper.Monkey
         public async UniTask<GameObjectFinderResult> FindByNameAsync(string name,
             bool reachable = true, bool interactable = false, CancellationToken cancellationToken = default)
         {
-            return await FindByNameAsync(name, null, reachable, interactable, cancellationToken);
+            var matcher = new NameMatcher(name);
+            return await FindByMatcherAsync(matcher, reachable, interactable, cancellationToken);
         }
 
         /// <summary>
@@ -149,8 +176,8 @@ namespace TestHelper.Monkey
         public async UniTask<GameObjectFinderResult> FindByPathAsync(string path,
             bool reachable = true, bool interactable = false, CancellationToken cancellationToken = default)
         {
-            var name = path.Split('/').Last();
-            return await FindByNameAsync(name, path, reachable, interactable, cancellationToken);
+            var matcher = new PathMatcher(path);
+            return await FindByMatcherAsync(matcher, reachable, interactable, cancellationToken);
         }
     }
 }
