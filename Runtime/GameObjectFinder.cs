@@ -111,8 +111,17 @@ namespace TestHelper.Monkey
                 select FindRecursive(childTransform.gameObject, matcher)).FirstOrDefault(found => found);
         }
 
-        private async UniTask<GameObjectFinderResult> FindByMatcherAsync(IGameObjectMatcher matcher,
-            bool reachable, bool interactable, CancellationToken cancellationToken)
+        /// <summary>
+        /// Find <c>GameObject</c> by <see cref="IGameObjectMatcher"/> (wait until they appear).
+        /// </summary>
+        /// <param name="matcher"></param>
+        /// <param name="reachable">Find only reachable object</param>
+        /// <param name="interactable">Find only interactable object</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Found <c>GameObject</c> and the frontmost raycast hit result will be set regardless of whether the event can be processed</returns>
+        /// <exception cref="TimeoutException">Throws if <c>GameObject</c> is not found</exception>
+        public async UniTask<GameObjectFinderResult> FindByMatcherAsync(IGameObjectMatcher matcher,
+            bool reachable = true, bool interactable = false, CancellationToken cancellationToken = default)
         {
             var timeoutTime = Time.realtimeSinceStartup + (float)_timeoutSeconds;
             var delaySeconds = MinTimeoutSeconds;

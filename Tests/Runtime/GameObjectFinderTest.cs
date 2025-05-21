@@ -2,17 +2,20 @@
 // This software is released under the MIT License.
 
 using System;
-using System.IO; // Do not remove, required for Unity 2022 or earlier
 using System.Threading.Tasks;
-using Cysharp.Threading.Tasks; // Do not remove, required for Unity 2022 or earlier
+using Cysharp.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
 using TestHelper.Monkey.DefaultStrategies;
 using TestHelper.Monkey.Extensions;
+using TestHelper.Monkey.GameObjectMatchers;
 using TestHelper.Monkey.TestDoubles;
 using TestHelper.RuntimeInternals;
 using UnityEngine;
 using UnityEngine.UI;
+#if !UNITY_2022_1_OR_NEWER
+using System.IO;
+#endif
 
 namespace TestHelper.Monkey
 {
@@ -191,7 +194,25 @@ namespace TestHelper.Monkey
                 var result = await sut.FindByPathAsync(path, reachable: false, interactable: false);
                 Assert.That(result.GameObject.transform.GetPath(),
                     Is.EqualTo("/Canvas/Parent/Child/Grandchild/Interactable"));
+
+                // TODO: 複数ヒットのケースは、例外になるべき
             }
+
+            [TestCase("Text", "/Canvas/Text (Legacy)")]
+            [TestCase("Text under the Button", "/Canvas/Button (Legacy)")]
+            [TestCase("Text under the Toggle", "/Canvas/Toggle")]
+            [TestCase("TMP Text", "/Canvas/Text (TMP)")]
+            [TestCase("TMP Text under the Button", "/Canvas/Button")]
+            [LoadScene("../Scenes/GameObjectFinderText.unity")]
+            public async Task FindByMatcherAsync_WithTextMatcher_Found(string text, string expectedPath)
+            {
+                var matcher = new TextMatcher(text);
+                var result = await _sut.FindByMatcherAsync(matcher, reachable: false, interactable: false);
+                Assert.That(result.GameObject.transform.GetPath(), Is.EqualTo(expectedPath));
+                // TODO: in childでやってるので、TextのケースでCanvasがヒットしてる？
+            }
+
+            // TODO: name, path, textureの不一致ケース
         }
 
         [TestFixture("2D")]
