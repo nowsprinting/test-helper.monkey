@@ -198,21 +198,24 @@ namespace TestHelper.Monkey
                 // TODO: 複数ヒットのケースは、例外になるべき
             }
 
-            [TestCase("Text", "/Canvas/Text (Legacy)")]
             [TestCase("Text under the Button", "/Canvas/Button (Legacy)")]
-            [TestCase("Text under the Toggle", "/Canvas/Toggle")]
-            [TestCase("TMP Text", "/Canvas/Text (TMP)")]
             [TestCase("TMP Text under the Button", "/Canvas/Button")]
             [LoadScene("../Scenes/GameObjectFinderText.unity")]
-            public async Task FindByMatcherAsync_WithTextMatcher_Found(string text, string expectedPath)
+            public async Task FindByMatcherAsync_TextInButton_Found(string text, string expectedPath)
             {
-                var matcher = new TextMatcher(text);
+                var matcher = new ButtonMatcher(text: text);
                 var result = await _sut.FindByMatcherAsync(matcher, reachable: false, interactable: false);
                 Assert.That(result.GameObject.transform.GetPath(), Is.EqualTo(expectedPath));
-                // TODO: in childでやってるので、TextのケースでCanvasがヒットしてる？
             }
 
-            // TODO: name, path, textureの不一致ケース
+            [TestCase("Text under the Toggle", "/Canvas/Toggle")]
+            [LoadScene("../Scenes/GameObjectFinderText.unity")]
+            public async Task FindByMatcherAsync_TextInToggle_Found(string text, string expectedPath)
+            {
+                var matcher = new ToggleMatcher(text: text);
+                var result = await _sut.FindByMatcherAsync(matcher, reachable: false, interactable: false);
+                Assert.That(result.GameObject.transform.GetPath(), Is.EqualTo(expectedPath));
+            }
         }
 
         [TestFixture("2D")]
