@@ -1,7 +1,6 @@
-// Copyright (c) 2023-2024 Koji Hasegawa.
+// Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
-using System;
 using NUnit.Framework;
 using UnityEngine;
 
@@ -43,6 +42,10 @@ namespace TestHelper.Monkey.Extensions
         [TestCase("/*/*/Grandchild")]
         [TestCase("/**/Grandchild")]
         [TestCase("**/Grandchild")]
+        [TestCase("**/Grandchild*")]
+        [TestCase("**/Gran?child")]
+        [TestCase("**/*")]
+        [TestCase("**")]
         public void MatchPath_Match(string glob)
         {
             var grandchild = CreateThreeGenerationObjects();
@@ -59,18 +62,6 @@ namespace TestHelper.Monkey.Extensions
             var grandchild = CreateThreeGenerationObjects();
             var actual = grandchild.transform.MatchPath(glob);
             Assert.That(actual, Is.False);
-        }
-
-        [TestCase("**/Grandchild*")]
-        [TestCase("**/Gran?child")]
-        [TestCase("*")]
-        [TestCase("**")]
-        public void MatchPath_InvalidGlobPattern_ThrowsArgumentException(string glob)
-        {
-            var grandchild = CreateThreeGenerationObjects();
-            Assert.That(() => grandchild.transform.MatchPath(glob),
-                Throws.TypeOf<ArgumentException>()
-                    .And.Message.StartsWith("Wildcards cannot be used in the most right section of path"));
         }
     }
 }
