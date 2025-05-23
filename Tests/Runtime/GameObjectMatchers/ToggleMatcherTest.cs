@@ -91,7 +91,7 @@ namespace TestHelper.Monkey.GameObjectMatchers
             var sut = new ToggleMatcher(
                 componentType: typeof(Toggle),
                 name: "Toggle",
-                path: "/Path/To/Toggle",
+                path: "/Path/??/Toggle",
                 text: "Click Me");
             var actual = sut.IsMatch(CreateToggle(
                 componentType: typeof(Toggle),
@@ -107,7 +107,7 @@ namespace TestHelper.Monkey.GameObjectMatchers
             var sut = new ToggleMatcher(
                 componentType: typeof(Toggle),
                 name: "Toggle",
-                path: "/Path/To/Toggle",
+                path: "/Path/To/*",
                 text: "Click Me");
             var actual = sut.IsMatch(CreateToggle(
                 componentType: typeof(Toggle),

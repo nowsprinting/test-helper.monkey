@@ -107,7 +107,7 @@ namespace TestHelper.Monkey.GameObjectMatchers
             var sut = new ButtonMatcher(
                 componentType: typeof(Button),
                 name: "Button",
-                path: "/Path/To/Button",
+                path: "/Path/*/Button",
                 text: "Click Me",
                 texture: "test_sprite");
             var actual = sut.IsMatch(CreateButton(
@@ -125,7 +125,7 @@ namespace TestHelper.Monkey.GameObjectMatchers
             var sut = new ButtonMatcher(
                 componentType: typeof(Button),
                 name: "Button",
-                path: "/Path/To/Button",
+                path: "**/Button",
                 text: "Click Me",
                 texture: "test_sprite");
             var actual = sut.IsMatch(CreateButton(
