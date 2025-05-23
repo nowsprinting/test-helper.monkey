@@ -2,10 +2,12 @@
 // This software is released under the MIT License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using TestHelper.Monkey.DefaultStrategies;
+using TestHelper.Monkey.Exceptions;
 using TestHelper.Monkey.GameObjectMatchers;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -49,15 +51,54 @@ namespace TestHelper.Monkey
             NotFound,
             NotReachable,
             NotInteractable,
+            MultipleMatching,
             None
         }
 
         private (GameObject, RaycastResult, Reason) FindByMatcher(IGameObjectMatcher matcher,
             bool reachable, bool interactable)
         {
-            GameObject foundObject = null;
-            RaycastResult raycastResult = default;
+            var foundObjects = FindInAllScenes(matcher).ToList();
+            if (!foundObjects.Any())
+            {
+                return (null, default, Reason.NotFound);
+            }
 
+            if (reachable)
+            {
+                foundObjects = foundObjects.Where(obj => _reachableStrategy.IsReachable(obj, out _)).ToList();
+                if (!foundObjects.Any())
+                {
+                    return (null, default, Reason.NotReachable);
+                }
+            }
+
+            if (interactable)
+            {
+                foundObjects = foundObjects.Where(obj => obj.GetComponents<Component>().Any(_isInteractable)).ToList();
+                if (!foundObjects.Any())
+                {
+                    return (null, default, Reason.NotInteractable);
+                }
+            }
+
+            if (foundObjects.Count > 1)
+            {
+                return (null, default, Reason.MultipleMatching);
+            }
+
+            var resultObject = foundObjects.First();
+            if (!reachable)
+            {
+                return (resultObject, new RaycastResult(), Reason.None);
+            }
+
+            _reachableStrategy.IsReachable(resultObject, out var raycastResult);
+            return (resultObject, raycastResult, Reason.None);
+        }
+
+        private static IEnumerable<GameObject> FindInAllScenes(IGameObjectMatcher matcher)
+        {
             for (var i = 0; i < SceneManager.sceneCount; i++)
             {
                 var scene = SceneManager.GetSceneAt(i);
@@ -69,46 +110,28 @@ namespace TestHelper.Monkey
                 var rootGameObjects = scene.GetRootGameObjects();
                 foreach (var rootGameObject in rootGameObjects)
                 {
-                    foundObject = FindRecursive(rootGameObject, matcher);
-                    if (foundObject)
+                    foreach (var foundObject in FindRecursive(rootGameObject, matcher))
                     {
-                        break;
+                        yield return foundObject;
                     }
                 }
-
-                if (foundObject)
-                {
-                    break;
-                }
             }
-
-            if (!foundObject)
-            {
-                return (null, default, Reason.NotFound);
-            }
-
-            if (reachable && !_reachableStrategy.IsReachable(foundObject, out raycastResult))
-            {
-                return (null, default, Reason.NotReachable);
-            }
-
-            if (interactable && !foundObject.GetComponents<Component>().Any(_isInteractable))
-            {
-                return (null, default, Reason.NotInteractable);
-            }
-
-            return (foundObject, raycastResult, Reason.None);
         }
 
-        private static GameObject FindRecursive(GameObject current, IGameObjectMatcher matcher)
+        private static IEnumerable<GameObject> FindRecursive(GameObject current, IGameObjectMatcher matcher)
         {
             if (current.activeInHierarchy && matcher.IsMatch(current))
             {
-                return current;
+                yield return current;
             }
 
-            return (from Transform childTransform in current.transform
-                select FindRecursive(childTransform.gameObject, matcher)).FirstOrDefault(found => found);
+            foreach (Transform childTransform in current.transform)
+            {
+                foreach (var found in FindRecursive(childTransform.gameObject, matcher))
+                {
+                    yield return found;
+                }
+            }
         }
 
         /// <summary>
@@ -150,6 +173,9 @@ namespace TestHelper.Monkey
                     throw new TimeoutException($"GameObject ({matcher}) is found, but not reachable.");
                 case Reason.NotInteractable:
                     throw new TimeoutException($"GameObject ({matcher}) is found, but not interactable.");
+                case Reason.MultipleMatching:
+                    throw new MultipleGameObjectsMatchingException(
+                        $"Multiple GameObjects matching the condition ({matcher}) were found.");
                 case Reason.None:
                 default:
                     throw new ArgumentOutOfRangeException();

@@ -3,16 +3,15 @@
 
 using System;
 using System.Threading.Tasks;
-using Cysharp.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
 using TestHelper.Monkey.DefaultStrategies;
+using TestHelper.Monkey.Exceptions;
 using TestHelper.Monkey.Extensions;
 using TestHelper.Monkey.GameObjectMatchers;
 using TestHelper.Monkey.TestDoubles;
 using TestHelper.RuntimeInternals;
 using UnityEngine;
-using UnityEngine.UI;
 #if !UNITY_2022_1_OR_NEWER
 using System.IO;
 #endif
@@ -173,29 +172,45 @@ namespace TestHelper.Monkey
                 }
             }
 
-            [TestCase("/Canvas/Parent/**/Interactable")]
+            [Test]
             [LoadScene(TestScenePath)]
-            public async Task FindByPathAsync_DummyHasSameName_Found(string path)
+            public async Task FindByMatcherAsync_MultipleGameObjectsMatching_OnlyOneReachable_Found()
             {
-                var dummyInteractable = new GameObject("Interactable").AddComponent<Button>();
-                var canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
-                dummyInteractable.transform.SetParent(canvas.transform);
+                // Move to out of sight
+                ((RectTransform)GameObject.Find("ButtonOnDialog").transform).pivot = new Vector2(0, 300f);
+                ((RectTransform)GameObject.Find("Interactable").transform).pivot = new Vector2(0, 300f);
 
-                var target = GameObject.Find("Interactable");
-                target.SetActive(false);
-                new Task(async () =>
-                {
-                    await UniTask.Delay(100);
-                    target.SetActive(true);
-                    dummyInteractable.gameObject.SetActive(false);
-                }).Start();
+                var matcher = new ButtonMatcher(); // Tree buttons match, one is not reachable
+                var result = await _sut.FindByMatcherAsync(matcher, reachable: true, interactable: false);
+                Assert.That(result.GameObject.transform.GetPath(),
+                    Is.EqualTo("/Canvas/NotInteractable"));
+            }
 
-                var sut = new GameObjectFinder(0.5d);
-                var result = await sut.FindByPathAsync(path, reachable: false, interactable: false);
+            [Test]
+            [LoadScene(TestScenePath)]
+            public async Task FindByMatcherAsync_MultipleGameObjectsMatching_OnlyOneInteractable_Found()
+            {
+                var matcher = new ButtonMatcher(path: "**/*Interactable"); // Two buttons match, one is not interactable
+                var result = await _sut.FindByMatcherAsync(matcher, reachable: false, interactable: true);
                 Assert.That(result.GameObject.transform.GetPath(),
                     Is.EqualTo("/Canvas/Parent/Child/Grandchild/Interactable"));
+            }
 
-                // TODO: 複数ヒットのケースは、例外になるべき
+            [Test]
+            [LoadScene(TestScenePath)]
+            public async Task FindByMatcherAsync_MultipleGameObjectsMatching_ThrowException()
+            {
+                var matcher = new ButtonMatcher(); // Three buttons match
+                try
+                {
+                    await _sut.FindByMatcherAsync(matcher, reachable: false, interactable: false);
+                    Assert.Fail("Expected MultipleGameObjectsMatchingException but was not thrown");
+                }
+                catch (MultipleGameObjectsMatchingException e)
+                {
+                    Assert.That(e.Message,
+                        Is.EqualTo($"Multiple GameObjects matching the condition ({matcher}) were found."));
+                }
             }
 
             [TestCase("Text under the Button", "/Canvas/Button (Legacy)")]
