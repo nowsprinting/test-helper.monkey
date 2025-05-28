@@ -55,7 +55,7 @@ jobs:
 
     steps:
       - name: Crete project for tests
-        uses: nowsprinting/create-unity-project-action@fab595f04a568aa51a94b28b7202b861b0f7d8b2 # v3
+        uses: nowsprinting/create-unity-project-action@eeafc6df4ff7584ca8744b866b61a87a94aa3c2d # v3
         with:
           project-path: UnityProject~
 
