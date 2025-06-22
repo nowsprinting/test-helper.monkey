@@ -1,15 +1,17 @@
 // Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
-using System.Linq; // Do not remove, required for Unity 2022 or earlier
 using System.Threading.Tasks;
-using Cysharp.Threading.Tasks; // Do not remove, required for Unity 2022 or earlier
 using NUnit.Framework;
 using TestHelper.Attributes;
 using TestHelper.Monkey.TestDoubles;
 using TestHelper.RuntimeInternals;
 using UnityEngine;
 using UnityEngine.TestTools;
+#if !UNITY_2022_1_OR_NEWER
+using System.Linq;
+using Cysharp.Threading.Tasks;
+#endif
 
 namespace TestHelper.Monkey.DefaultStrategies
 {

@@ -3,7 +3,6 @@
 
 using System;
 using System.Threading.Tasks;
-using Cysharp.Threading.Tasks; // Do not remove, required for Unity 2022 or earlier
 using NUnit.Framework;
 using TestHelper.Attributes;
 using TestHelper.Monkey.DefaultStrategies;
@@ -15,6 +14,7 @@ using TestHelper.RuntimeInternals;
 using UnityEngine;
 #if !UNITY_2022_1_OR_NEWER
 using System.IO;
+using Cysharp.Threading.Tasks;
 #endif
 
 namespace TestHelper.Monkey
