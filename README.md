@@ -173,7 +173,7 @@ Specify the world position where Monkey operators operate.
 
 
 
-### Find and operate interactable GameObject
+### Find and operate GameObject
 
 `GameObjectFinder` is a class that finds `GameObject` by name, path (can specify [glob](https://en.wikipedia.org/wiki/Glob_(programming)) pattern), or custom matcher.
 
@@ -284,7 +284,7 @@ public class MyIntegrationTest
 ```
 
 
-#### Operate to a found GameObject
+#### Operate GameObject
 
 `SelectOperators` and `SelectOperators<T>` are extensions of `GameObject` that return available operators.
 Operators implement the `IOperator` interface. It has an `OperateAsync` method that operates on the component.
