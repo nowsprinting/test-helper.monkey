@@ -39,13 +39,13 @@ namespace TestHelper.Monkey.GameObjectMatchers
 
         private static GameObject CreateGameObject(string path)
         {
-            using var enumerator = path.Split("/").Reverse().GetEnumerator();
+            var enumerator = path.Split('/').Reverse().GetEnumerator();
             enumerator.MoveNext();
-            var gameObject = new GameObject(enumerator.Current!);
+            var gameObject = new GameObject(enumerator.Current);
             var lastGameObject = gameObject;
             while (enumerator.MoveNext())
             {
-                var node = enumerator.Current!;
+                var node = enumerator.Current;
                 if (string.IsNullOrEmpty(node))
                 {
                     continue;
@@ -55,6 +55,8 @@ namespace TestHelper.Monkey.GameObjectMatchers
                 lastGameObject.transform.SetParent(parent.transform);
                 lastGameObject = parent;
             }
+
+            enumerator.Dispose();
 
             return gameObject;
         }

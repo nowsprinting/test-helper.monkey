@@ -3,6 +3,7 @@
 
 using System;
 using System.Threading.Tasks;
+using Cysharp.Threading.Tasks; // Do not remove, required for Unity 2022 or earlier
 using NUnit.Framework;
 using TestHelper.Attributes;
 using TestHelper.Monkey.DefaultStrategies;

@@ -144,13 +144,13 @@ namespace TestHelper.Monkey.GameObjectMatchers
 
             if (path != null)
             {
-                using var enumerator = path.Split("/").Reverse().GetEnumerator();
+                var enumerator = path.Split('/').Reverse().GetEnumerator();
                 enumerator.MoveNext();
-                gameObject.name = enumerator.Current!;
+                gameObject.name = enumerator.Current ?? "null";
                 var lastGameObject = gameObject;
                 while (enumerator.MoveNext())
                 {
-                    var node = enumerator.Current!;
+                    var node = enumerator.Current;
                     if (string.IsNullOrEmpty(node))
                     {
                         continue;
@@ -160,6 +160,8 @@ namespace TestHelper.Monkey.GameObjectMatchers
                     lastGameObject.transform.SetParent(parent.transform);
                     lastGameObject = parent;
                 }
+
+                enumerator.Dispose();
             }
 
             if (name != null)
