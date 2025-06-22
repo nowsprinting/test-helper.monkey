@@ -15,6 +15,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 #if !UNITY_2022_1_OR_NEWER
 using System.IO;
+#endif
+#if !UNITY_2023_1_OR_NEWER
 using Cysharp.Threading.Tasks;
 #endif
 

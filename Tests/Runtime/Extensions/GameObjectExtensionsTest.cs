@@ -13,7 +13,7 @@ using UnityEngine.UI;
 #if UNITY_EDITOR
 using UnityEditor.SceneManagement;
 #endif
-#if !UNITY_2022_1_OR_NEWER
+#if !UNITY_2023_1_OR_NEWER
 using System.Linq;
 using Cysharp.Threading.Tasks;
 #endif
