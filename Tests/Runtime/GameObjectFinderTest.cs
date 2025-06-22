@@ -320,6 +320,9 @@ namespace TestHelper.Monkey
 
                 var result = await _sut.FindByNameAsync(target.name);
                 Assert.That(result.GameObject, Is.EqualTo(target));
+
+                // Teardown
+                GameObject.Destroy(target);
             }
 
             [Test]

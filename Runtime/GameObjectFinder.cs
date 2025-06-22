@@ -13,6 +13,7 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
+using Object = UnityEngine.Object;
 
 namespace TestHelper.Monkey
 {
@@ -21,6 +22,8 @@ namespace TestHelper.Monkey
     /// </summary>
     public class GameObjectFinder
     {
+        private static Scene s_dontDestroyOnLoadScene;
+
         private readonly double _timeoutSeconds;
         private readonly IReachableStrategy _reachableStrategy;
         private readonly Func<Component, bool> _isInteractable;
@@ -99,23 +102,39 @@ namespace TestHelper.Monkey
 
         private static IEnumerable<GameObject> FindInAllScenes(IGameObjectMatcher matcher)
         {
+            var scenes = new List<Scene> { GetDontDestroyOnLoadScene() };
             for (var i = 0; i < SceneManager.sceneCount; i++)
             {
                 var scene = SceneManager.GetSceneAt(i);
-                if (!scene.isLoaded)
+                if (scene.isLoaded)
                 {
-                    continue;
-                }
-
-                var rootGameObjects = scene.GetRootGameObjects();
-                foreach (var rootGameObject in rootGameObjects)
-                {
-                    foreach (var foundObject in FindRecursive(rootGameObject, matcher))
-                    {
-                        yield return foundObject;
-                    }
+                    scenes.Add(scene);
                 }
             }
+
+            foreach (var foundObject in from scene in scenes
+                     select scene.GetRootGameObjects()
+                     into rootGameObjects
+                     from rootGameObject in rootGameObjects
+                     from foundObject in FindRecursive(rootGameObject, matcher)
+                     select foundObject)
+            {
+                yield return foundObject;
+            }
+        }
+
+        private static Scene GetDontDestroyOnLoadScene()
+        {
+            if (s_dontDestroyOnLoadScene.IsValid())
+            {
+                return s_dontDestroyOnLoadScene;
+            }
+
+            var gameObject = new GameObject("DontDestroyOnLoad Object, Created by GameObjectFinder");
+            Object.DontDestroyOnLoad(gameObject);
+            s_dontDestroyOnLoadScene = gameObject.scene;
+
+            return s_dontDestroyOnLoadScene;
         }
 
         private static IEnumerable<GameObject> FindRecursive(GameObject current, IGameObjectMatcher matcher)
