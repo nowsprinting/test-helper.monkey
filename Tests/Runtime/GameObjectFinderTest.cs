@@ -2,17 +2,23 @@
 // This software is released under the MIT License.
 
 using System;
-using System.IO; // Do not remove, required for Unity 2022 or earlier
 using System.Threading.Tasks;
-using Cysharp.Threading.Tasks; // Do not remove, required for Unity 2022 or earlier
 using NUnit.Framework;
 using TestHelper.Attributes;
 using TestHelper.Monkey.DefaultStrategies;
+using TestHelper.Monkey.Exceptions;
 using TestHelper.Monkey.Extensions;
+using TestHelper.Monkey.GameObjectMatchers;
 using TestHelper.Monkey.TestDoubles;
 using TestHelper.RuntimeInternals;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+#if !UNITY_2022_1_OR_NEWER
+using System.IO;
+#endif
+#if !UNITY_2023_1_OR_NEWER
+using Cysharp.Threading.Tasks;
+#endif
 
 namespace TestHelper.Monkey
 {
@@ -76,7 +82,7 @@ namespace TestHelper.Monkey
                 }
                 catch (TimeoutException e)
                 {
-                    Assert.That(e.Message, Is.EqualTo($"GameObject `{target}` is not found."));
+                    Assert.That(e.Message, Is.EqualTo($"GameObject (name={target}) is not found."));
                 }
             }
 
@@ -92,7 +98,7 @@ namespace TestHelper.Monkey
                 }
                 catch (TimeoutException e)
                 {
-                    Assert.That(e.Message, Is.EqualTo($"GameObject `{target}` is found, but not reachable."));
+                    Assert.That(e.Message, Is.EqualTo($"GameObject (name={target}) is found, but not reachable."));
                 }
             }
 
@@ -111,7 +117,7 @@ namespace TestHelper.Monkey
                 }
                 catch (TimeoutException e)
                 {
-                    Assert.That(e.Message, Is.EqualTo($"GameObject `{target}` is found, but not reachable."));
+                    Assert.That(e.Message, Is.EqualTo($"GameObject (name={target}) is found, but not reachable."));
                 }
 
                 Assert.That(spyLogger.Messages, Is.Not.Empty);
@@ -135,7 +141,7 @@ namespace TestHelper.Monkey
                 }
                 catch (TimeoutException e)
                 {
-                    Assert.That(e.Message, Is.EqualTo($"GameObject `{target}` is found, but not interactable."));
+                    Assert.That(e.Message, Is.EqualTo($"GameObject (name={target}) is found, but not interactable."));
                 }
             }
 
@@ -166,31 +172,68 @@ namespace TestHelper.Monkey
                 catch (TimeoutException e)
                 {
                     Assert.That(e.Message,
-                        Is.EqualTo($"GameObject `Interactable` is found, but it does not match path `{path}`."));
+                        Is.EqualTo($"GameObject (path={path}) is not found."));
                 }
             }
 
-            [TestCase("/Canvas/Parent/**/Interactable")]
+            [Test]
             [LoadScene(TestScenePath)]
-            public async Task FindByPathAsync_DummyHasSameName_Found(string path)
+            public async Task FindByMatcherAsync_MultipleGameObjectsMatching_OnlyOneReachable_Found()
             {
-                var dummyInteractable = new GameObject("Interactable").AddComponent<Button>();
-                var canvas = GameObject.Find("Canvas").GetComponent<Canvas>();
-                dummyInteractable.transform.SetParent(canvas.transform);
+                // Move to out of sight
+                ((RectTransform)GameObject.Find("ButtonOnDialog").transform).pivot = new Vector2(0, 300f);
+                ((RectTransform)GameObject.Find("Interactable").transform).pivot = new Vector2(0, 300f);
 
-                var target = GameObject.Find("Interactable");
-                target.SetActive(false);
-                new Task(async () =>
-                {
-                    await UniTask.Delay(100);
-                    target.SetActive(true);
-                    dummyInteractable.gameObject.SetActive(false);
-                }).Start();
+                var matcher = new ButtonMatcher(); // Tree buttons match, one is not reachable
+                var result = await _sut.FindByMatcherAsync(matcher, reachable: true, interactable: false);
+                Assert.That(result.GameObject.transform.GetPath(),
+                    Is.EqualTo("/Canvas/NotInteractable"));
+            }
 
-                var sut = new GameObjectFinder(0.5d);
-                var result = await sut.FindByPathAsync(path, reachable: false, interactable: false);
+            [Test]
+            [LoadScene(TestScenePath)]
+            public async Task FindByMatcherAsync_MultipleGameObjectsMatching_OnlyOneInteractable_Found()
+            {
+                var matcher = new ButtonMatcher(path: "**/*Interactable"); // Two buttons match, one is not interactable
+                var result = await _sut.FindByMatcherAsync(matcher, reachable: false, interactable: true);
                 Assert.That(result.GameObject.transform.GetPath(),
                     Is.EqualTo("/Canvas/Parent/Child/Grandchild/Interactable"));
+            }
+
+            [Test]
+            [LoadScene(TestScenePath)]
+            public async Task FindByMatcherAsync_MultipleGameObjectsMatching_ThrowException()
+            {
+                var matcher = new ButtonMatcher(); // Three buttons match
+                try
+                {
+                    await _sut.FindByMatcherAsync(matcher, reachable: false, interactable: false);
+                    Assert.Fail("Expected MultipleGameObjectsMatchingException but was not thrown");
+                }
+                catch (MultipleGameObjectsMatchingException e)
+                {
+                    Assert.That(e.Message,
+                        Is.EqualTo($"Multiple GameObjects matching the condition ({matcher}) were found."));
+                }
+            }
+
+            [TestCase("Text under the Button", "/Canvas/Button (Legacy)")]
+            [TestCase("TMP Text under the Button", "/Canvas/Button")]
+            [LoadScene("../Scenes/GameObjectFinderText.unity")]
+            public async Task FindByMatcherAsync_TextInButton_Found(string text, string expectedPath)
+            {
+                var matcher = new ButtonMatcher(text: text);
+                var result = await _sut.FindByMatcherAsync(matcher, reachable: false, interactable: false);
+                Assert.That(result.GameObject.transform.GetPath(), Is.EqualTo(expectedPath));
+            }
+
+            [TestCase("Text under the Toggle", "/Canvas/Toggle")]
+            [LoadScene("../Scenes/GameObjectFinderText.unity")]
+            public async Task FindByMatcherAsync_TextInToggle_Found(string text, string expectedPath)
+            {
+                var matcher = new ToggleMatcher(text: text);
+                var result = await _sut.FindByMatcherAsync(matcher, reachable: false, interactable: false);
+                Assert.That(result.GameObject.transform.GetPath(), Is.EqualTo(expectedPath));
             }
         }
 
@@ -241,7 +284,7 @@ namespace TestHelper.Monkey
                 }
                 catch (TimeoutException e)
                 {
-                    Assert.That(e.Message, Is.EqualTo($"GameObject `{target}` is found, but not reachable."));
+                    Assert.That(e.Message, Is.EqualTo($"GameObject (name={target}) is found, but not reachable."));
                 }
             }
 
@@ -257,8 +300,44 @@ namespace TestHelper.Monkey
                 }
                 catch (TimeoutException e)
                 {
-                    Assert.That(e.Message, Is.EqualTo($"GameObject `{target}` is found, but not interactable."));
+                    Assert.That(e.Message, Is.EqualTo($"GameObject (name={target}) is found, but not interactable."));
                 }
+            }
+        }
+
+        [TestFixture]
+        public class MultipleScene
+        {
+            private const string TestScenePath = "../Scenes/GameObjectFinder2D.unity";
+
+            private readonly GameObjectFinder _sut = new GameObjectFinder(0.1d);
+
+            [Test]
+            [LoadScene(TestScenePath)]
+            public async Task FindByNameAsync_DontDestroyOnLoad_Found()
+            {
+                var target = GameObject.Find("EventHandler");
+
+                GameObject.DontDestroyOnLoad(target);
+
+                var result = await _sut.FindByNameAsync(target.name);
+                Assert.That(result.GameObject, Is.EqualTo(target));
+
+                // Teardown
+                GameObject.Destroy(target);
+            }
+
+            [Test]
+            [LoadScene(TestScenePath)]
+            public async Task FindByNameAsync_OnInactiveScene_Found()
+            {
+                var target = GameObject.Find("EventHandler");
+
+                var newScene = SceneManager.CreateScene("NewScene");
+                SceneManager.SetActiveScene(newScene);
+
+                var result = await _sut.FindByNameAsync(target.name);
+                Assert.That(result.GameObject, Is.EqualTo(target));
             }
         }
     }

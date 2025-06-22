@@ -173,9 +173,9 @@ Specify the world position where Monkey operators operate.
 
 
 
-### Find and operate interactable GameObject
+### Find and operate GameObject
 
-`GameObjectFinder` is a class that finds `GameObject` by name or path (can specify [glob](https://en.wikipedia.org/wiki/Glob_(programming)) pattern).
+`GameObjectFinder` is a class that finds `GameObject` by name, path (can specify [glob](https://en.wikipedia.org/wiki/Glob_(programming)) pattern), or custom matcher.
 
 Constructor arguments:
 
@@ -246,7 +246,45 @@ public class MyIntegrationTest
 ```
 
 
-#### Operate to a found GameObject
+#### Find GameObject by matcher
+
+Find a `GameObject` by custom `IGameObjectMatcher`; if not found, poll until a timeout.
+If the timeout, a `TimeoutException` is thrown.
+
+Arguments:
+
+- **matcher**: Custom `IGameObjectMatcher` implementation
+- **reachable**: Find only reachable object. Default is true
+- **interactable**: Find only interactable object. Default is false
+
+Built-in matchers:
+
+- `ButtonMatcher`: Matches `UnityEngine.UI.Button` components by `name`, `path`, `text`, or `texture`
+- `ToggleMatcher`: Matches `UnityEngine.UI.Toggle` components by `name`, `path`, or `text`
+
+Usage:
+
+```csharp
+using NUnit.Framework;
+using TestHelper.Monkey;
+using TestHelper.Monkey.GameObjectMatchers;
+
+[TestFixture]
+public class MyIntegrationTest
+{
+    [Test]
+    public async Task MyTestMethod()
+    {
+        var finder = new GameObjectFinder();
+        var matcher = new ButtonMatcher(text: "Click Me");
+        var result = await finder.FindByMatcherAsync(matcher, reachable: true, interactable: false);
+        var button = result.GameObject;
+    }
+}
+```
+
+
+#### Operate GameObject
 
 `SelectOperators` and `SelectOperators<T>` are extensions of `GameObject` that return available operators.
 Operators implement the `IOperator` interface. It has an `OperateAsync` method that operates on the component.
@@ -481,36 +519,42 @@ Lottery entries are empty or all of not reachable.
 
 ##### Not found
 
-If no `GameObject` is found with the specified name or path, throw `TimeoutException` with the following message:
+If no `GameObject` is found with the specified name, path, or matcher, throw `TimeoutException` with the following message:
 
 ```
-GameObject `Target` is not found.
+GameObject (NameMatcher: Target) is not found.
 ```
 
-##### Not match path
-
-If `GameObject` is found with the specified name but does not match path, throw `TimeoutException` with the following message:
+Or for path:
 
 ```
-GameObject `Target` is found, but it does not match path `Path/To/Target`.
+GameObject (PathMatcher: Path/To/Target) is not found.
 ```
 
 ##### Not reachable
 
-If `GameObject` is found with the specified name or path but not reachable, throw `TimeoutException` with the following message:
+If `GameObject` is found with the specified name, path, or matcher but not reachable, throw `TimeoutException` with the following message:
 
 ```
-GameObject `Target` is found, but not reachable.
+GameObject (NameMatcher: Target) is found, but not reachable.
 ```
 
 If you need detailed logs, pass an `ILogger` instance to the constructor of `GameObjectFinder`.
 
 ##### Not interactable
 
-If `GameObject` is found with the specified name or path but not interactable, throw `TimeoutException` with the following message:
+If `GameObject` is found with the specified name, path, or matcher but not interactable, throw `TimeoutException` with the following message:
 
 ```
-GameObject `Target` is found, but not interactable.
+GameObject (NameMatcher: Target) is found, but not interactable.
+```
+
+#### Thrown MultipleGameObjectsMatchingException
+
+If multiple `GameObjects` matching the condition are found, throw `MultipleGameObjectsMatchingException` with the following message:
+
+```
+Multiple GameObjects matching the condition (NameMatcher: Target) were found.
 ```
 
 

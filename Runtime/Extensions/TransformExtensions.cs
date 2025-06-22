@@ -1,8 +1,6 @@
-// Copyright (c) 2023-2024 Koji Hasegawa.
+// Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
-using System;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using UnityEngine;
@@ -38,19 +36,8 @@ namespace TestHelper.Monkey.Extensions
         /// <seealso href="https://en.wikipedia.org/wiki/Glob_(programming)"/>
         public static bool MatchPath(this Transform transform, string glob)
         {
-            if (!ValidateGlobPattern(glob))
-            {
-                throw new ArgumentException($"Wildcards cannot be used in the most right section of path: {glob}");
-            }
-
             var regex = ConvertRegexFromGlob(glob);
             return regex.IsMatch(transform.GetPath());
-        }
-
-        private static bool ValidateGlobPattern(string glob)
-        {
-            var right = glob.Split('/').Last();
-            return right.IndexOfAny(new[] { '*', '?' }) < 0;
         }
 
         private static Regex ConvertRegexFromGlob(string glob)

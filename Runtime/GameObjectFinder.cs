@@ -2,14 +2,18 @@
 // This software is released under the MIT License.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using TestHelper.Monkey.DefaultStrategies;
-using TestHelper.Monkey.Extensions;
+using TestHelper.Monkey.Exceptions;
+using TestHelper.Monkey.GameObjectMatchers;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
+using Object = UnityEngine.Object;
 
 namespace TestHelper.Monkey
 {
@@ -18,6 +22,8 @@ namespace TestHelper.Monkey
     /// </summary>
     public class GameObjectFinder
     {
+        private static Scene s_dontDestroyOnLoadScene;
+
         private readonly double _timeoutSeconds;
         private readonly IReachableStrategy _reachableStrategy;
         private readonly Func<Component, bool> _isInteractable;
@@ -46,45 +52,118 @@ namespace TestHelper.Monkey
         private enum Reason
         {
             NotFound,
-            NotMatchPath,
             NotReachable,
             NotInteractable,
+            MultipleMatching,
             None
         }
 
-        private (GameObject, RaycastResult, Reason) FindByName(string name, string path, bool reachable,
-            bool interactable)
+        private (GameObject, RaycastResult, Reason) FindByMatcher(IGameObjectMatcher matcher,
+            bool reachable, bool interactable)
         {
-            var foundObject = GameObject.Find(name);
-            // Note: Cases where there are multiple GameObjects with the same name are not considered.
-
-            RaycastResult raycastResult = default;
-
-            if (foundObject == null)
+            var foundObjects = FindInAllScenes(matcher).ToList();
+            if (!foundObjects.Any())
             {
                 return (null, default, Reason.NotFound);
             }
 
-            if (path != null && !foundObject.transform.MatchPath(path))
+            if (reachable)
             {
-                return (null, default, Reason.NotMatchPath);
+                foundObjects = foundObjects.Where(obj => _reachableStrategy.IsReachable(obj, out _)).ToList();
+                if (!foundObjects.Any())
+                {
+                    return (null, default, Reason.NotReachable);
+                }
             }
 
-            if (reachable && !_reachableStrategy.IsReachable(foundObject, out raycastResult))
+            if (interactable)
             {
-                return (null, default, Reason.NotReachable);
+                foundObjects = foundObjects.Where(obj => obj.GetComponents<Component>().Any(_isInteractable)).ToList();
+                if (!foundObjects.Any())
+                {
+                    return (null, default, Reason.NotInteractable);
+                }
             }
 
-            if (interactable && !foundObject.GetComponents<Component>().Any(_isInteractable))
+            if (foundObjects.Count > 1)
             {
-                return (null, default, Reason.NotInteractable);
+                return (null, default, Reason.MultipleMatching);
             }
 
-            return (foundObject, raycastResult, Reason.None);
+            var resultObject = foundObjects.First();
+            if (!reachable)
+            {
+                return (resultObject, new RaycastResult(), Reason.None);
+            }
+
+            _reachableStrategy.IsReachable(resultObject, out var raycastResult);
+            return (resultObject, raycastResult, Reason.None);
         }
 
-        private async UniTask<GameObjectFinderResult> FindByNameAsync(string name, string path,
-            bool reachable, bool interactable, CancellationToken cancellationToken)
+        private static IEnumerable<GameObject> FindInAllScenes(IGameObjectMatcher matcher)
+        {
+            var scenes = new List<Scene> { GetDontDestroyOnLoadScene() };
+            for (var i = 0; i < SceneManager.sceneCount; i++)
+            {
+                var scene = SceneManager.GetSceneAt(i);
+                if (scene.isLoaded)
+                {
+                    scenes.Add(scene);
+                }
+            }
+
+            foreach (var foundObject in from scene in scenes
+                     select scene.GetRootGameObjects()
+                     into rootGameObjects
+                     from rootGameObject in rootGameObjects
+                     from foundObject in FindRecursive(rootGameObject, matcher)
+                     select foundObject)
+            {
+                yield return foundObject;
+            }
+        }
+
+        private static Scene GetDontDestroyOnLoadScene()
+        {
+            if (s_dontDestroyOnLoadScene.IsValid())
+            {
+                return s_dontDestroyOnLoadScene;
+            }
+
+            var gameObject = new GameObject("DontDestroyOnLoad Object, Created by GameObjectFinder");
+            Object.DontDestroyOnLoad(gameObject);
+            s_dontDestroyOnLoadScene = gameObject.scene;
+
+            return s_dontDestroyOnLoadScene;
+        }
+
+        private static IEnumerable<GameObject> FindRecursive(GameObject current, IGameObjectMatcher matcher)
+        {
+            if (current.activeInHierarchy && matcher.IsMatch(current))
+            {
+                yield return current;
+            }
+
+            foreach (Transform childTransform in current.transform)
+            {
+                foreach (var found in FindRecursive(childTransform.gameObject, matcher))
+                {
+                    yield return found;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Find <c>GameObject</c> by <see cref="IGameObjectMatcher"/> (wait until they appear).
+        /// </summary>
+        /// <param name="matcher"></param>
+        /// <param name="reachable">Find only reachable object</param>
+        /// <param name="interactable">Find only interactable object</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Found <c>GameObject</c> and the frontmost raycast hit result will be set regardless of whether the event can be processed</returns>
+        /// <exception cref="TimeoutException">Throws if <c>GameObject</c> is not found</exception>
+        public async UniTask<GameObjectFinderResult> FindByMatcherAsync(IGameObjectMatcher matcher,
+            bool reachable = true, bool interactable = false, CancellationToken cancellationToken = default)
         {
             var timeoutTime = Time.realtimeSinceStartup + (float)_timeoutSeconds;
             var delaySeconds = MinTimeoutSeconds;
@@ -94,8 +173,8 @@ namespace TestHelper.Monkey
             {
                 GameObject foundObject;
                 RaycastResult raycastResult;
-                (foundObject, raycastResult, reason) = FindByName(name, path, reachable, interactable);
-                if (foundObject != null)
+                (foundObject, raycastResult, reason) = FindByMatcher(matcher, reachable, interactable);
+                if (foundObject)
                 {
                     return new GameObjectFinderResult(foundObject, raycastResult);
                 }
@@ -108,13 +187,14 @@ namespace TestHelper.Monkey
             switch (reason)
             {
                 case Reason.NotFound:
-                    throw new TimeoutException($"GameObject `{name}` is not found.");
-                case Reason.NotMatchPath:
-                    throw new TimeoutException($"GameObject `{name}` is found, but it does not match path `{path}`.");
+                    throw new TimeoutException($"GameObject ({matcher}) is not found.");
                 case Reason.NotReachable:
-                    throw new TimeoutException($"GameObject `{name}` is found, but not reachable.");
+                    throw new TimeoutException($"GameObject ({matcher}) is found, but not reachable.");
                 case Reason.NotInteractable:
-                    throw new TimeoutException($"GameObject `{name}` is found, but not interactable.");
+                    throw new TimeoutException($"GameObject ({matcher}) is found, but not interactable.");
+                case Reason.MultipleMatching:
+                    throw new MultipleGameObjectsMatchingException(
+                        $"Multiple GameObjects matching the condition ({matcher}) were found.");
                 case Reason.None:
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -133,7 +213,8 @@ namespace TestHelper.Monkey
         public async UniTask<GameObjectFinderResult> FindByNameAsync(string name,
             bool reachable = true, bool interactable = false, CancellationToken cancellationToken = default)
         {
-            return await FindByNameAsync(name, null, reachable, interactable, cancellationToken);
+            var matcher = new NameMatcher(name);
+            return await FindByMatcherAsync(matcher, reachable, interactable, cancellationToken);
         }
 
         /// <summary>
@@ -149,8 +230,8 @@ namespace TestHelper.Monkey
         public async UniTask<GameObjectFinderResult> FindByPathAsync(string path,
             bool reachable = true, bool interactable = false, CancellationToken cancellationToken = default)
         {
-            var name = path.Split('/').Last();
-            return await FindByNameAsync(name, path, reachable, interactable, cancellationToken);
+            var matcher = new PathMatcher(path);
+            return await FindByMatcherAsync(matcher, reachable, interactable, cancellationToken);
         }
     }
 }

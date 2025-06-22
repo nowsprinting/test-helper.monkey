@@ -42,20 +42,20 @@ jobs:
       matrix:
         unityVersion: # Available versions see: https://game.ci/docs/docker/versions
           - 2019.4.40f1
-          - 2022.3.61f1
-          - 6000.0.48f1
-          - 6000.1.1f1
+          - 2022.3.62f1
+          - 6000.0.51f1
+          - 6000.1.8f1
         testMode:
           - All # run tests in editor
         include:
-          - unityVersion: 6000.0.48f1
+          - unityVersion: 6000.0.51f1
             octocov: true
-          - unityVersion: 6000.0.48f1
+          - unityVersion: 6000.0.51f1
             testMode: Standalone  # run tests on player
 
     steps:
       - name: Crete project for tests
-        uses: nowsprinting/create-unity-project-action@fab595f04a568aa51a94b28b7202b861b0f7d8b2 # v3
+        uses: nowsprinting/create-unity-project-action@eeafc6df4ff7584ca8744b866b61a87a94aa3c2d # v3
         with:
           project-path: UnityProject~
 
