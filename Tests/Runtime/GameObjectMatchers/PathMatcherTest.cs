@@ -18,24 +18,23 @@ namespace TestHelper.Monkey.GameObjectMatchers
             Assert.That(actual, Is.EqualTo("path=/Path/To/Button"));
         }
 
-
         [Test]
         public void IsMatch_NotMatchPath_ReturnsFalse()
         {
-            var sut = new PathMatcher("/Path/To/Button");
-            var actual = sut.IsMatch(CreateGameObject("/Path/To/Not/Button"));
+            var sut = new PathMatcher("/Path/To/Not/Button");
+            var actual = sut.IsMatch(CreateGameObject("/Path/To/Button"));
             Assert.That(actual, Is.False);
         }
 
-        [Test]
-        public void IsMatch_MatchPath_ReturnsTrue()
+        [TestCase("/Path/To/Button")]
+        [TestCase("/Path/*/Button")]
+        [TestCase("/Path/**")]
+        public void IsMatch_MatchPath_ReturnsTrue(string path)
         {
-            var sut = new PathMatcher("/Path/To/Button");
+            var sut = new PathMatcher(path);
             var actual = sut.IsMatch(CreateGameObject("/Path/To/Button"));
             Assert.That(actual, Is.True);
         }
-
-        // TODO: using glob
 
         private static GameObject CreateGameObject(string path)
         {

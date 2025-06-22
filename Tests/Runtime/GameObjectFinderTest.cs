@@ -12,6 +12,7 @@ using TestHelper.Monkey.GameObjectMatchers;
 using TestHelper.Monkey.TestDoubles;
 using TestHelper.RuntimeInternals;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 #if !UNITY_2022_1_OR_NEWER
 using System.IO;
 using Cysharp.Threading.Tasks;
@@ -299,6 +300,39 @@ namespace TestHelper.Monkey
                 {
                     Assert.That(e.Message, Is.EqualTo($"GameObject (name={target}) is found, but not interactable."));
                 }
+            }
+        }
+
+        [TestFixture]
+        public class MultipleScene
+        {
+            private const string TestScenePath = "../Scenes/GameObjectFinder2D.unity";
+
+            private readonly GameObjectFinder _sut = new GameObjectFinder(0.1d);
+
+            [Test]
+            [LoadScene(TestScenePath)]
+            public async Task FindByNameAsync_DontDestroyOnLoad_Found()
+            {
+                var target = GameObject.Find("EventHandler");
+
+                GameObject.DontDestroyOnLoad(target);
+
+                var result = await _sut.FindByNameAsync(target.name);
+                Assert.That(result.GameObject, Is.EqualTo(target));
+            }
+
+            [Test]
+            [LoadScene(TestScenePath)]
+            public async Task FindByNameAsync_OnInactiveScene_Found()
+            {
+                var target = GameObject.Find("EventHandler");
+
+                var newScene = SceneManager.CreateScene("NewScene");
+                SceneManager.SetActiveScene(newScene);
+
+                var result = await _sut.FindByNameAsync(target.name);
+                Assert.That(result.GameObject, Is.EqualTo(target));
             }
         }
     }
