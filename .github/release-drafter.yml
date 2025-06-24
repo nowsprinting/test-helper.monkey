@@ -35,12 +35,12 @@ version-resolver:
   major:
     labels:
       - 'major'
-      - 'breaking-change'
   minor:
     labels:
       - 'minor'
       - 'enhancement'
       - 'feature'
+      - 'breaking-change' # This package is still v0, so only bump minor
   patch:
     labels:
       - 'patch'
