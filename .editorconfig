@@ -258,6 +258,9 @@ dotnet_diagnostic.IDE0060.severity = warning
 # ReSharper comment alignment
 resharper_csharp_int_align_comments = true
 
+# Keep existing initializer arrangements
+resharper_csharp_keep_existing_initializer_arrangement = true
+
 # Some values of the enum are not processed inside 'switch' statement and are handled via default section
 resharper_switch_statement_handles_some_known_enum_values_with_default_highlighting = warning
 
