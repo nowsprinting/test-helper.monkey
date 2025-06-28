@@ -274,8 +274,8 @@ resharper_convert_to_null_coalescing_compound_assignment_highlighting = none
 resharper_merge_into_logical_pattern_highlighting = none
 resharper_use_negated_pattern_in_is_expression_highlighting = none
 
-# Unity Test Framework
-[**/Tests/**/*.cs]
+# Test codes for Unity Test Framework
+[Tests/**/*.cs]
 
 # Access to a static member of a type via a derived type (e.g., NUnit.Framework.Is)
 resharper_access_to_static_member_via_derived_type_highlighting = none
