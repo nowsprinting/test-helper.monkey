@@ -4,6 +4,8 @@
 using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using TestHelper.Monkey.Extensions;
+using TestHelper.Monkey.Operators.Utils;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -40,8 +42,12 @@ namespace TestHelper.Monkey.Operators
         /// <inheritdoc />
         public bool CanOperate(GameObject gameObject)
         {
-            // TODO: Implement actual logic
-            return false;
+            if (gameObject == null)
+            {
+                return false;
+            }
+
+            return gameObject.TryGetEnabledComponent<IScrollHandler>(out _);
         }
 
         /// <inheritdoc />
@@ -49,8 +55,12 @@ namespace TestHelper.Monkey.Operators
             ILogger logger = null, ScreenshotOptions screenshotOptions = null,
             CancellationToken cancellationToken = default)
         {
-            // TODO: Generate random destination and call the overload method
-            await UniTask.CompletedTask;
+            var randomDestination = new Vector2(
+                UnityEngine.Random.Range(-10f, 10f),
+                UnityEngine.Random.Range(-10f, 10f)
+            );
+
+            await OperateAsync(gameObject, raycastResult, randomDestination, logger, screenshotOptions, cancellationToken);
         }
 
         /// <inheritdoc />
@@ -58,8 +68,54 @@ namespace TestHelper.Monkey.Operators
             ILogger logger = null, ScreenshotOptions screenshotOptions = null,
             CancellationToken cancellationToken = default)
         {
-            // TODO: Implement actual scroll operation
-            await UniTask.CompletedTask;
+            logger = logger ?? _logger;
+            screenshotOptions = screenshotOptions ?? _screenshotOptions;
+
+            if (!gameObject.TryGetEnabledComponent<IScrollHandler>(out var scrollHandler))
+            {
+                return;
+            }
+
+            // Output log before the operation
+            var operationLogger = new OperationLogger(gameObject, this, logger, screenshotOptions);
+            operationLogger.Properties.Add("destination", destination);
+            await operationLogger.Log();
+
+            // Send pointer enter event
+            var pointerEventData = new PointerEventData(EventSystem.current)
+            {
+                position = raycastResult.screenPosition
+            };
+            
+            if (gameObject.TryGetEnabledComponent<IPointerEnterHandler>(out var enterHandler))
+            {
+                enterHandler.OnPointerEnter(pointerEventData);
+            }
+
+            // Perform scroll operation
+            if (destination.magnitude > 0)
+            {
+                var remainingDistance = destination.magnitude;
+                var direction = destination.normalized;
+                
+                while (remainingDistance > 0 && !cancellationToken.IsCancellationRequested)
+                {
+                    var scrollDelta = direction * Mathf.Min(_scrollDistance, remainingDistance);
+                    pointerEventData.scrollDelta = scrollDelta;
+                    
+                    scrollHandler.OnScroll(pointerEventData);
+                    
+                    remainingDistance -= _scrollDistance;
+                    
+                    await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
+                }
+            }
+
+            // Send pointer exit event
+            if (gameObject.TryGetEnabledComponent<IPointerExitHandler>(out var exitHandler))
+            {
+                exitHandler.OnPointerExit(pointerEventData);
+            }
         }
     }
 }
