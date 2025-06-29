@@ -95,6 +95,7 @@ namespace TestHelper.Monkey
         {
             new UGUIClickOperator(), // Specify screen click point strategy as a constructor argument, if necessary
             new UGUIClickAndHoldOperator(), // Specify screen click point strategy and hold millis, if necessary
+            new UguiScrollWheelOperator(10.0f), // Specify PRNG instance, if necessary
             new UGUITextInputOperator(), // Specify random text input strategy, if necessary
         };
     }

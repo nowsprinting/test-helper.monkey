@@ -30,7 +30,7 @@ namespace TestHelper.Monkey.Operators
         /// </summary>
         /// <remarks>
         /// If required parameters for the operation, such as hold time, input text strategy, etc., keep them in instance fields of the implementation class.
-        /// If you want to add parameters for execution outside of monkey tests, define a sub-interface (e.g., <c>ITextInputOperator</c>).
+        /// If you want to add parameters for execution outside of monkey tests, define a method in the sub-interface (e.g., <c>ITextInputOperator</c>).
         /// </remarks>
         /// <param name="gameObject">Operation target <c>GameObject</c></param>
         /// <param name="raycastResult"><c>RaycastResult</c> includes the screen position of the starting operation. Passing <c>default</c> may be OK, depending on the operator implementation.</param>

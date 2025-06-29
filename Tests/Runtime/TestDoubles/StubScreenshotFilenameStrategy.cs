@@ -7,14 +7,12 @@ namespace TestHelper.Monkey.TestDoubles
 {
     public class StubScreenshotFilenameStrategy : IScreenshotFilenameStrategy
     {
-        public string _screenshotFilename;
-
+        private readonly string _screenshotFilename;
 
         public StubScreenshotFilenameStrategy(string screenshotFilename)
         {
             _screenshotFilename = screenshotFilename;
         }
-
 
         public string GetFilename()
         {

@@ -67,7 +67,7 @@ Configurations in `MonkeyConfig`:
 - **IsInteractable**: Function returns whether the `Component` is interactable or not. The default implementation returns true if the component is a uGUI compatible component and its `interactable` property is true.
 - **IgnoreStrategy**: Strategy to examine whether `GameObject` should be ignored. The default implementation returns true if the `GameObject` has `IgnoreAnnotation` attached.
 - **ReachableStrategy**: Strategy to examine whether `GameObject` is reachable from the user. The default implementation returns true if it can raycast from `Camera.main` to the pivot position.
-- **Operators**: A collection of `IOperator` that the monkey invokes. the default is `UGUIClickOperator`, `UGUIClickAndHoldOperator`, and `UGUITextInputOperator`. There is support for standard uGUI components.
+- **Operators**: A collection of `IOperator` that the monkey invokes. The default is `UGUIClickOperator`, `UGUIClickAndHoldOperator`, `UguiScrollWheelOperator`, and `UGUITextInputOperator`. There is support for standard uGUI components.
 
 Class diagram for default strategies:
 
