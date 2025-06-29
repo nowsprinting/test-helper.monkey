@@ -97,8 +97,6 @@ namespace TestHelper.Monkey.Operators
             {
                 position = raycastResult.screenPosition
             };
-
-            // Send pointer enter event
             ExecuteEvents.ExecuteHierarchy(gameObject, pointerEventData, ExecuteEvents.pointerEnterHandler);
 
             // Perform scroll operation
