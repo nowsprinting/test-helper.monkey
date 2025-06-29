@@ -6,6 +6,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using TestHelper.Monkey.Extensions;
 using TestHelper.Monkey.Operators.Utils;
+using TestHelper.Random;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -16,26 +17,30 @@ namespace TestHelper.Monkey.Operators
     /// </summary>
     public class UguiScrollWheelOperator : IScrollWheelOperator
     {
-        private readonly float _scrollDistance;
+        private readonly float _scrollPerFrame;
         private readonly ILogger _logger;
+        private readonly IRandom _random;
         private readonly ScreenshotOptions _screenshotOptions;
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="scrollDistance">Scroll distance per frame (must be positive)</param>
+        /// <param name="scrollPerFrame">Scroll distance per frame (must be positive)</param>
         /// <param name="logger">Logger, if omitted, use Debug.unityLogger</param>
+        /// <param name="random">PRNG instance</param>
         /// <param name="screenshotOptions">Take screenshot options set if you need</param>
         /// <exception cref="ArgumentException">Thrown when scrollDistance is zero or negative</exception>
-        public UguiScrollWheelOperator(float scrollDistance, ILogger logger = null, ScreenshotOptions screenshotOptions = null)
+        public UguiScrollWheelOperator(float scrollPerFrame, ILogger logger = null, IRandom random = null,
+            ScreenshotOptions screenshotOptions = null)
         {
-            if (scrollDistance <= 0)
+            if (scrollPerFrame <= 0)
             {
-                throw new ArgumentException("scrollDistance must be positive", nameof(scrollDistance));
+                throw new ArgumentException("scrollPerFrame must be positive", nameof(scrollPerFrame));
             }
 
-            _scrollDistance = scrollDistance;
+            _scrollPerFrame = scrollPerFrame;
             _logger = logger ?? Debug.unityLogger;
+            _random = random ?? new RandomWrapper();
             _screenshotOptions = screenshotOptions;
         }
 
@@ -55,12 +60,23 @@ namespace TestHelper.Monkey.Operators
             ILogger logger = null, ScreenshotOptions screenshotOptions = null,
             CancellationToken cancellationToken = default)
         {
-            var randomDestination = new Vector2(
-                UnityEngine.Random.Range(-10f, 10f),
-                UnityEngine.Random.Range(-10f, 10f)
+            var distance = CalcMaxScrollDistance(gameObject);
+            var destination = new Vector2(
+                _random.Next(-distance, distance),
+                _random.Next(-distance, distance)
             );
+            await OperateAsync(gameObject, raycastResult, destination, logger, screenshotOptions, cancellationToken);
+        }
 
-            await OperateAsync(gameObject, raycastResult, randomDestination, logger, screenshotOptions, cancellationToken);
+        private static int CalcMaxScrollDistance(GameObject gameObject)
+        {
+            var rectTransform = gameObject.GetComponent<RectTransform>();
+            if (rectTransform == null)
+            {
+                return 200;
+            }
+
+            return (int)Math.Max(rectTransform.rect.width, rectTransform.rect.height);
         }
 
         /// <inheritdoc />
@@ -70,11 +86,6 @@ namespace TestHelper.Monkey.Operators
         {
             logger = logger ?? _logger;
             screenshotOptions = screenshotOptions ?? _screenshotOptions;
-
-            if (!gameObject.TryGetEnabledComponent<IScrollHandler>(out var scrollHandler))
-            {
-                return;
-            }
 
             // Output log before the operation
             var operationLogger = new OperationLogger(gameObject, this, logger, screenshotOptions);
@@ -86,36 +97,31 @@ namespace TestHelper.Monkey.Operators
             {
                 position = raycastResult.screenPosition
             };
-            
-            if (gameObject.TryGetEnabledComponent<IPointerEnterHandler>(out var enterHandler))
-            {
-                enterHandler.OnPointerEnter(pointerEventData);
-            }
+
+            // Send pointer enter event
+            ExecuteEvents.ExecuteHierarchy(gameObject, pointerEventData, ExecuteEvents.pointerEnterHandler);
 
             // Perform scroll operation
             if (destination.magnitude > 0)
             {
                 var remainingDistance = destination.magnitude;
                 var direction = destination.normalized;
-                
+
                 while (remainingDistance > 0 && !cancellationToken.IsCancellationRequested)
                 {
-                    var scrollDelta = direction * Mathf.Min(_scrollDistance, remainingDistance);
+                    var scrollDelta = direction * Mathf.Min(_scrollPerFrame, remainingDistance);
                     pointerEventData.scrollDelta = scrollDelta;
-                    
-                    scrollHandler.OnScroll(pointerEventData);
-                    
-                    remainingDistance -= _scrollDistance;
-                    
-                    await UniTask.Yield(PlayerLoopTiming.Update, cancellationToken);
+
+                    ExecuteEvents.ExecuteHierarchy(gameObject, pointerEventData, ExecuteEvents.scrollHandler);
+
+                    remainingDistance -= _scrollPerFrame;
+
+                    await UniTask.Yield(cancellationToken);
                 }
             }
 
             // Send pointer exit event
-            if (gameObject.TryGetEnabledComponent<IPointerExitHandler>(out var exitHandler))
-            {
-                exitHandler.OnPointerExit(pointerEventData);
-            }
+            ExecuteEvents.ExecuteHierarchy(gameObject, pointerEventData, ExecuteEvents.pointerExitHandler);
         }
     }
 }

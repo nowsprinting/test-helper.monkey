@@ -13,11 +13,19 @@ namespace TestHelper.Monkey.TestDoubles
     [AddComponentMenu("/")] // Hide from "Add Component" picker
     internal class SpyOnScrollHandler : MonoBehaviour, IScrollHandler
     {
+        public bool WasScrolled { get; private set; }
+        public Vector2 LastScrollDelta { get; private set; }
+
         private void Log([CallerMemberName] string member = "")
         {
             Debug.Log($"{this.name}.{member}");
         }
 
-        public void OnScroll(PointerEventData eventData) => Log();
+        public void OnScroll(PointerEventData eventData)
+        {
+            WasScrolled = true;
+            LastScrollDelta = eventData.scrollDelta;
+            Log();
+        }
     }
 }

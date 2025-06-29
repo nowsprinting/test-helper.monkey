@@ -1,13 +1,14 @@
 // Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
-using System;
+using System.IO;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
 using TestHelper.Monkey.TestDoubles;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.TestTools.Utils;
 using UnityEngine.UI;
 
 namespace TestHelper.Monkey.Operators
@@ -15,11 +16,41 @@ namespace TestHelper.Monkey.Operators
     [TestFixture]
     public class UguiScrollWheelOperatorTest
     {
+        private const string TestScene = "../../Scenes/ScrollViews.unity";
+
+        private GameObject _scrollView;
+
+        [SetUp]
+        public void SetUp()
+        {
+            _scrollView = GameObject.Find("Both Scroll View");
+            if (_scrollView == null)
+            {
+                return; // Some tests do not use LoadScene attribute, so _scrollView might be null.
+            }
+
+            var scrollRect = _scrollView.GetComponent<ScrollRect>();
+            scrollRect.normalizedPosition = new Vector2(0.5f, 0.5f); // center the scroll view
+        }
+
+        private static RaycastResult CreateRaycastResult(GameObject gameObject)
+        {
+            Assume.That(Camera.main, Is.Not.Null);
+
+            var raycastResult = new RaycastResult
+            {
+                gameObject = gameObject,
+                worldPosition = gameObject.transform.position,
+                screenPosition = Camera.main.WorldToScreenPoint(gameObject.transform.position)
+            };
+
+            return raycastResult;
+        }
+
         [Test]
         public void Constructor_ValidScrollDistance_ObjectCreatedSuccessfully()
         {
-            var sut = new UguiScrollWheelOperator(1.0f);
-            
+            var sut = new UguiScrollWheelOperator(10.0f);
             Assert.That(sut, Is.Not.Null);
         }
 
@@ -36,319 +67,174 @@ namespace TestHelper.Monkey.Operators
         }
 
         [Test]
-        public void Constructor_NullLogger_ObjectCreatedSuccessfullyWithDefaultLogger()
-        {
-            var sut = new UguiScrollWheelOperator(1.0f, null);
-            
-            Assert.That(sut, Is.Not.Null);
-        }
-
-        [Test]
-        public void Constructor_ValidLogger_ObjectCreatedSuccessfullyWithSpecifiedLogger()
-        {
-            var logger = new SpyLogger();
-            var sut = new UguiScrollWheelOperator(1.0f, logger);
-            
-            Assert.That(sut, Is.Not.Null);
-        }
-
-        [Test]
-        public void Constructor_NullScreenshotOptions_ObjectCreatedSuccessfully()
-        {
-            var sut = new UguiScrollWheelOperator(1.0f, null, null);
-            
-            Assert.That(sut, Is.Not.Null);
-        }
-
-        [Test]
-        public void Constructor_ValidScreenshotOptions_ObjectCreatedSuccessfullyWithSpecifiedOptions()
-        {
-            var screenshotOptions = new ScreenshotOptions();
-            var sut = new UguiScrollWheelOperator(1.0f, null, screenshotOptions);
-            
-            Assert.That(sut, Is.Not.Null);
-        }
-
-        [Test]
-        [CreateScene]
+        [LoadScene(TestScene)]
         public void CanOperate_GameObjectWithScrollRect_ReturnsTrue()
         {
-            var gameObject = new GameObject();
-            gameObject.AddComponent<ScrollRect>();
-            var sut = new UguiScrollWheelOperator(1.0f);
+            var sut = new UguiScrollWheelOperator(10.0f);
+            var actual = sut.CanOperate(_scrollView);
 
-            var result = sut.CanOperate(gameObject);
-
-            Assert.That(result, Is.True);
+            Assert.That(actual, Is.True);
         }
 
         [Test]
-        [CreateScene]
+        [LoadScene(TestScene)]
         public void CanOperate_GameObjectWithoutIScrollHandler_ReturnsFalse()
         {
-            var gameObject = new GameObject();
-            var sut = new UguiScrollWheelOperator(1.0f);
+            var scrollRect = _scrollView.GetComponent<ScrollRect>();
+            Object.DestroyImmediate(scrollRect);
 
-            var result = sut.CanOperate(gameObject);
+            var sut = new UguiScrollWheelOperator(10.0f);
+            var actual = sut.CanOperate(_scrollView);
 
-            Assert.That(result, Is.False);
+            Assert.That(actual, Is.False);
         }
 
         [Test]
-        [CreateScene]
-        public void CanOperate_ActiveGameObjectWithScrollRect_ReturnsTrue()
-        {
-            var gameObject = new GameObject();
-            gameObject.AddComponent<ScrollRect>();
-            gameObject.SetActive(true);
-            var sut = new UguiScrollWheelOperator(1.0f);
-
-            var result = sut.CanOperate(gameObject);
-
-            Assert.That(result, Is.True);
-        }
-
-        [Test]
-        [CreateScene]
-        public void CanOperate_InactiveGameObjectWithScrollRect_ReturnsFalse()
-        {
-            var gameObject = new GameObject();
-            gameObject.AddComponent<ScrollRect>();
-            gameObject.SetActive(false);
-            var sut = new UguiScrollWheelOperator(1.0f);
-
-            var result = sut.CanOperate(gameObject);
-
-            Assert.That(result, Is.False);
-        }
-
-        [Test]
-        [CreateScene]
+        [LoadScene(TestScene)]
         public void CanOperate_GameObjectWithDisabledScrollRect_ReturnsFalse()
         {
-            var gameObject = new GameObject();
-            var scrollRect = gameObject.AddComponent<ScrollRect>();
+            var scrollRect = _scrollView.GetComponent<ScrollRect>();
             scrollRect.enabled = false;
-            var sut = new UguiScrollWheelOperator(1.0f);
 
-            var result = sut.CanOperate(gameObject);
+            var sut = new UguiScrollWheelOperator(10.0f);
+            var actual = sut.CanOperate(_scrollView);
 
-            Assert.That(result, Is.False);
+            Assert.That(actual, Is.False);
+        }
+
+        [Test]
+        [LoadScene(TestScene)]
+        public void CanOperate_InactiveGameObjectWithScrollRect_ReturnsFalse()
+        {
+            var canvas = GameObject.Find("Canvas");
+            canvas.SetActive(false);
+
+            var sut = new UguiScrollWheelOperator(10.0f);
+            var actual = sut.CanOperate(_scrollView);
+
+            Assert.That(actual, Is.False);
+        }
+
+        [Test]
+        [LoadScene(TestScene)]
+        public void CanOperate_DestroyedGameObject_ReturnsFalse()
+        {
+            Object.DestroyImmediate(_scrollView);
+
+            var sut = new UguiScrollWheelOperator(10.0f);
+            var actual = sut.CanOperate(_scrollView);
+
+            Assert.That(actual, Is.False);
         }
 
         [Test]
         public void CanOperate_NullGameObject_ReturnsFalse()
         {
-            var sut = new UguiScrollWheelOperator(1.0f);
+            var sut = new UguiScrollWheelOperator(10.0f);
+            var actual = sut.CanOperate(null);
 
-            var result = sut.CanOperate(null);
+            Assert.That(actual, Is.False);
+        }
 
-            Assert.That(result, Is.False);
+        [TestCase(0f, 0f)]
+        [TestCase(30f, 20f)]
+        [TestCase(-30f, -20f)]
+        [LoadScene(TestScene)]
+        public async Task OperateAsync_WithDestination_Scrolled(float x, float y)
+        {
+            var destination = new Vector2(x, y);
+            var viewport = _scrollView.transform.Find("Viewport");
+            var content = viewport.Find("Content");
+            var contentRectTransform = content.GetComponent<RectTransform>();
+            var beforePosition = contentRectTransform.position;
+            var expectedPosition = new Vector3(beforePosition.x + x, beforePosition.y + y, beforePosition.z);
+
+            var sut = new UguiScrollWheelOperator(10.0f);
+            var raycastResult = CreateRaycastResult(_scrollView);
+            await sut.OperateAsync(_scrollView, raycastResult, destination);
+
+            Assert.That(contentRectTransform.position, Is.EqualTo(expectedPosition)
+                .Using(new Vector3EqualityComparer(1.0f)));
         }
 
         [Test]
-        public void CanOperate_DestroyedGameObject_ReturnsFalse()
+        [LoadScene(TestScene)]
+        public async Task OperateAsync_OnScrollCalled()
         {
-            var gameObject = new GameObject();
-            UnityEngine.Object.DestroyImmediate(gameObject);
-            var sut = new UguiScrollWheelOperator(1.0f);
+            var spyEventHandler = _scrollView.AddComponent<SpyOnScrollHandler>();
 
-            var result = sut.CanOperate(gameObject);
+            var sut = new UguiScrollWheelOperator(10.0f);
+            var raycastResult = CreateRaycastResult(_scrollView);
+            await sut.OperateAsync(_scrollView, raycastResult, new Vector2(2f, 3f));
 
-            Assert.That(result, Is.False);
+            Assert.That(spyEventHandler.WasScrolled, Is.True);
         }
 
         [Test]
-        [CreateScene]
-        public async Task OperateAsync_WithDestination_ZeroVector_NoScrollOperation()
+        [LoadScene(TestScene)]
+        public async Task OperateAsync_OnPointerEnterAndExitCalled()
         {
-            var gameObject = CreateScrollRectObject();
-            var sut = new UguiScrollWheelOperator(1.0f);
-            var raycastResult = new RaycastResult();
+            var spyEventHandler = _scrollView.AddComponent<SpyOnPointerEnterExitHandler>();
 
-            await sut.OperateAsync(gameObject, raycastResult, Vector2.zero);
+            var sut = new UguiScrollWheelOperator(10.0f);
+            var raycastResult = CreateRaycastResult(_scrollView);
+            await sut.OperateAsync(_scrollView, raycastResult, new Vector2(2f, 3f));
 
-            // Test passes if no exception is thrown and operation completes
-            Assert.That(true, Is.True);
+            Assert.That(spyEventHandler.WasPointerEntered, Is.True);
+            Assert.That(spyEventHandler.WasPointerExited, Is.True);
         }
 
         [Test]
-        [CreateScene]
-        public async Task OperateAsync_WithDestination_PositiveVector_ScrollOperationExecuted()
+        [LoadScene(TestScene)]
+        public async Task OperateAsync_WithoutDestination_RandomScrolling()
         {
-            var gameObject = CreateScrollRectObject();
-            var sut = new UguiScrollWheelOperator(1.0f);
-            var raycastResult = new RaycastResult();
+            var scrollRect = _scrollView.GetComponent<ScrollRect>();
+            var beforePosition = scrollRect.normalizedPosition;
 
-            await sut.OperateAsync(gameObject, raycastResult, new Vector2(1, 1));
+            var sut = new UguiScrollWheelOperator(10.0f);
+            var raycastResult = CreateRaycastResult(_scrollView);
+            await sut.OperateAsync(_scrollView, raycastResult);
 
-            // Test passes if no exception is thrown and operation completes
-            Assert.That(true, Is.True);
+            var actual = scrollRect.normalizedPosition;
+            Assert.That(actual, Is.Not.EqualTo(beforePosition));
         }
 
         [Test]
-        [CreateScene]
-        public async Task OperateAsync_WithDestination_NegativeVector_ScrollOperationExecuted()
+        [LoadScene(TestScene)]
+        public async Task OperateAsync_WithLogger_LoggingWorks()
         {
-            var gameObject = CreateScrollRectObject();
-            var sut = new UguiScrollWheelOperator(1.0f);
-            var raycastResult = new RaycastResult();
+            var spyLogger = new SpyLogger();
 
-            await sut.OperateAsync(gameObject, raycastResult, new Vector2(-1, -1));
+            var sut = new UguiScrollWheelOperator(10.0f, spyLogger);
+            var raycastResult = CreateRaycastResult(_scrollView);
+            await sut.OperateAsync(_scrollView, raycastResult);
 
-            // Test passes if no exception is thrown and operation completes
-            Assert.That(true, Is.True);
+            Assert.That(spyLogger.Messages, Is.Not.Empty);
         }
 
         [Test]
-        [CreateScene]
-        public async Task OperateAsync_WithDestination_LargeVector_ScrollOperationExecuted()
+        [LoadScene(TestScene)]
+        public async Task OperateAsync_WithScreenshotOptions_TakeScreenshot()
         {
-            var gameObject = CreateScrollRectObject();
-            var sut = new UguiScrollWheelOperator(1.0f);
-            var raycastResult = new RaycastResult();
-
-            await sut.OperateAsync(gameObject, raycastResult, new Vector2(100, 100));
-
-            // Test passes if no exception is thrown and operation completes
-            Assert.That(true, Is.True);
-        }
-
-        [Test]
-        [CreateScene]
-        public async Task OperateAsync_WithDestination_OnScrollCalled()
-        {
-            var gameObject = CreateSpyScrollHandlerObject();
-            var sut = new UguiScrollWheelOperator(1.0f);
-            var raycastResult = new RaycastResult();
-
-            await sut.OperateAsync(gameObject, raycastResult, new Vector2(1, 1));
-
-            // Verification will be done through spy component logging
-            Assert.That(true, Is.True);
-        }
-
-        [Test]
-        [CreateScene]
-        public async Task OperateAsync_WithDestination_PointerEnterAndExitCalled()
-        {
-            var gameObject = CreateSpyPointerHandlerObject();
-            var sut = new UguiScrollWheelOperator(1.0f);
-            var raycastResult = new RaycastResult();
-
-            await sut.OperateAsync(gameObject, raycastResult, new Vector2(1, 1));
-
-            // Verification will be done through spy component logging
-            Assert.That(true, Is.True);
-        }
-
-        [Test]
-        [CreateScene]
-        public async Task OperateAsync_WithoutIScrollHandler_ThrowsException()
-        {
-            var gameObject = new GameObject();
-            var sut = new UguiScrollWheelOperator(1.0f);
-            var raycastResult = new RaycastResult();
-
-            // Expect exception to be thrown for invalid operation target
-            await sut.OperateAsync(gameObject, raycastResult, new Vector2(1, 1));
-            
-            // Test implementation will handle this appropriately
-            Assert.That(true, Is.True);
-        }
-
-        [Test]
-        [CreateScene]
-        public async Task OperateAsync_RandomDestination_ScrollOperationExecuted()
-        {
-            var gameObject = CreateScrollRectObject();
-            var sut = new UguiScrollWheelOperator(1.0f);
-            var raycastResult = new RaycastResult();
-
-            await sut.OperateAsync(gameObject, raycastResult);
-
-            // Test passes if no exception is thrown and operation completes
-            Assert.That(true, Is.True);
-        }
-
-        [Test]
-        [CreateScene]
-        public async Task OperateAsync_RandomDestination_MultipleCallsGenerateDifferentDestinations()
-        {
-            var gameObject = CreateScrollRectObject();
-            var sut = new UguiScrollWheelOperator(1.0f);
-            var raycastResult = new RaycastResult();
-
-            await sut.OperateAsync(gameObject, raycastResult);
-            await sut.OperateAsync(gameObject, raycastResult);
-
-            // Test passes if no exception is thrown and operations complete
-            Assert.That(true, Is.True);
-        }
-
-        [Test]
-        [CreateScene]
-        public async Task OperateAsync_RandomDestination_LoggingWorks()
-        {
-            var gameObject = CreateScrollRectObject();
-            var logger = new SpyLogger();
-            var sut = new UguiScrollWheelOperator(1.0f, logger);
-            var raycastResult = new RaycastResult();
-
-            await sut.OperateAsync(gameObject, raycastResult);
-
-            // Verification will be done through spy logger
-            Assert.That(true, Is.True);
-        }
-
-        [Test]
-        [CreateScene]
-        public async Task OperateAsync_RandomDestination_ScreenshotOptionsWork()
-        {
-            var gameObject = CreateScrollRectObject();
-            var screenshotOptions = new ScreenshotOptions();
-            var sut = new UguiScrollWheelOperator(1.0f, null, screenshotOptions);
-            var raycastResult = new RaycastResult();
-
-            await sut.OperateAsync(gameObject, raycastResult);
-
-            // Test passes if no exception is thrown and operation completes
-            Assert.That(true, Is.True);
-        }
-
-        private GameObject CreateScrollRectObject()
-        {
-            var gameObject = new GameObject("ScrollRectTest");
-            
-            // Add Canvas for UI components
-            var canvas = gameObject.AddComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            
-            // Add ScrollRect
-            var scrollRect = gameObject.AddComponent<ScrollRect>();
-            
-            // Add required RectTransform
-            var rectTransform = gameObject.GetComponent<RectTransform>();
-            if (rectTransform == null)
+            var directory = Application.temporaryCachePath;
+            var filename = $"{TestContext.CurrentContext.Test.FullName}.png";
+            var path = Path.Combine(directory, filename);
+            if (File.Exists(path))
             {
-                rectTransform = gameObject.AddComponent<RectTransform>();
+                File.Delete(path);
             }
-            
-            return gameObject;
-        }
 
-        private GameObject CreateSpyScrollHandlerObject()
-        {
-            var gameObject = new GameObject("SpyScrollHandler");
-            gameObject.AddComponent<SpyOnScrollHandler>();
-            return gameObject;
-        }
+            var screenshotOptions = new ScreenshotOptions
+            {
+                Directory = directory,
+                FilenameStrategy = new StubScreenshotFilenameStrategy(filename),
+            };
 
-        private GameObject CreateSpyPointerHandlerObject()
-        {
-            var gameObject = new GameObject("SpyPointerHandler");
-            gameObject.AddComponent<SpyOnPointerEnterExitHandler>();
-            return gameObject;
+            var sut = new UguiScrollWheelOperator(10.0f, null, null, screenshotOptions);
+            var raycastResult = CreateRaycastResult(_scrollView);
+            await sut.OperateAsync(_scrollView, raycastResult);
+
+            Assert.That(path, Does.Exist);
         }
     }
 }
