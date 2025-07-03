@@ -45,12 +45,28 @@ namespace TestHelper.Monkey.Operators
         /// <inheritdoc />
         public bool CanOperate(GameObject gameObject)
         {
-            if (gameObject.TryGetEnabledComponent<EventTrigger>(out var eventTrigger))
+            if (gameObject == null)
             {
-                return eventTrigger.triggers.Any(x => x.eventID == EventTriggerType.PointerClick);
+                return false;
             }
 
-            return gameObject.TryGetEnabledComponent<IPointerClickHandler>(out _);
+            try
+            {
+                if (gameObject.TryGetEnabledComponent<EventTrigger>(out var eventTrigger))
+                {
+                    return eventTrigger.triggers.Any(x => x.eventID == EventTriggerType.PointerClick);
+                }
+
+                return gameObject.TryGetEnabledComponent<IPointerClickHandler>(out _);
+            }
+            catch (UnityEngine.MissingReferenceException)
+            {
+                return false;
+            }
+            catch (System.NullReferenceException)
+            {
+                return false;
+            }
         }
 
         /// <inheritdoc />
