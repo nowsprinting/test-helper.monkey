@@ -5,7 +5,7 @@ PACKAGE_HOME?=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 PROJECT_HOME?=$(PACKAGE_HOME)/UnityProject~
 BUILD_DIR?=$(PROJECT_HOME)/Build
 LOG_DIR?=$(PROJECT_HOME)/Logs
-UNITY_VERSION?=$(shell grep '"unity":' $(PACKAGE_HOME)/package.json | grep -o -E '\d{4}\.[1-4]').$(shell grep '"unityRelease":' $(PACKAGE_HOME)/package.json | grep -o -E '\d+[abfp]\d+')
+UNITY_VERSION?=$(shell grep '"unity":' $(PACKAGE_HOME)/package.json | grep -o -E '\d{4}\.\d+').$(shell grep '"unityRelease":' $(PACKAGE_HOME)/package.json | grep -o -E '\d+[abfp]\d+')
 PACKAGE_NAME?=$(shell grep -o -E '"name": "(.+)"' $(PACKAGE_HOME)/package.json | cut -d ' ' -f2)
 
 # Code Coverage report filter (comma separated)
