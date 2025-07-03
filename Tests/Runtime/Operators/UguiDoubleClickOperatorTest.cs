@@ -309,7 +309,7 @@ namespace TestHelper.Monkey.Operators
         public async Task OperateAsync_GameObjectDisabledDuringOperation_HandledGracefully()
         {
             var gameObject = new GameObject("DoubleClickTarget");
-            var spy = gameObject.AddComponent<SpyPointerClickHandler>();
+            gameObject.AddComponent<SpyPointerClickHandler>();
             var raycastResult = CreateRaycastResult(gameObject);
 
             var sut = new UguiDoubleClickOperator(100);

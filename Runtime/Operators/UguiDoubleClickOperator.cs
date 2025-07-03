@@ -59,11 +59,11 @@ namespace TestHelper.Monkey.Operators
 
                 return gameObject.TryGetEnabledComponent<IPointerClickHandler>(out _);
             }
-            catch (UnityEngine.MissingReferenceException)
+            catch (MissingReferenceException)
             {
                 return false;
             }
-            catch (System.NullReferenceException)
+            catch (NullReferenceException)
             {
                 return false;
             }
