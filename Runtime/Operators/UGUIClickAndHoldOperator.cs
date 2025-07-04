@@ -67,7 +67,7 @@ namespace TestHelper.Monkey.Operators
             // Do operation
             using (var pointerClickSimulator = new PointerEventSimulator(gameObject, raycastResult, logger))
             {
-                await pointerClickSimulator.PointerClickAsync(_holdMillis, cancellationToken);
+                await pointerClickSimulator.PointerClickAsync(_holdMillis, cancellationToken: cancellationToken);
             }
         }
     }

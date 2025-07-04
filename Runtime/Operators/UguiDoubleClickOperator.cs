@@ -20,26 +20,25 @@ namespace TestHelper.Monkey.Operators
     /// </summary>
     public class UguiDoubleClickOperator : IDoubleClickOperator
     {
-        private readonly int _doubleClickIntervalMillis;
+        private readonly int _intervalMillis;
         private readonly ScreenshotOptions _screenshotOptions;
         private readonly ILogger _logger;
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="doubleClickIntervalMillis">Double click interval in milliseconds. Must be positive.</param>
+        /// <param name="intervalMillis">Double click interval in milliseconds. Must be positive.</param>
         /// <param name="logger">Logger, if omitted, use Debug.unityLogger (output to console)</param>
         /// <param name="screenshotOptions">Take screenshot options set if you need</param>
-        public UguiDoubleClickOperator(int doubleClickIntervalMillis = 100, ILogger logger = null,
+        public UguiDoubleClickOperator(int intervalMillis = 100, ILogger logger = null,
             ScreenshotOptions screenshotOptions = null)
         {
-            if (doubleClickIntervalMillis <= 0)
+            if (intervalMillis <= 0)
             {
-                throw new ArgumentException("Double click interval must be positive",
-                    nameof(doubleClickIntervalMillis));
+                throw new ArgumentException("Interval must be positive", nameof(intervalMillis));
             }
 
-            _doubleClickIntervalMillis = doubleClickIntervalMillis;
+            _intervalMillis = intervalMillis;
             _screenshotOptions = screenshotOptions;
             _logger = logger ?? Debug.unityLogger;
         }
@@ -78,19 +77,10 @@ namespace TestHelper.Monkey.Operators
             operationLogger.Properties.Add("position", raycastResult.screenPosition);
             await operationLogger.Log();
 
-            // Do first click
+            // Do double click using the new multiple click method
             using (var pointerClickSimulator = new PointerEventSimulator(gameObject, raycastResult, logger))
             {
-                await pointerClickSimulator.PointerClickAsync(cancellationToken: cancellationToken);
-            }
-
-            // Wait for double click interval
-            await UniTask.Delay(_doubleClickIntervalMillis, cancellationToken: cancellationToken);
-
-            // Do second click
-            using (var pointerClickSimulator = new PointerEventSimulator(gameObject, raycastResult, logger))
-            {
-                await pointerClickSimulator.PointerClickAsync(cancellationToken: cancellationToken);
+                await pointerClickSimulator.PointerClickAsync(0, 2, _intervalMillis, cancellationToken);
             }
         }
     }

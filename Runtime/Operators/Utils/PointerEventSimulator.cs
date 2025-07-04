@@ -43,58 +43,76 @@ namespace TestHelper.Monkey.Operators.Utils
         /// <summary>
         /// Reproduce the sequence of events that happen when pointer-clicking.
         /// <list type="number">
-        ///     <item><c>OnPointerEnter</c></item>
-        ///     <item><c>OnSelect</c> (if <c>Selectable</c> is attached)</item>
-        ///     <item><c>OnPointerDown</c></item>
-        ///     <item><c>OnInitializePotentialDrag</c></item>
-        ///     <item>Wait for the hold time</item>
-        ///     <item><c>OnPointerUp</c></item>
-        ///     <item><c>OnPointerClick</c></item>
-        ///     <item><c>OnPointerExit</c></item>
+        ///     <item><c>OnPointerEnter</c> (once at the beginning)</item>
+        ///     <item><c>OnSelect</c> (once at the beginning, if <c>Selectable</c> is attached)</item>
+        ///     <item>For each click:</item>
+        ///     <item>-- <c>OnPointerDown</c></item>
+        ///     <item>-- <c>OnInitializePotentialDrag</c></item>
+        ///     <item>-- Wait for the hold time</item>
+        ///     <item>-- <c>OnPointerUp</c></item>
+        ///     <item>-- <c>OnPointerClick</c></item>
+        ///     <item>-- Wait for interval</item>
+        ///     <item><c>OnPointerExit</c> (once at the end)</item>
         /// </list>
         /// </summary>
         /// <remarks>
         /// <c>OnDeselect</c> event is called by the system when the focus moves to another element, so it is not called in this method.
         /// </remarks>
         /// <param name="holdMillis">Hold time in milliseconds if click-and-hold</param>
-        /// <param name="cancellationToken">Cancellation token to use when holding</param>
-        public async UniTask PointerClickAsync(int holdMillis = 0, CancellationToken cancellationToken = default)
+        /// <param name="clickCount">Number of clicks</param>
+        /// <param name="intervalMillis">Interval between clicks in milliseconds</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        public async UniTask PointerClickAsync(int holdMillis = 0, int clickCount = 1, int intervalMillis = 0,
+            CancellationToken cancellationToken = default)
         {
             var gameObjectNameCache = _gameObject.name;
 
-            // Enter
+            // Enter (once at the beginning)
             ExecuteEvents.ExecuteHierarchy(_gameObject, _eventData, ExecuteEvents.pointerEnterHandler);
             if (_hasSelectable)
             {
                 ExecuteEvents.ExecuteHierarchy(_gameObject, _eventData, ExecuteEvents.selectHandler);
             }
 
-            // Down
-            ExecuteEvents.ExecuteHierarchy(_gameObject, _eventData, ExecuteEvents.pointerDownHandler);
-            ExecuteEvents.ExecuteHierarchy(_gameObject, _eventData, ExecuteEvents.initializePotentialDrag);
+            // Multiple clicks
+            for (var i = 0; i < clickCount; i++)
+            {
+                // Down
+                ExecuteEvents.ExecuteHierarchy(_gameObject, _eventData, ExecuteEvents.pointerDownHandler);
+                ExecuteEvents.ExecuteHierarchy(_gameObject, _eventData, ExecuteEvents.initializePotentialDrag);
 
-            if (holdMillis > 0)
-            {
-                await UniTask.Delay(holdMillis, ignoreTimeScale: true, cancellationToken: cancellationToken);
-            }
-            else
-            {
-                await UniTask.NextFrame(cancellationToken: cancellationToken);
-            }
+                if (holdMillis > 0)
+                {
+                    await UniTask.Delay(holdMillis, ignoreTimeScale: true, cancellationToken: cancellationToken);
+                }
+                else
+                {
+                    await UniTask.NextFrame(cancellationToken: cancellationToken);
+                }
 
-            if (_gameObject == null)
-            {
+                // Up
+                ExecuteEvents.ExecuteHierarchy(_gameObject, _eventData, ExecuteEvents.pointerUpHandler);
+                _eventData.SetStateToClicking();
+                ExecuteEvents.ExecuteHierarchy(_gameObject, _eventData, ExecuteEvents.pointerClickHandler);
+                _eventData.SetStateToClicked();
+
+                // Wait for interval for multiple clicks
+                if (intervalMillis <= 0)
+                {
+                    continue;
+                }
+
+                await UniTask.Delay(intervalMillis, ignoreTimeScale: true, cancellationToken: cancellationToken);
+                if (_gameObject != null)
+                {
+                    continue;
+                }
+
                 _logger?.Log($"{gameObjectNameCache} is destroyed before pointer-up event.");
                 return;
             }
 
-            // Up
-            ExecuteEvents.ExecuteHierarchy(_gameObject, _eventData, ExecuteEvents.pointerUpHandler);
-            _eventData.SetStateToClicking();
-            ExecuteEvents.ExecuteHierarchy(_gameObject, _eventData, ExecuteEvents.pointerClickHandler);
-            _eventData.SetStateToClicked();
-
-            // Exit
+            // Exit (once at the end)
             ExecuteEvents.ExecuteHierarchy(_gameObject, _eventData, ExecuteEvents.pointerExitHandler);
         }
     }
