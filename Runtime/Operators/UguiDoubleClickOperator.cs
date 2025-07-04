@@ -30,11 +30,13 @@ namespace TestHelper.Monkey.Operators
         /// <param name="doubleClickIntervalMillis">Double click interval in milliseconds. Must be positive.</param>
         /// <param name="logger">Logger, if omitted, use Debug.unityLogger (output to console)</param>
         /// <param name="screenshotOptions">Take screenshot options set if you need</param>
-        public UguiDoubleClickOperator(int doubleClickIntervalMillis = 100, ILogger logger = null, ScreenshotOptions screenshotOptions = null)
+        public UguiDoubleClickOperator(int doubleClickIntervalMillis = 100, ILogger logger = null,
+            ScreenshotOptions screenshotOptions = null)
         {
             if (doubleClickIntervalMillis <= 0)
             {
-                throw new ArgumentException("Double click interval must be positive", nameof(doubleClickIntervalMillis));
+                throw new ArgumentException("Double click interval must be positive",
+                    nameof(doubleClickIntervalMillis));
             }
 
             _doubleClickIntervalMillis = doubleClickIntervalMillis;
@@ -50,23 +52,12 @@ namespace TestHelper.Monkey.Operators
                 return false;
             }
 
-            try
+            if (gameObject.TryGetEnabledComponent<EventTrigger>(out var eventTrigger))
             {
-                if (gameObject.TryGetEnabledComponent<EventTrigger>(out var eventTrigger))
-                {
-                    return eventTrigger.triggers.Any(x => x.eventID == EventTriggerType.PointerClick);
-                }
+                return eventTrigger.triggers.Any(x => x.eventID == EventTriggerType.PointerClick);
+            }
 
-                return gameObject.TryGetEnabledComponent<IPointerClickHandler>(out _);
-            }
-            catch (MissingReferenceException)
-            {
-                return false;
-            }
-            catch (NullReferenceException)
-            {
-                return false;
-            }
+            return gameObject.TryGetEnabledComponent<IPointerClickHandler>(out _);
         }
 
         /// <inheritdoc />

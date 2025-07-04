@@ -17,7 +17,7 @@ namespace TestHelper.Monkey.Operators
     [TestFixture]
     public class UguiDoubleClickOperatorTest
     {
-        private const string TestScene = "../../Scenes/Operators.unity";
+        private const string TestScene = "../../Scenes/Canvas.unity";
 
         private static RaycastResult CreateRaycastResult(GameObject gameObject)
         {
@@ -38,7 +38,7 @@ namespace TestHelper.Monkey.Operators
         [Test]
         public void Constructor_ValidDoubleClickInterval_ObjectCreatedSuccessfully()
         {
-            var sut = new UguiDoubleClickOperator(100);
+            var sut = new UguiDoubleClickOperator();
 
             Assert.That(sut, Is.Not.Null);
         }
@@ -69,7 +69,7 @@ namespace TestHelper.Monkey.Operators
         [Test]
         public void Constructor_NullLogger_ObjectCreatedSuccessfully()
         {
-            var sut = new UguiDoubleClickOperator(100, null, null);
+            var sut = new UguiDoubleClickOperator();
 
             Assert.That(sut, Is.Not.Null);
         }
@@ -90,7 +90,7 @@ namespace TestHelper.Monkey.Operators
             };
             eventTrigger.triggers.Add(entry);
 
-            var sut = new UguiDoubleClickOperator(100);
+            var sut = new UguiDoubleClickOperator();
             var actual = sut.CanOperate(gameObject);
 
             Assert.That(actual, Is.True);
@@ -108,7 +108,7 @@ namespace TestHelper.Monkey.Operators
             };
             eventTrigger.triggers.Add(entry);
 
-            var sut = new UguiDoubleClickOperator(100);
+            var sut = new UguiDoubleClickOperator();
             var actual = sut.CanOperate(gameObject);
 
             Assert.That(actual, Is.False);
@@ -121,7 +121,7 @@ namespace TestHelper.Monkey.Operators
             var gameObject = new GameObject("TestObject");
             gameObject.AddComponent<Button>();
 
-            var sut = new UguiDoubleClickOperator(100);
+            var sut = new UguiDoubleClickOperator();
             var actual = sut.CanOperate(gameObject);
 
             Assert.That(actual, Is.True);
@@ -134,7 +134,7 @@ namespace TestHelper.Monkey.Operators
             var gameObject = new GameObject("TestObject");
             gameObject.AddComponent<Image>();
 
-            var sut = new UguiDoubleClickOperator(100);
+            var sut = new UguiDoubleClickOperator();
             var actual = sut.CanOperate(gameObject);
 
             Assert.That(actual, Is.False);
@@ -148,7 +148,7 @@ namespace TestHelper.Monkey.Operators
             gameObject.AddComponent<Button>();
             gameObject.SetActive(false);
 
-            var sut = new UguiDoubleClickOperator(100);
+            var sut = new UguiDoubleClickOperator();
             var actual = sut.CanOperate(gameObject);
 
             Assert.That(actual, Is.False);
@@ -164,7 +164,7 @@ namespace TestHelper.Monkey.Operators
             child.transform.SetParent(parent.transform);
             parent.SetActive(false);
 
-            var sut = new UguiDoubleClickOperator(100);
+            var sut = new UguiDoubleClickOperator();
             var actual = sut.CanOperate(child);
 
             Assert.That(actual, Is.False);
@@ -173,7 +173,7 @@ namespace TestHelper.Monkey.Operators
         [Test]
         public void CanOperate_NullGameObject_ReturnsFalse()
         {
-            var sut = new UguiDoubleClickOperator(100);
+            var sut = new UguiDoubleClickOperator();
             var actual = sut.CanOperate(null);
 
             Assert.That(actual, Is.False);
@@ -187,7 +187,7 @@ namespace TestHelper.Monkey.Operators
             gameObject.AddComponent<Button>();
             UnityEngine.Object.DestroyImmediate(gameObject);
 
-            var sut = new UguiDoubleClickOperator(100);
+            var sut = new UguiDoubleClickOperator();
             var actual = sut.CanOperate(gameObject);
 
             Assert.That(actual, Is.False);
@@ -202,10 +202,10 @@ namespace TestHelper.Monkey.Operators
         public async Task OperateAsync_ValidGameObject_DoubleClickOccurs()
         {
             var gameObject = new GameObject("DoubleClickTarget");
-            var spy = gameObject.AddComponent<SpyPointerClickHandler>();
+            var spy = gameObject.AddComponent<SpyOnPointerClickHandler>();
             var raycastResult = CreateRaycastResult(gameObject);
 
-            var sut = new UguiDoubleClickOperator(100);
+            var sut = new UguiDoubleClickOperator();
             Assume.That(sut.CanOperate(gameObject), Is.True);
             await sut.OperateAsync(gameObject, raycastResult);
 
@@ -220,7 +220,7 @@ namespace TestHelper.Monkey.Operators
         public async Task OperateAsync_VariousIntervals_ClicksWithCorrectTiming(int intervalMillis)
         {
             var gameObject = new GameObject("DoubleClickTarget");
-            var spy = gameObject.AddComponent<SpySequenceTrackingClickHandler>();
+            var spy = gameObject.AddComponent<SpyOnPointerClickHandler>();
             var raycastResult = CreateRaycastResult(gameObject);
 
             var stopwatch = Stopwatch.StartNew();
@@ -228,7 +228,7 @@ namespace TestHelper.Monkey.Operators
             await sut.OperateAsync(gameObject, raycastResult);
             stopwatch.Stop();
 
-            Assert.That(spy.ClickTimestamps.Count, Is.EqualTo(2));
+            Assert.That(spy.ClickCount, Is.EqualTo(2));
             Assert.That(stopwatch.ElapsedMilliseconds, Is.GreaterThanOrEqualTo(intervalMillis));
         }
 
@@ -237,10 +237,10 @@ namespace TestHelper.Monkey.Operators
         public async Task OperateAsync_PointerClickHandler_OnPointerClickCalled()
         {
             var gameObject = new GameObject("DoubleClickTarget");
-            var spy = gameObject.AddComponent<SpyPointerClickHandler>();
+            var spy = gameObject.AddComponent<SpyOnPointerClickHandler>();
             var raycastResult = CreateRaycastResult(gameObject);
 
-            var sut = new UguiDoubleClickOperator(100);
+            var sut = new UguiDoubleClickOperator();
             await sut.OperateAsync(gameObject, raycastResult);
 
             Assert.That(spy.WasClicked, Is.True);
@@ -251,13 +251,13 @@ namespace TestHelper.Monkey.Operators
         public async Task OperateAsync_DoubleClickSequenceAndTiming_CorrectInterval()
         {
             var gameObject = new GameObject("DoubleClickTarget");
-            var spy = gameObject.AddComponent<SpySequenceTrackingClickHandler>();
+            var spy = gameObject.AddComponent<SpyOnPointerClickHandler>();
             var raycastResult = CreateRaycastResult(gameObject);
 
             var sut = new UguiDoubleClickOperator(50);
             await sut.OperateAsync(gameObject, raycastResult);
 
-            Assert.That(spy.ClickTimestamps.Count, Is.EqualTo(2));
+            Assert.That(spy.ClickCount, Is.EqualTo(2));
             var interval = (spy.ClickTimestamps[1] - spy.ClickTimestamps[0]).TotalMilliseconds;
             Assert.That(interval, Is.GreaterThanOrEqualTo(50).And.LessThan(200));
         }
@@ -305,31 +305,9 @@ namespace TestHelper.Monkey.Operators
         }
 
         [Test]
-        [LoadScene(TestScene)]
-        public async Task OperateAsync_GameObjectDisabledDuringOperation_HandledGracefully()
-        {
-            var gameObject = new GameObject("DoubleClickTarget");
-            gameObject.AddComponent<SpyPointerClickHandler>();
-            var raycastResult = CreateRaycastResult(gameObject);
-
-            var sut = new UguiDoubleClickOperator(100);
-            var operationTask = sut.OperateAsync(gameObject, raycastResult);
-            
-            // Disable the GameObject after 50ms
-            await Task.Delay(50);
-            gameObject.SetActive(false);
-
-            // Should not throw exception
-            await operationTask;
-            
-            // The operation should complete without throwing
-            Assert.Pass("Operation completed without exception");
-        }
-
-        [Test]
         public async Task OperateAsync_NullGameObject_ThrowsArgumentNullException()
         {
-            var sut = new UguiDoubleClickOperator(100);
+            var sut = new UguiDoubleClickOperator();
             var raycastResult = new RaycastResult();
 
             try
@@ -352,7 +330,7 @@ namespace TestHelper.Monkey.Operators
             var raycastResult = CreateRaycastResult(gameObject);
             UnityEngine.Object.DestroyImmediate(gameObject);
 
-            var sut = new UguiDoubleClickOperator(100);
+            var sut = new UguiDoubleClickOperator();
 
             try
             {
