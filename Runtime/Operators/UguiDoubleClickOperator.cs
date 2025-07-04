@@ -1,6 +1,7 @@
-﻿// Copyright (c) 2023-2025 Koji Hasegawa.
+// Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
+using System;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -9,31 +10,35 @@ using TestHelper.Monkey.Operators.Utils;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+
 namespace TestHelper.Monkey.Operators
 {
     /// <summary>
-    /// Click and hold operator for Unity UI (uGUI) components.
-    /// a.k.a. touch and hold, long press.
-    /// <p/>
+    /// Double click (tap) operator for Unity UI (uGUI) components.
     /// This operator receives <c>RaycastResult</c>, but passing <c>default</c> may be OK, depending on the component being operated on.
     /// </summary>
-    public class UGUIClickAndHoldOperator : IClickAndHoldOperator
+    public class UguiDoubleClickOperator : IDoubleClickOperator
     {
-        private readonly int _holdMillis;
-
+        private readonly int _intervalMillis;
         private readonly ScreenshotOptions _screenshotOptions;
         private readonly ILogger _logger;
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="holdMillis">Hold time in milliseconds</param>
+        /// <param name="intervalMillis">Double click interval in milliseconds. Must be positive.</param>
         /// <param name="logger">Logger, if omitted, use Debug.unityLogger (output to console)</param>
         /// <param name="screenshotOptions">Take screenshot options set if you need</param>
-        public UGUIClickAndHoldOperator(int holdMillis = 1000,
-            ILogger logger = null, ScreenshotOptions screenshotOptions = null)
+        public UguiDoubleClickOperator(int intervalMillis = 100, ILogger logger = null,
+            ScreenshotOptions screenshotOptions = null)
         {
-            _holdMillis = holdMillis;
+            if (intervalMillis <= 0)
+            {
+                throw new ArgumentException("Interval must be positive", nameof(intervalMillis));
+            }
+
+            _intervalMillis = intervalMillis;
             _screenshotOptions = screenshotOptions;
             _logger = logger ?? Debug.unityLogger;
         }
@@ -41,14 +46,17 @@ namespace TestHelper.Monkey.Operators
         /// <inheritdoc />
         public bool CanOperate(GameObject gameObject)
         {
-            if (gameObject.TryGetEnabledComponent<EventTrigger>(out var eventTrigger))
+            if (gameObject == null)
             {
-                return eventTrigger.triggers.Any(x => x.eventID == EventTriggerType.PointerDown) &&
-                       eventTrigger.triggers.Any(x => x.eventID == EventTriggerType.PointerUp);
+                return false;
             }
 
-            return gameObject.TryGetEnabledComponent<IPointerDownHandler>(out _) &&
-                   gameObject.TryGetEnabledComponent<IPointerUpHandler>(out _);
+            if (gameObject.TryGetEnabledComponent<EventTrigger>(out var eventTrigger))
+            {
+                return eventTrigger.triggers.Any(x => x.eventID == EventTriggerType.PointerClick);
+            }
+
+            return gameObject.TryGetEnabledComponent<IPointerClickHandler>(out _);
         }
 
         /// <inheritdoc />
@@ -56,6 +64,11 @@ namespace TestHelper.Monkey.Operators
             ILogger logger = null, ScreenshotOptions screenshotOptions = null,
             CancellationToken cancellationToken = default)
         {
+            if (gameObject == null)
+            {
+                throw new ArgumentNullException(nameof(gameObject));
+            }
+
             logger = logger ?? _logger;
             screenshotOptions = screenshotOptions ?? _screenshotOptions;
 
@@ -64,10 +77,10 @@ namespace TestHelper.Monkey.Operators
             operationLogger.Properties.Add("position", raycastResult.screenPosition);
             await operationLogger.Log();
 
-            // Do operation
+            // Do double click using the new multiple click method
             using (var pointerClickSimulator = new PointerEventSimulator(gameObject, raycastResult, logger))
             {
-                await pointerClickSimulator.PointerClickAsync(_holdMillis, cancellationToken: cancellationToken);
+                await pointerClickSimulator.PointerClickAsync(0, 2, _intervalMillis, cancellationToken);
             }
         }
     }

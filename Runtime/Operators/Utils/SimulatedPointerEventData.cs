@@ -100,7 +100,7 @@ namespace TestHelper.Monkey.Operators.Utils
         /// </summary>
         public void SetStateToClicked()
         {
-            clickTime = Time.realtimeSinceStartup;
+            clickTime = Time.unscaledTime;
         }
     }
 }
