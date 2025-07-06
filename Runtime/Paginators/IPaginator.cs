@@ -7,31 +7,30 @@ using Cysharp.Threading.Tasks;
 namespace TestHelper.Monkey.Paginators
 {
     /// <summary>
-    /// ページング可能なUIコンポーネントを制御するためのインターフェース。
-    /// ページ送り機能として直感的なページネーション操作を提供し、
-    /// UI要素探索時の補助操作を実現する。
+    /// Interface for controlling pageable UI components.
+    /// Provides intuitive pagination operations as page navigation functionality, enabling auxiliary operations during UI element exploration.
     /// </summary>
     public interface IPaginator
     {
         /// <summary>
-        /// ページ位置を先頭に移動する。
-        /// スクロールコンポーネントの場合、表示上の位置（上端か下端か左端か右端か）は実装依存。
+        /// Move the page position to the beginning.
+        /// For scroll components, the display position (top, bottom, left, or right) depends on the implementation.
         /// </summary>
-        /// <param name="cancellationToken">キャンセレーショントークン</param>
+        /// <param name="cancellationToken">Cancellation token</param>
         UniTask ResetAsync(CancellationToken cancellationToken = default);
-        
+
         /// <summary>
-        /// 次のページに移動する。
-        /// スクロールコンポーネントの場合、表示領域サイズ分だけページを進める。
+        /// Move to the next page.
+        /// For scroll components, advance the page by the size of the display area.
         /// </summary>
-        /// <param name="cancellationToken">キャンセレーショントークン</param>
-        /// <returns>ページ送りが実行された場合true、終端で実行されなかった場合false</returns>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>True if page navigation was executed, false if not executed at the end</returns>
         UniTask<bool> NextPageAsync(CancellationToken cancellationToken = default);
-        
+
         /// <summary>
-        /// 次のページが存在するかどうかを取得する
+        /// Get whether the next page exists
         /// </summary>
-        /// <returns>次のページが存在する場合true、終端に達している場合false</returns>
+        /// <returns>True if the next page exists, false if the end has been reached</returns>
         bool HasNextPage();
     }
 }

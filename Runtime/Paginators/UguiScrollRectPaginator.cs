@@ -10,7 +10,7 @@ using UnityEngine.UI;
 namespace TestHelper.Monkey.Paginators
 {
     /// <summary>
-    /// ScrollRect用のページネーター実装
+    /// Paginator implementation for <see cref="ScrollRect"/>.
     /// </summary>
     public class UguiScrollRectPaginator : IPaginator
     {
@@ -18,14 +18,14 @@ namespace TestHelper.Monkey.Paginators
         private bool _isHorizontalAtEnd;
 
         /// <summary>
-        /// コンストラクタ
+        /// Constructor.
         /// </summary>
-        /// <param name="scrollRect">制御対象のScrollRect</param>
-        /// <exception cref="ArgumentNullException">scrollRectがnullの場合</exception>
+        /// <param name="scrollRect">ScrollRect to be controlled</param>
+        /// <exception cref="ArgumentNullException">When scrollRect is null</exception>
         public UguiScrollRectPaginator(ScrollRect scrollRect)
         {
             _scrollRect = scrollRect ?? throw new ArgumentNullException(nameof(scrollRect));
-            
+
             if (_scrollRect.content == null)
             {
                 throw new ArgumentNullException(nameof(scrollRect.content), "ScrollRect.content is null");
@@ -35,7 +35,7 @@ namespace TestHelper.Monkey.Paginators
         /// <inheritdoc />
         public async UniTask ResetAsync(CancellationToken cancellationToken = default)
         {
-            _scrollRect.normalizedPosition = new Vector2(0f, 0f);
+            _scrollRect.normalizedPosition = new Vector2(0f, 1f);
             _isHorizontalAtEnd = false;
             await UniTask.Yield(cancellationToken);
         }
@@ -52,10 +52,10 @@ namespace TestHelper.Monkey.Paginators
 
             if (_scrollRect.horizontal && _scrollRect.vertical)
             {
-                // 両方向スクロールの場合
+                // For both scrolling
                 if (!_isHorizontalAtEnd && !IsHorizontalAtEnd())
                 {
-                    // 水平方向に移動
+                    // Move horizontally
                     var horizontalAmount = CalculateHorizontalScrollAmount();
                     var newX = Mathf.Min(currentPosition.x + horizontalAmount, 1f);
                     _scrollRect.normalizedPosition = new Vector2(newX, currentPosition.y);
@@ -63,7 +63,7 @@ namespace TestHelper.Monkey.Paginators
                 }
                 else
                 {
-                    // 水平方向が終端なので、左端に戻って垂直方向に移動
+                    // Horizontal direction is at the end, so return to the left and move vertically
                     var verticalAmount = CalculateVerticalScrollAmount();
                     var newY = Mathf.Max(currentPosition.y - verticalAmount, 0f);
                     _scrollRect.normalizedPosition = new Vector2(0f, newY);
@@ -72,21 +72,21 @@ namespace TestHelper.Monkey.Paginators
             }
             else if (_scrollRect.horizontal)
             {
-                // 水平方向のみ
+                // Horizontal direction only
                 var horizontalAmount = CalculateHorizontalScrollAmount();
                 var newX = Mathf.Min(currentPosition.x + horizontalAmount, 1f);
                 _scrollRect.normalizedPosition = new Vector2(newX, currentPosition.y);
             }
             else if (_scrollRect.vertical)
             {
-                // 垂直方向のみ
+                // Vertical direction only
                 var verticalAmount = CalculateVerticalScrollAmount();
                 var newY = Mathf.Max(currentPosition.y - verticalAmount, 0f);
                 _scrollRect.normalizedPosition = new Vector2(currentPosition.x, newY);
             }
             else
             {
-                // スクロール無効
+                // Scrolling disabled
                 return false;
             }
 
@@ -97,25 +97,25 @@ namespace TestHelper.Monkey.Paginators
         /// <inheritdoc />
         public bool HasNextPage()
         {
-            // 両方向スクロールの場合の終端判定
+            // End determination for bidirectional scrolling
             if (_scrollRect.horizontal && _scrollRect.vertical)
             {
-                // 水平・垂直両方向とも終端に達している場合のみfalse
+                // Return false only when both horizontal and vertical directions have reached the end
                 return !(IsHorizontalAtEnd() && IsVerticalAtEnd());
             }
-            
-            // 単方向スクロールの場合
+
+            // For unidirectional scrolling
             if (_scrollRect.horizontal)
             {
                 return !IsHorizontalAtEnd();
             }
-            
+
             if (_scrollRect.vertical)
             {
                 return !IsVerticalAtEnd();
             }
-            
-            // スクロールが無効の場合
+
+            // When scrolling is disabled
             return false;
         }
 
@@ -144,10 +144,10 @@ namespace TestHelper.Monkey.Paginators
 
             var viewportSize = CalculateViewportSize();
             var contentSize = _scrollRect.content.rect.size;
-            
+
             if (contentSize.x <= viewportSize.x)
             {
-                return 0f; // コンテンツがビューポートより小さい場合
+                return 0f; // When content is smaller than viewport
             }
 
             return viewportSize.x / (contentSize.x - viewportSize.x);
@@ -162,10 +162,10 @@ namespace TestHelper.Monkey.Paginators
 
             var viewportSize = CalculateViewportSize();
             var contentSize = _scrollRect.content.rect.size;
-            
+
             if (contentSize.y <= viewportSize.y)
             {
-                return 0f; // コンテンツがビューポートより小さい場合
+                return 0f; // When content is smaller than viewport
             }
 
             return viewportSize.y / (contentSize.y - viewportSize.y);

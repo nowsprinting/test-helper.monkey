@@ -10,17 +10,17 @@ using UnityEngine.UI;
 namespace TestHelper.Monkey.Paginators
 {
     /// <summary>
-    /// Scrollbar用のページネーター実装
+    /// Paginator implementation for <see cref="Scrollbar"/>.
     /// </summary>
     public class UguiScrollbarPaginator : IPaginator
     {
         private readonly Scrollbar _scrollbar;
 
         /// <summary>
-        /// コンストラクタ
+        /// Constructor.
         /// </summary>
-        /// <param name="scrollbar">制御対象のScrollbar</param>
-        /// <exception cref="ArgumentNullException">scrollbarがnullの場合</exception>
+        /// <param name="scrollbar">Scrollbar to be controlled</param>
+        /// <exception cref="ArgumentNullException">When scrollbar is null</exception>
         public UguiScrollbarPaginator(Scrollbar scrollbar)
         {
             _scrollbar = scrollbar ?? throw new ArgumentNullException(nameof(scrollbar));
@@ -44,7 +44,7 @@ namespace TestHelper.Monkey.Paginators
             var currentValue = _scrollbar.value;
             var scrollAmount = CalculateNormalizedScrollAmount();
             var newValue = Mathf.Min(currentValue + scrollAmount, 1f);
-            
+
             _scrollbar.value = newValue;
             await UniTask.Yield(cancellationToken);
             return true;
@@ -53,13 +53,13 @@ namespace TestHelper.Monkey.Paginators
         /// <inheritdoc />
         public bool HasNextPage()
         {
-            // Scrollbarの場合、valueが1.0未満であれば次のページが存在
+            // For Scrollbar, if value is less than 1.0, the next page exists
             return _scrollbar.value < 1.0f - float.Epsilon;
         }
 
         private float CalculateNormalizedScrollAmount()
         {
-            // Scrollbarのsizeプロパティを使用（表示領域の比率を表す）
+            // Use the size property of Scrollbar (represents the ratio of the display area)
             return _scrollbar.size;
         }
     }

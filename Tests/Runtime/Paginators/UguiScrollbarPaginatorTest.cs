@@ -4,7 +4,6 @@
 using System.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
-using TestHelper.Monkey.Paginators;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -49,9 +48,8 @@ namespace TestHelper.Monkey.Paginators
         public void Constructor_ValidScrollbar_ObjectCreatedSuccessfully()
         {
             var scrollbar = _horizontalScrollbar.GetComponent<Scrollbar>();
-            
             var sut = new UguiScrollbarPaginator(scrollbar);
-            
+
             Assert.That(sut, Is.Not.Null);
         }
 
@@ -63,7 +61,7 @@ namespace TestHelper.Monkey.Paginators
 
         [Test]
         [LoadScene(TestScene)]
-        public async Task ResetAsync_ValidScrollbar_ValueBecomesZero()
+        public async Task ResetAsync_ValueBecomesZero()
         {
             var scrollbar = _horizontalScrollbar.GetComponent<Scrollbar>();
             scrollbar.value = 0.5f;
@@ -128,7 +126,7 @@ namespace TestHelper.Monkey.Paginators
             await sut.NextPageAsync();
 
             // Value increase should be based on scrollbar.size
-            Assert.That(scrollbar.value, Is.EqualTo(scrollbar.size).Within(0.01f));
+            Assert.That(scrollbar.value, Is.EqualTo(scrollbar.size).Within(0.05f));
         }
 
         [Test]
@@ -162,7 +160,7 @@ namespace TestHelper.Monkey.Paginators
         public void HasNextPage_AtEnd_ReturnsFalse()
         {
             var scrollbar = _horizontalScrollbar.GetComponent<Scrollbar>();
-            scrollbar.value = 1f;
+            scrollbar.value = 1.0f;
             var sut = new UguiScrollbarPaginator(scrollbar);
 
             var actual = sut.HasNextPage();

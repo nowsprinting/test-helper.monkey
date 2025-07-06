@@ -4,7 +4,6 @@
 using System.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
-using TestHelper.Monkey.Paginators;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -25,24 +24,6 @@ namespace TestHelper.Monkey.Paginators
             _horizontalScrollView = GameObject.Find("Horizontal Scroll View");
             _verticalScrollView = GameObject.Find("Vertical Scroll View");
             _bothScrollView = GameObject.Find("Both Scroll View");
-
-            if (_horizontalScrollView != null)
-            {
-                var scrollRect = _horizontalScrollView.GetComponent<ScrollRect>();
-                scrollRect.normalizedPosition = new Vector2(0f, 0f);
-            }
-
-            if (_verticalScrollView != null)
-            {
-                var scrollRect = _verticalScrollView.GetComponent<ScrollRect>();
-                scrollRect.normalizedPosition = new Vector2(0f, 1f);
-            }
-
-            if (_bothScrollView != null)
-            {
-                var scrollRect = _bothScrollView.GetComponent<ScrollRect>();
-                scrollRect.normalizedPosition = new Vector2(0f, 1f);
-            }
         }
 
         [Test]
@@ -50,9 +31,8 @@ namespace TestHelper.Monkey.Paginators
         public void Constructor_ValidScrollRect_ObjectCreatedSuccessfully()
         {
             var scrollRect = _horizontalScrollView.GetComponent<ScrollRect>();
-            
             var sut = new UguiScrollRectPaginator(scrollRect);
-            
+
             Assert.That(sut, Is.Not.Null);
         }
 
@@ -64,7 +44,7 @@ namespace TestHelper.Monkey.Paginators
 
         [Test]
         [LoadScene(TestScene)]
-        public async Task ResetAsync_HorizontalScrollRect_NormalizedPositionBecomesZeroZero()
+        public async Task ResetAsync_HorizontalScrollRect_NormalizedPositionBecomesZero()
         {
             var scrollRect = _horizontalScrollView.GetComponent<ScrollRect>();
             scrollRect.normalizedPosition = new Vector2(0.5f, 0.5f);
@@ -72,12 +52,12 @@ namespace TestHelper.Monkey.Paginators
 
             await sut.ResetAsync();
 
-            Assert.That(scrollRect.normalizedPosition, Is.EqualTo(new Vector2(0f, 0f)));
+            Assert.That(scrollRect.normalizedPosition.x, Is.EqualTo(0f));
         }
 
         [Test]
         [LoadScene(TestScene)]
-        public async Task ResetAsync_VerticalScrollRect_NormalizedPositionBecomesZeroZero()
+        public async Task ResetAsync_VerticalScrollRect_NormalizedPositionBecomesOne()
         {
             var scrollRect = _verticalScrollView.GetComponent<ScrollRect>();
             scrollRect.normalizedPosition = new Vector2(0.5f, 0.5f);
@@ -85,12 +65,12 @@ namespace TestHelper.Monkey.Paginators
 
             await sut.ResetAsync();
 
-            Assert.That(scrollRect.normalizedPosition, Is.EqualTo(new Vector2(0f, 0f)));
+            Assert.That(scrollRect.normalizedPosition.y, Is.EqualTo(1f));
         }
 
         [Test]
         [LoadScene(TestScene)]
-        public async Task ResetAsync_BothScrollRect_NormalizedPositionBecomesZeroZero()
+        public async Task ResetAsync_BothScrollRect_NormalizedPositionBecomesZeroOne()
         {
             var scrollRect = _bothScrollView.GetComponent<ScrollRect>();
             scrollRect.normalizedPosition = new Vector2(0.5f, 0.5f);
@@ -98,7 +78,7 @@ namespace TestHelper.Monkey.Paginators
 
             await sut.ResetAsync();
 
-            Assert.That(scrollRect.normalizedPosition, Is.EqualTo(new Vector2(0f, 0f)));
+            Assert.That(scrollRect.normalizedPosition, Is.EqualTo(new Vector2(0f, 1f)));
         }
 
         [Test]
