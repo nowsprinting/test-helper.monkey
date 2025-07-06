@@ -2,7 +2,9 @@
 // This software is released under the MIT License.
 
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
 using TestHelper.Monkey.TestDoubles;
@@ -48,20 +50,20 @@ namespace TestHelper.Monkey.Operators
         }
 
         [Test]
-        public void Constructor_ValidScrollDistance_ObjectCreatedSuccessfully()
+        public void Constructor_ValidScrollSpeed_ObjectCreatedSuccessfully()
         {
-            var sut = new UguiScrollWheelOperator(10.0f);
+            var sut = new UguiScrollWheelOperator(1.0f);
             Assert.That(sut, Is.Not.Null);
         }
 
         [Test]
-        public void Constructor_ZeroScrollDistance_ThrowsArgumentException()
+        public void Constructor_ZeroScrollSpeed_ThrowsArgumentException()
         {
             Assert.That(() => new UguiScrollWheelOperator(0f), Throws.ArgumentException);
         }
 
         [Test]
-        public void Constructor_NegativeScrollDistance_ThrowsArgumentException()
+        public void Constructor_NegativeScrollSpeed_ThrowsArgumentException()
         {
             Assert.That(() => new UguiScrollWheelOperator(-1.0f), Throws.ArgumentException);
         }
@@ -70,7 +72,7 @@ namespace TestHelper.Monkey.Operators
         [LoadScene(TestScene)]
         public void CanOperate_GameObjectWithScrollRect_ReturnsTrue()
         {
-            var sut = new UguiScrollWheelOperator(10.0f);
+            var sut = new UguiScrollWheelOperator();
             var actual = sut.CanOperate(_scrollView);
 
             Assert.That(actual, Is.True);
@@ -83,7 +85,7 @@ namespace TestHelper.Monkey.Operators
             var scrollRect = _scrollView.GetComponent<ScrollRect>();
             Object.DestroyImmediate(scrollRect);
 
-            var sut = new UguiScrollWheelOperator(10.0f);
+            var sut = new UguiScrollWheelOperator();
             var actual = sut.CanOperate(_scrollView);
 
             Assert.That(actual, Is.False);
@@ -96,7 +98,7 @@ namespace TestHelper.Monkey.Operators
             var scrollRect = _scrollView.GetComponent<ScrollRect>();
             scrollRect.enabled = false;
 
-            var sut = new UguiScrollWheelOperator(10.0f);
+            var sut = new UguiScrollWheelOperator();
             var actual = sut.CanOperate(_scrollView);
 
             Assert.That(actual, Is.False);
@@ -109,7 +111,7 @@ namespace TestHelper.Monkey.Operators
             var canvas = GameObject.Find("Canvas");
             canvas.SetActive(false);
 
-            var sut = new UguiScrollWheelOperator(10.0f);
+            var sut = new UguiScrollWheelOperator();
             var actual = sut.CanOperate(_scrollView);
 
             Assert.That(actual, Is.False);
@@ -121,7 +123,7 @@ namespace TestHelper.Monkey.Operators
         {
             Object.DestroyImmediate(_scrollView);
 
-            var sut = new UguiScrollWheelOperator(10.0f);
+            var sut = new UguiScrollWheelOperator();
             var actual = sut.CanOperate(_scrollView);
 
             Assert.That(actual, Is.False);
@@ -130,10 +132,61 @@ namespace TestHelper.Monkey.Operators
         [Test]
         public void CanOperate_NullGameObject_ReturnsFalse()
         {
-            var sut = new UguiScrollWheelOperator(10.0f);
+            var sut = new UguiScrollWheelOperator();
             var actual = sut.CanOperate(null);
 
             Assert.That(actual, Is.False);
+        }
+
+        [Test]
+        [LoadScene(TestScene)]
+        public async Task OperateAsync_WithScrollSpeed_ScrollSpecifiedAmountInOneFrame()
+        {
+            const float ScrollSpeed = 5.0f;
+            var destination = new Vector2(20, 20);
+            var viewport = _scrollView.transform.Find("Viewport");
+            var content = viewport.Find("Content");
+            var contentRectTransform = content.GetComponent<RectTransform>();
+            var beforePosition = contentRectTransform.position;
+            var expectedPosition = new Vector3(beforePosition.x + ScrollSpeed, beforePosition.y + ScrollSpeed,
+                beforePosition.z);
+
+            var sut = new UguiScrollWheelOperator(ScrollSpeed);
+            var raycastResult = CreateRaycastResult(_scrollView);
+            var task = sut.OperateAsync(_scrollView, raycastResult, destination);
+            await UniTask.NextFrame();
+
+            Assert.That(contentRectTransform.position, Is.EqualTo(expectedPosition)
+                .Using(new Vector3EqualityComparer(1.0f)));
+
+            await task; // Ensure the task completes
+        }
+
+        [Test]
+        [LoadScene(TestScene)]
+        public async Task OperateAsync_Cancel_ScrollCancelled()
+        {
+            const float ScrollSpeed = 5.0f;
+            var destination = new Vector2(20, 20);
+            var viewport = _scrollView.transform.Find("Viewport");
+            var content = viewport.Find("Content");
+            var contentRectTransform = content.GetComponent<RectTransform>();
+            var beforePosition = contentRectTransform.position;
+            var expectedPosition = new Vector3(beforePosition.x + ScrollSpeed, beforePosition.y + ScrollSpeed,
+                beforePosition.z); // Cancelled position
+
+            var sut = new UguiScrollWheelOperator(ScrollSpeed);
+            var raycastResult = CreateRaycastResult(_scrollView);
+            var cancellationTokenSource = new CancellationTokenSource();
+            var cancellationToken = cancellationTokenSource.Token;
+            var task = sut.OperateAsync(_scrollView, raycastResult, destination, cancellationToken: cancellationToken);
+            await UniTask.NextFrame(cancellationToken);
+
+            cancellationTokenSource.Cancel();
+            await task; // Cancelled
+
+            Assert.That(contentRectTransform.position, Is.EqualTo(expectedPosition)
+                .Using(new Vector3EqualityComparer(1.0f)));
         }
 
         [TestCase(0f, 0f)]
@@ -149,7 +202,7 @@ namespace TestHelper.Monkey.Operators
             var beforePosition = contentRectTransform.position;
             var expectedPosition = new Vector3(beforePosition.x + x, beforePosition.y + y, beforePosition.z);
 
-            var sut = new UguiScrollWheelOperator(10.0f);
+            var sut = new UguiScrollWheelOperator();
             var raycastResult = CreateRaycastResult(_scrollView);
             await sut.OperateAsync(_scrollView, raycastResult, destination);
 
@@ -163,7 +216,7 @@ namespace TestHelper.Monkey.Operators
         {
             var spyEventHandler = _scrollView.AddComponent<SpyOnScrollHandler>();
 
-            var sut = new UguiScrollWheelOperator(10.0f);
+            var sut = new UguiScrollWheelOperator();
             var raycastResult = CreateRaycastResult(_scrollView);
             await sut.OperateAsync(_scrollView, raycastResult, new Vector2(2f, 3f));
 
@@ -176,7 +229,7 @@ namespace TestHelper.Monkey.Operators
         {
             var spyEventHandler = _scrollView.AddComponent<SpyOnPointerEnterExitHandler>();
 
-            var sut = new UguiScrollWheelOperator(10.0f);
+            var sut = new UguiScrollWheelOperator();
             var raycastResult = CreateRaycastResult(_scrollView);
             await sut.OperateAsync(_scrollView, raycastResult, new Vector2(2f, 3f));
 
@@ -191,7 +244,7 @@ namespace TestHelper.Monkey.Operators
             var scrollRect = _scrollView.GetComponent<ScrollRect>();
             var beforePosition = scrollRect.normalizedPosition;
 
-            var sut = new UguiScrollWheelOperator(10.0f);
+            var sut = new UguiScrollWheelOperator();
             var raycastResult = CreateRaycastResult(_scrollView);
             await sut.OperateAsync(_scrollView, raycastResult);
 
@@ -205,7 +258,7 @@ namespace TestHelper.Monkey.Operators
         {
             var spyLogger = new SpyLogger();
 
-            var sut = new UguiScrollWheelOperator(10.0f, spyLogger);
+            var sut = new UguiScrollWheelOperator(logger: spyLogger);
             var raycastResult = CreateRaycastResult(_scrollView);
             await sut.OperateAsync(_scrollView, raycastResult);
 
@@ -230,7 +283,7 @@ namespace TestHelper.Monkey.Operators
                 FilenameStrategy = new StubScreenshotFilenameStrategy(filename),
             };
 
-            var sut = new UguiScrollWheelOperator(10.0f, null, null, screenshotOptions);
+            var sut = new UguiScrollWheelOperator(screenshotOptions: screenshotOptions);
             var raycastResult = CreateRaycastResult(_scrollView);
             await sut.OperateAsync(_scrollView, raycastResult);
 
