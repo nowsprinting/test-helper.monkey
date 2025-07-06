@@ -17,7 +17,7 @@ namespace TestHelper.Monkey.Operators
     /// </summary>
     public class UguiScrollWheelOperator : IScrollWheelOperator
     {
-        private readonly float _scrollPerFrame;
+        private readonly float _scrollSpeed;
         private readonly ILogger _logger;
         private readonly IRandom _random;
         private readonly ScreenshotOptions _screenshotOptions;
@@ -25,20 +25,20 @@ namespace TestHelper.Monkey.Operators
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="scrollPerFrame">Scroll distance per frame (must be positive)</param>
+        /// <param name="scrollSpeed">Scroll amount per frame (must be positive)</param>
         /// <param name="logger">Logger, if omitted, use Debug.unityLogger</param>
         /// <param name="random">PRNG instance</param>
         /// <param name="screenshotOptions">Take screenshot options set if you need</param>
-        /// <exception cref="ArgumentException">Thrown when scrollDistance is zero or negative</exception>
-        public UguiScrollWheelOperator(float scrollPerFrame, ILogger logger = null, IRandom random = null,
+        /// <exception cref="ArgumentException">Thrown when scrollPerFrame is zero or negative</exception>
+        public UguiScrollWheelOperator(float scrollSpeed = 10.0f, ILogger logger = null, IRandom random = null,
             ScreenshotOptions screenshotOptions = null)
         {
-            if (scrollPerFrame <= 0)
+            if (scrollSpeed <= 0)
             {
-                throw new ArgumentException("scrollPerFrame must be positive", nameof(scrollPerFrame));
+                throw new ArgumentException("scrollSpeed must be positive", nameof(scrollSpeed));
             }
 
-            _scrollPerFrame = scrollPerFrame;
+            _scrollSpeed = scrollSpeed;
             _logger = logger ?? Debug.unityLogger;
             _random = random ?? new RandomWrapper();
             _screenshotOptions = screenshotOptions;
@@ -107,12 +107,12 @@ namespace TestHelper.Monkey.Operators
 
                 while (remainingDistance > 0 && !cancellationToken.IsCancellationRequested)
                 {
-                    var scrollDelta = direction * Mathf.Min(_scrollPerFrame, remainingDistance);
+                    var scrollDelta = direction * Mathf.Min(_scrollSpeed, remainingDistance);
                     pointerEventData.scrollDelta = scrollDelta;
 
                     ExecuteEvents.ExecuteHierarchy(gameObject, pointerEventData, ExecuteEvents.scrollHandler);
 
-                    remainingDistance -= _scrollPerFrame;
+                    remainingDistance -= _scrollSpeed;
 
                     await UniTask.Yield(cancellationToken);
                 }
