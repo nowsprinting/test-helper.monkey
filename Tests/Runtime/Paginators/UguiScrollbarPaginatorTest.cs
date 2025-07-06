@@ -1,16 +1,14 @@
 // Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
-using System;
-using System.Threading;
-using Cysharp.Threading.Tasks;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
 using TestHelper.Monkey.Paginators;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace TestHelper.Monkey.Tests.Paginators
+namespace TestHelper.Monkey.Paginators
 {
     [TestFixture]
     public class UguiScrollbarPaginatorTest

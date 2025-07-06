@@ -1,16 +1,14 @@
 // Copyright (c) 2023-2025 Koji Hasegawa.
 // This software is released under the MIT License.
 
-using System;
-using System.Threading;
-using Cysharp.Threading.Tasks;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
 using TestHelper.Monkey.Paginators;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace TestHelper.Monkey.Tests.Paginators
+namespace TestHelper.Monkey.Paginators
 {
     [TestFixture]
     public class UguiScrollRectPaginatorTest
@@ -20,7 +18,6 @@ namespace TestHelper.Monkey.Tests.Paginators
         private GameObject _horizontalScrollView;
         private GameObject _verticalScrollView;
         private GameObject _bothScrollView;
-        private GameObject _disabledScrollView;
 
         [SetUp]
         public void SetUp()
@@ -28,7 +25,6 @@ namespace TestHelper.Monkey.Tests.Paginators
             _horizontalScrollView = GameObject.Find("Horizontal Scroll View");
             _verticalScrollView = GameObject.Find("Vertical Scroll View");
             _bothScrollView = GameObject.Find("Both Scroll View");
-            _disabledScrollView = GameObject.Find("Disabled Scroll View");
 
             if (_horizontalScrollView != null)
             {

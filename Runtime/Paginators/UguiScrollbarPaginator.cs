@@ -29,23 +29,38 @@ namespace TestHelper.Monkey.Paginators
         /// <inheritdoc />
         public async UniTask ResetAsync(CancellationToken cancellationToken = default)
         {
-            // TODO: Implement reset functionality
+            _scrollbar.value = 0f;
             await UniTask.Yield(cancellationToken);
         }
 
         /// <inheritdoc />
         public async UniTask<bool> NextPageAsync(CancellationToken cancellationToken = default)
         {
-            // TODO: Implement next page functionality
+            if (!HasNextPage())
+            {
+                return false;
+            }
+
+            var currentValue = _scrollbar.value;
+            var scrollAmount = CalculateNormalizedScrollAmount();
+            var newValue = Mathf.Min(currentValue + scrollAmount, 1f);
+            
+            _scrollbar.value = newValue;
             await UniTask.Yield(cancellationToken);
-            return false;
+            return true;
         }
 
         /// <inheritdoc />
         public bool HasNextPage()
         {
-            // TODO: Implement has next page logic
-            return false;
+            // Scrollbarの場合、valueが1.0未満であれば次のページが存在
+            return _scrollbar.value < 1.0f - float.Epsilon;
+        }
+
+        private float CalculateNormalizedScrollAmount()
+        {
+            // Scrollbarのsizeプロパティを使用（表示領域の比率を表す）
+            return _scrollbar.size;
         }
     }
 }
