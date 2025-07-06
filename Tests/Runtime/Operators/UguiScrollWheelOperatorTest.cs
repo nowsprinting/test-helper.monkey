@@ -2,6 +2,7 @@
 // This software is released under the MIT License.
 
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using NUnit.Framework;
@@ -159,6 +160,33 @@ namespace TestHelper.Monkey.Operators
                 .Using(new Vector3EqualityComparer(1.0f)));
 
             await task; // Ensure the task completes
+        }
+
+        [Test]
+        [LoadScene(TestScene)]
+        public async Task OperateAsync_Cancel_ScrollCancelled()
+        {
+            const float ScrollSpeed = 5.0f;
+            var destination = new Vector2(20, 20);
+            var viewport = _scrollView.transform.Find("Viewport");
+            var content = viewport.Find("Content");
+            var contentRectTransform = content.GetComponent<RectTransform>();
+            var beforePosition = contentRectTransform.position;
+            var expectedPosition = new Vector3(beforePosition.x + ScrollSpeed, beforePosition.y + ScrollSpeed,
+                beforePosition.z); // Cancelled position
+
+            var sut = new UguiScrollWheelOperator(ScrollSpeed);
+            var raycastResult = CreateRaycastResult(_scrollView);
+            var cancellationTokenSource = new CancellationTokenSource();
+            var cancellationToken = cancellationTokenSource.Token;
+            var task = sut.OperateAsync(_scrollView, raycastResult, destination, cancellationToken: cancellationToken);
+            await UniTask.NextFrame(cancellationToken);
+
+            cancellationTokenSource.Cancel();
+            await task; // Cancelled
+
+            Assert.That(contentRectTransform.position, Is.EqualTo(expectedPosition)
+                .Using(new Vector3EqualityComparer(1.0f)));
         }
 
         [TestCase(0f, 0f)]
