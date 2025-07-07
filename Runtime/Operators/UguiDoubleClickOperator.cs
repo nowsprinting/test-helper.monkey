@@ -16,7 +16,6 @@ namespace TestHelper.Monkey.Operators
 {
     /// <summary>
     /// Double click (tap) operator for Unity UI (uGUI) components.
-    /// This operator receives <c>RaycastResult</c>, but passing <c>default</c> may be OK, depending on the component being operated on.
     /// </summary>
     public class UguiDoubleClickOperator : IDoubleClickOperator
     {
@@ -60,6 +59,9 @@ namespace TestHelper.Monkey.Operators
         }
 
         /// <inheritdoc />
+        /// <remarks>
+        /// This method receives <c>RaycastResult</c>, but passing <c>default</c> may be OK, depending on the component being operated on.
+        /// </remarks>
         public async UniTask OperateAsync(GameObject gameObject, RaycastResult raycastResult,
             ILogger logger = null, ScreenshotOptions screenshotOptions = null,
             CancellationToken cancellationToken = default)
