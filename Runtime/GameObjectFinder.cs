@@ -9,6 +9,7 @@ using Cysharp.Threading.Tasks;
 using TestHelper.Monkey.DefaultStrategies;
 using TestHelper.Monkey.Exceptions;
 using TestHelper.Monkey.GameObjectMatchers;
+using TestHelper.Monkey.Paginators;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.EventSystems;
@@ -100,6 +101,38 @@ namespace TestHelper.Monkey
             return (resultObject, raycastResult, Reason.None);
         }
 
+        private async UniTask<(GameObject, RaycastResult, Reason)> FindInPaginatorAsync(
+            IGameObjectMatcher matcher,
+            bool reachable,
+            bool interactable,
+            IPaginator paginator,
+            CancellationToken cancellationToken)
+        {
+            await paginator.ResetAsync(cancellationToken);
+
+            var lastMeaningfulReason = Reason.NotFound;
+            var unsearchedPage = true;
+
+            while (unsearchedPage)
+            {
+                var (foundObject, raycastResult, reason) = FindByMatcher(matcher, reachable, interactable);
+
+                if (foundObject != null)
+                {
+                    return (foundObject, raycastResult, reason);
+                }
+
+                if (reason != Reason.NotFound)
+                {
+                    lastMeaningfulReason = reason;
+                }
+
+                unsearchedPage = await paginator.NextPageAsync(cancellationToken);
+            }
+
+            return (null, default, lastMeaningfulReason);
+        }
+
         private static IEnumerable<GameObject> FindInAllScenes(IGameObjectMatcher matcher)
         {
             var scenes = new List<Scene> { GetDontDestroyOnLoadScene() };
@@ -159,11 +192,13 @@ namespace TestHelper.Monkey
         /// <param name="matcher"></param>
         /// <param name="reachable">Find only reachable object</param>
         /// <param name="interactable">Find only interactable object</param>
+        /// <param name="paginator">Paginator for searching <c>GameObject</c> on pageable components (e.g., Scroll View).</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Found <c>GameObject</c> and the frontmost raycast hit result will be set regardless of whether the event can be processed</returns>
         /// <exception cref="TimeoutException">Throws if <c>GameObject</c> is not found</exception>
         public async UniTask<GameObjectFinderResult> FindByMatcherAsync(IGameObjectMatcher matcher,
-            bool reachable = true, bool interactable = false, CancellationToken cancellationToken = default)
+            bool reachable = true, bool interactable = false, IPaginator paginator = null,
+            CancellationToken cancellationToken = default)
         {
             var timeoutTime = Time.realtimeSinceStartup + (float)_timeoutSeconds;
             var delaySeconds = MinTimeoutSeconds;
@@ -173,7 +208,17 @@ namespace TestHelper.Monkey
             {
                 GameObject foundObject;
                 RaycastResult raycastResult;
-                (foundObject, raycastResult, reason) = FindByMatcher(matcher, reachable, interactable);
+
+                if (paginator != null)
+                {
+                    (foundObject, raycastResult, reason) = await FindInPaginatorAsync(matcher, reachable, interactable,
+                        paginator, cancellationToken);
+                }
+                else
+                {
+                    (foundObject, raycastResult, reason) = FindByMatcher(matcher, reachable, interactable);
+                }
+
                 if (foundObject)
                 {
                     return new GameObjectFinderResult(foundObject, raycastResult);
@@ -207,14 +252,15 @@ namespace TestHelper.Monkey
         /// <param name="name">Find <c>GameObject</c> name</param>
         /// <param name="reachable">Find only reachable object</param>
         /// <param name="interactable">Find only interactable object</param>
+        /// <param name="paginator">Paginator for searching <c>GameObject</c> on pageable components (e.g., Scroll View).</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Found <c>GameObject</c> and the frontmost raycast hit result will be set regardless of whether the event can be processed</returns>
         /// <exception cref="TimeoutException">Throws if <c>GameObject</c> is not found</exception>
-        public async UniTask<GameObjectFinderResult> FindByNameAsync(string name,
-            bool reachable = true, bool interactable = false, CancellationToken cancellationToken = default)
+        public async UniTask<GameObjectFinderResult> FindByNameAsync(string name, bool reachable = true,
+            bool interactable = false, IPaginator paginator = null, CancellationToken cancellationToken = default)
         {
             var matcher = new NameMatcher(name);
-            return await FindByMatcherAsync(matcher, reachable, interactable, cancellationToken);
+            return await FindByMatcherAsync(matcher, reachable, interactable, paginator, cancellationToken);
         }
 
         /// <summary>
@@ -223,15 +269,16 @@ namespace TestHelper.Monkey
         /// <param name="path">Find <c>GameObject</c> hierarchy path separated by `/`. Can specify glob pattern</param>
         /// <param name="reachable">Find only reachable object</param>
         /// <param name="interactable">Find only interactable object</param>
+        /// <param name="paginator">Paginator for searching <c>GameObject</c> on pageable components (e.g., Scroll View).</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Found <c>GameObject</c> and the frontmost raycast hit result will be set regardless of whether the event can be processed</returns>
         /// <exception cref="TimeoutException">Throws if <c>GameObject</c> is not found</exception>
         /// <seealso href="https://en.wikipedia.org/wiki/Glob_(programming)"/>
-        public async UniTask<GameObjectFinderResult> FindByPathAsync(string path,
-            bool reachable = true, bool interactable = false, CancellationToken cancellationToken = default)
+        public async UniTask<GameObjectFinderResult> FindByPathAsync(string path, bool reachable = true,
+            bool interactable = false, IPaginator paginator = null, CancellationToken cancellationToken = default)
         {
             var matcher = new PathMatcher(path);
-            return await FindByMatcherAsync(matcher, reachable, interactable, cancellationToken);
+            return await FindByMatcherAsync(matcher, reachable, interactable, paginator, cancellationToken);
         }
     }
 }
