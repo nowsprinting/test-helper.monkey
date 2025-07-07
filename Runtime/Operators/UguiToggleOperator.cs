@@ -39,7 +39,7 @@ namespace TestHelper.Monkey.Operators
                 return UniTask.CompletedTask;
             }
 
-            return OperateAsync(gameObject, raycastResult, logger, screenshotOptions, cancellationToken);
+            return base.OperateAsync(gameObject, raycastResult, logger, screenshotOptions, cancellationToken);
         }
     }
 }
