@@ -111,9 +111,9 @@ namespace TestHelper.Monkey
             await paginator.ResetAsync(cancellationToken);
 
             var lastMeaningfulReason = Reason.NotFound;
-            var unsearchedPage = true;
+            var nextPage = true;
 
-            while (unsearchedPage)
+            while (nextPage)
             {
                 var (foundObject, raycastResult, reason) = FindByMatcher(matcher, reachable, interactable);
 
@@ -127,7 +127,7 @@ namespace TestHelper.Monkey
                     lastMeaningfulReason = reason;
                 }
 
-                unsearchedPage = await paginator.NextPageAsync(cancellationToken);
+                nextPage = await paginator.NextPageAsync(cancellationToken);
             }
 
             return (null, default, lastMeaningfulReason);
