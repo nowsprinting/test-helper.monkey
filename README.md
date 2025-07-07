@@ -284,6 +284,51 @@ public class MyIntegrationTest
 ```
 
 
+#### Find GameObject in pageable component
+
+Find a `GameObject` in pageable (or scrollable) UI components (e.g., `ScrollRect`, Carousel, Paged dialog) using the paginator.
+A paginator provides step-by-step navigation through pageable content, allowing users to find objects that are not currently visible in the viewport.
+
+Arguments:
+
+- **matcher**: Custom `IGameObjectMatcher` implementation
+- **reachable**: Find only reachable object. Default is true
+- **interactable**: Find only interactable object. Default is false
+- **paginator**: `IPaginator` implementation for controlling pageable components
+
+Built-in paginators:
+
+- `UguiScrollRectPaginator`: For `ScrollRect`
+- `UguiScrollbarPaginator`: For `Scrollbar`
+
+Usage:
+
+```csharp
+using NUnit.Framework;
+using TestHelper.Monkey;
+using TestHelper.Monkey.GameObjectMatchers;
+using TestHelper.Monkey.Paginators;
+
+[TestFixture]
+public class MyIntegrationTest
+{
+    [Test]
+    public async Task FindButtonInScrollView()
+    {
+        var finder = new GameObjectFinder();
+        var matcher = new NameMatcher("Button_10");
+
+        var scrollView = GameObject.Find("Scroll View");
+        var scrollRect = scrollView.GetComponent<ScrollRect>();
+        var paginator = new UguiScrollRectPaginator(scrollRect);
+
+        var result = await finder.FindByMatcherAsync(matcher, paginator: paginator);
+        var button = result.GameObject;
+    }
+}
+```
+
+
 #### Operate GameObject
 
 `SelectOperators` and `SelectOperators<T>` are extensions of `GameObject` that return available operators.

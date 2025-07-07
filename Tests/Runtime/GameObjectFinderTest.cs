@@ -2,6 +2,7 @@
 // This software is released under the MIT License.
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using TestHelper.Attributes;
@@ -9,13 +10,16 @@ using TestHelper.Monkey.DefaultStrategies;
 using TestHelper.Monkey.Exceptions;
 using TestHelper.Monkey.Extensions;
 using TestHelper.Monkey.GameObjectMatchers;
+using TestHelper.Monkey.Paginators;
 using TestHelper.Monkey.TestDoubles;
 using TestHelper.RuntimeInternals;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 #if !UNITY_2022_1_OR_NEWER
 using System.IO;
 #endif
+
 #if !UNITY_2023_1_OR_NEWER
 using Cysharp.Threading.Tasks;
 #endif
@@ -338,6 +342,124 @@ namespace TestHelper.Monkey
 
                 var result = await _sut.FindByNameAsync(target.name);
                 Assert.That(result.GameObject, Is.EqualTo(target));
+            }
+        }
+
+        [TestFixture]
+        public class InPaginator
+        {
+            private const string TestScenePath = "../Scenes/ScrollViews.unity";
+
+            private readonly GameObjectFinder _sut = new GameObjectFinder(2.0d);
+
+            [Test]
+            [LoadScene(TestScenePath)]
+            public async Task FindByMatcherAsync_PaginatorAndObjectExists_ReturnsGameObjectFinderResult()
+            {
+                var scrollView = GameObject.Find("Vertical Scroll View");
+                var scrollRect = scrollView.GetComponent<ScrollRect>();
+                var paginator = new UguiScrollRectPaginator(scrollRect);
+                var matcher = new NameMatcher("Vertical_Button_10");
+
+                var result = await _sut.FindByMatcherAsync(matcher, paginator: paginator);
+
+                Assert.That(result.GameObject.name, Is.EqualTo("Vertical_Button_10"));
+            }
+
+            [Test]
+            [LoadScene(TestScenePath)]
+            public async Task FindByMatcherAsync_CancellationTokenCancelled_ThrowsOperationCanceledException()
+            {
+                var scrollView = GameObject.Find("Vertical Scroll View");
+                var scrollRect = scrollView.GetComponent<ScrollRect>();
+                var paginator = new UguiScrollRectPaginator(scrollRect);
+                var matcher = new NameMatcher("NotExistingObject");
+
+                var cts = new CancellationTokenSource();
+                cts.CancelAfter(100);
+
+                try
+                {
+                    await _sut.FindByMatcherAsync(matcher, paginator: paginator, cancellationToken: cts.Token);
+                    Assert.Fail("Expected exception but was not thrown");
+                }
+                catch (OperationCanceledException)
+                {
+                    Assert.Pass();
+                }
+            }
+
+            [Test]
+            [LoadScene(TestScenePath)]
+            public async Task FindByMatcherAsync_ObjectInFirstPage_ReturnsGameObject()
+            {
+                var scrollView = GameObject.Find("Vertical Scroll View");
+                var scrollRect = scrollView.GetComponent<ScrollRect>();
+                var paginator = new UguiScrollRectPaginator(scrollRect);
+                var matcher = new NameMatcher("Vertical_Button_1");
+
+                var result = await _sut.FindByMatcherAsync(matcher, paginator: paginator);
+
+                Assert.That(result.GameObject.name, Is.EqualTo("Vertical_Button_1"));
+            }
+
+            [Test]
+            [LoadScene(TestScenePath)]
+            public async Task FindByMatcherAsync_ObjectInLastPage_ReturnsGameObject()
+            {
+                var scrollView = GameObject.Find("Vertical Scroll View");
+                var scrollRect = scrollView.GetComponent<ScrollRect>();
+                var paginator = new UguiScrollRectPaginator(scrollRect);
+                var matcher = new NameMatcher("Vertical_Button_29");
+
+                var result = await _sut.FindByMatcherAsync(matcher, paginator: paginator);
+
+                Assert.That(result.GameObject.name, Is.EqualTo("Vertical_Button_29"));
+            }
+
+            [Test]
+            [LoadScene(TestScenePath)]
+            public async Task FindByMatcherAsync_ObjectNotFound_ThrowsTimeoutException()
+            {
+                var scrollView = GameObject.Find("Vertical Scroll View");
+                var scrollRect = scrollView.GetComponent<ScrollRect>();
+                var paginator = new UguiScrollRectPaginator(scrollRect);
+                var matcher = new NameMatcher("NotExistingObject");
+
+                try
+                {
+                    await _sut.FindByMatcherAsync(matcher, paginator: paginator);
+                    Assert.Fail("Expected exception but was not thrown");
+                }
+                catch (TimeoutException e)
+                {
+                    Assert.That(e.Message, Does.EndWith("is not found."));
+                }
+            }
+
+            [Test]
+            [LoadScene(TestScenePath)]
+            public async Task FindByMatcherAsync_SomePageReturnsNotReachable_SavesReasonAndReturns()
+            {
+                var scrollView = GameObject.Find("Vertical Scroll View");
+                var scrollRect = scrollView.GetComponent<ScrollRect>();
+                var paginator = new UguiScrollRectPaginator(scrollRect);
+                var matcher = new NameMatcher("Vertical_Button_10");
+
+                // Turn off raycast target to make it unreachable
+                var targetButton = GameObject.Find("Vertical_Button_10");
+                targetButton.GetComponent<Image>().raycastTarget = false;
+                targetButton.GetComponentInChildren<Text>().raycastTarget = false;
+
+                try
+                {
+                    await _sut.FindByMatcherAsync(matcher, reachable: true, paginator: paginator);
+                    Assert.Fail("Expected exception but was not thrown");
+                }
+                catch (TimeoutException e)
+                {
+                    Assert.That(e.Message, Does.EndWith("is found, but not reachable."));
+                }
             }
         }
     }
