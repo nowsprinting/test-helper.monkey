@@ -14,8 +14,6 @@ namespace TestHelper.Monkey.Operators
     /// <summary>
     /// Click and hold operator for Unity UI (uGUI) components.
     /// a.k.a. touch and hold, long press.
-    /// <p/>
-    /// This operator receives <c>RaycastResult</c>, but passing <c>default</c> may be OK, depending on the component being operated on.
     /// </summary>
     public class UGUIClickAndHoldOperator : IClickAndHoldOperator
     {
@@ -52,6 +50,9 @@ namespace TestHelper.Monkey.Operators
         }
 
         /// <inheritdoc />
+        /// <remarks>
+        /// This method receives <c>RaycastResult</c>, but passing <c>default</c> may be OK, depending on the component being operated on.
+        /// </remarks>
         public async UniTask OperateAsync(GameObject gameObject, RaycastResult raycastResult,
             ILogger logger = null, ScreenshotOptions screenshotOptions = null,
             CancellationToken cancellationToken = default)

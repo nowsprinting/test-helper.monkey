@@ -23,7 +23,6 @@ namespace TestHelper.Monkey.Operators
 {
     /// <summary>
     /// Text input operator for Unity UI (uGUI) <c>InputField</c> component.
-    /// This operator does not require a <c>RaycastResult</c>.
     /// </summary>
     public class UGUITextInputOperator : ITextInputOperator
     {
@@ -62,6 +61,9 @@ namespace TestHelper.Monkey.Operators
         }
 
         /// <inheritdoc />
+        /// <remarks>
+        /// This method does not require a <c>RaycastResult</c>.
+        /// </remarks>
         [SuppressMessage("ReSharper", "UnusedParameter.Local")]
         public async UniTask OperateAsync(GameObject gameObject, RaycastResult _,
             ILogger logger = null, ScreenshotOptions screenshotOptions = null,
