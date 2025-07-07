@@ -192,7 +192,7 @@ namespace TestHelper.Monkey
         /// <param name="matcher"></param>
         /// <param name="reachable">Find only reachable object</param>
         /// <param name="interactable">Find only interactable object</param>
-        /// <param name="paginator">Paginator for searching <c>GameObject</c> on pageable components (e.g., Scroll View).</param>
+        /// <param name="paginator">Pagination controller for finding <c>GameObject</c> on pageable (or scrollable) UI components (e.g., Scroll view, Carousel, Paged dialog).</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Found <c>GameObject</c> and the frontmost raycast hit result will be set regardless of whether the event can be processed</returns>
         /// <exception cref="TimeoutException">Throws if <c>GameObject</c> is not found</exception>
@@ -252,7 +252,7 @@ namespace TestHelper.Monkey
         /// <param name="name">Find <c>GameObject</c> name</param>
         /// <param name="reachable">Find only reachable object</param>
         /// <param name="interactable">Find only interactable object</param>
-        /// <param name="paginator">Paginator for searching <c>GameObject</c> on pageable components (e.g., Scroll View).</param>
+        /// <param name="paginator">Pagination controller for finding <c>GameObject</c> on pageable (or scrollable) UI components (e.g., Scroll view, Carousel, Paged dialog).</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Found <c>GameObject</c> and the frontmost raycast hit result will be set regardless of whether the event can be processed</returns>
         /// <exception cref="TimeoutException">Throws if <c>GameObject</c> is not found</exception>
@@ -269,7 +269,7 @@ namespace TestHelper.Monkey
         /// <param name="path">Find <c>GameObject</c> hierarchy path separated by `/`. Can specify glob pattern</param>
         /// <param name="reachable">Find only reachable object</param>
         /// <param name="interactable">Find only interactable object</param>
-        /// <param name="paginator">Paginator for searching <c>GameObject</c> on pageable components (e.g., Scroll View).</param>
+        /// <param name="paginator">Pagination controller for finding <c>GameObject</c> on pageable (or scrollable) UI components (e.g., Scroll view, Carousel, Paged dialog).</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Found <c>GameObject</c> and the frontmost raycast hit result will be set regardless of whether the event can be processed</returns>
         /// <exception cref="TimeoutException">Throws if <c>GameObject</c> is not found</exception>

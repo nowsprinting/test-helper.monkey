@@ -7,8 +7,8 @@ using Cysharp.Threading.Tasks;
 namespace TestHelper.Monkey.Paginators
 {
     /// <summary>
-    /// Interface for controlling pageable UI components.
-    /// Provides intuitive pagination operations as page navigation functionality, enabling auxiliary operations during UI element exploration.
+    /// Interface for pagination controller for finding <c>GameObject</c> on pageable (or scrollable) UI components (e.g., Scroll view, Carousel, Paged dialog).
+    /// Provides intuitive pagination operations as page navigation functionality, enabling auxiliary operations in the <see cref="GameObjectFinder"/>.
     /// </summary>
     public interface IPaginator
     {
@@ -28,7 +28,7 @@ namespace TestHelper.Monkey.Paginators
         UniTask<bool> NextPageAsync(CancellationToken cancellationToken = default);
 
         /// <summary>
-        /// Get whether the next page exists
+        /// Get whether the next page exists.
         /// </summary>
         /// <returns>True if the next page exists, false if the end has been reached</returns>
         bool HasNextPage();

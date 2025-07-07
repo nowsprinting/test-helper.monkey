@@ -284,17 +284,17 @@ public class MyIntegrationTest
 ```
 
 
-#### Find GameObject in scrollable component
+#### Find GameObject in pageable component
 
-Find `GameObject` in scrollable components (e.g., `ScrollRect`) by using paginator functionality.
-A paginator provides step-by-step navigation through scrollable content, making it possible to find objects that are not currently visible in the viewport.
+Find a `GameObject` in pageable (or scrollable) UI components (e.g., `ScrollRect`, Carousel, Paged dialog) using the paginator.
+A paginator provides step-by-step navigation through pageable content, allowing users to find objects that are not currently visible in the viewport.
 
 Arguments:
 
 - **matcher**: Custom `IGameObjectMatcher` implementation
 - **reachable**: Find only reachable object. Default is true
 - **interactable**: Find only interactable object. Default is false
-- **paginator**: `IPaginator` implementation for controlling scrollable components
+- **paginator**: `IPaginator` implementation for controlling pageable components
 
 Built-in paginators:
 
