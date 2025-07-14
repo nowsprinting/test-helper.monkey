@@ -266,7 +266,7 @@ namespace TestHelper.Monkey
         /// <summary>
         /// Find <c>GameObject</c> by path (wait until they appear).
         /// </summary>
-        /// <param name="path">Find <c>GameObject</c> hierarchy path separated by `/`. Can specify glob pattern</param>
+        /// <param name="path">Find <c>GameObject</c> hierarchy path separated by `/`. Can specify wildcards of glob pattern (`?`, `*`, and `**`).</param>
         /// <param name="reachable">Find only reachable object</param>
         /// <param name="interactable">Find only interactable object</param>
         /// <param name="paginator">Pagination controller for finding <c>GameObject</c> on pageable (or scrollable) UI components (e.g., Scroll view, Carousel, Paged dialog).</param>
