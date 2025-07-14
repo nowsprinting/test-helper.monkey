@@ -16,7 +16,7 @@ namespace TestHelper.Monkey.GameObjectMatchers
         /// <summary>
         /// Constructor with hierarchy path.
         /// </summary>
-        /// <param name="path"><see cref="GameObject"/> hierarchy path separated by `/`. Can specify glob pattern</param>
+        /// <param name="path"><see cref="GameObject"/> hierarchy path separated by `/`. Can specify wildcards of glob pattern (`?`, `*`, and `**`).</param>
         /// <seealso href="https://en.wikipedia.org/wiki/Glob_(programming)"/>
         public PathMatcher(string path)
         {

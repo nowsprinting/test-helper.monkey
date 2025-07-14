@@ -175,7 +175,7 @@ Specify the world position where Monkey operators operate.
 
 ### Find and operate GameObject
 
-`GameObjectFinder` is a class that finds `GameObject` by name, path (can specify [glob](https://en.wikipedia.org/wiki/Glob_(programming)) pattern), or custom matcher.
+`GameObjectFinder` is a class that finds `GameObject` by name, path, or custom matcher.
 
 Constructor arguments:
 
@@ -222,7 +222,7 @@ If the timeout, a `TimeoutException` is thrown.
 
 Arguments:
 
-- **path**: Find `GameObject` hierarchy path separated by `/`. Can specify [glob](https://en.wikipedia.org/wiki/Glob_(programming)) pattern
+- **path**: Find `GameObject` hierarchy path separated by `/`. Can specify wildcards of [glob](https://en.wikipedia.org/wiki/Glob_(programming)) pattern (`?`, `*`, and `**`).
 - **reachable**: Find only reachable object. Default is true
 - **interactable**: Find only interactable object. Default is false
 

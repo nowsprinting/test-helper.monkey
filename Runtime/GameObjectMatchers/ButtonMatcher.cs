@@ -32,7 +32,7 @@ namespace TestHelper.Monkey.GameObjectMatchers
         /// </summary>
         /// <param name="componentType"><c>Button</c> component type. If omitted, <see cref="Button"/> is used.</param>
         /// <param name="name"><see cref="GameObject"/> name</param>
-        /// <param name="path"><see cref="GameObject"/> hierarchy path separated by `/`. Can specify glob pattern</param>
+        /// <param name="path"><see cref="GameObject"/> hierarchy path separated by `/`. Can specify wildcards of glob pattern (`?`, `*`, and `**`).</param>
         /// <param name="text">text under the <c>Button</c></param>
         /// <param name="texture">texture name under the <c>Button</c></param>
         /// <seealso href="https://en.wikipedia.org/wiki/Glob_(programming)"/>
