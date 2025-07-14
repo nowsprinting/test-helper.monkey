@@ -59,6 +59,12 @@ namespace TestHelper.Monkey.Extensions
                     case '\\':
                         regex.Append("\\\\");
                         break;
+                    case '(':
+                        regex.Append("\\(");
+                        break;
+                    case ')':
+                        regex.Append("\\)");
+                        break;
                     default:
                         regex.Append(c);
                         break;

@@ -63,5 +63,17 @@ namespace TestHelper.Monkey.Extensions
             var actual = grandchild.transform.MatchPath(glob);
             Assert.That(actual, Is.False);
         }
+
+        [TestCase("/Parent/Child/Grandchild (1)")]
+        [TestCase("/Parent/Child/Grandchild (?)")]
+        [TestCase("/Parent/Child/Grandchild*")]
+        public void MatchPath_WithParenthesis_Match(string glob)
+        {
+            var grandchild = CreateThreeGenerationObjects();
+            grandchild.name = $"{grandchild.name} (1)"; // Set name to include parenthesis
+
+            var actual = grandchild.transform.MatchPath(glob);
+            Assert.That(actual, Is.True);
+        }
     }
 }
